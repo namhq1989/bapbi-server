@@ -12,7 +12,7 @@ var Tables = struct {
 	User:      "user.users",
 	AuthToken: "auth.tokens",
 
-	HealthProfile:           "health-profiles",
-	HealthDrinkWaterProfile: "health-drinkWater-profiles",
-	HealthWaterIntakeLog:    "health-drinkWater-waterIntakeLogs",
+	HealthProfile:           "health.profiles",
+	HealthDrinkWaterProfile: "health.drinkWater.profiles",
+	HealthWaterIntakeLog:    "health.drinkWater.waterIntakeLogs",
 }
