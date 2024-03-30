@@ -56,10 +56,5 @@ func (r WaterIntakeLogRepository) CreateWaterIntakeLog(ctx *appcontext.AppContex
 	}
 
 	_, err = r.collection().InsertOne(ctx.Context(), &doc)
-	if err != nil {
-		ctx.Logger().Error("failed to insert water intake log", err, appcontext.Fields{"log": log})
-	}
-
-	// respond
 	return err
 }

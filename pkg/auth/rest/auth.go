@@ -59,7 +59,7 @@ func (s server) registerAuthRoutes() {
 		}
 
 		return httprespond.R200(c, resp)
-	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
+	}, func(next echo.HandlerFunc) echo.HandlerFunc {
 		return validation.ValidateHTTPQuery[dto.GetAccessTokenByUserIDRequest](next)
 	})
 

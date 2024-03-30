@@ -13,7 +13,7 @@ import (
 type Module struct{}
 
 func (Module) Name() string {
-	return "Auth"
+	return "AUTH"
 }
 
 func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error {

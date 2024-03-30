@@ -56,11 +56,6 @@ func (r DrinkWaterProfileRepository) CreateDrinkWaterProfile(ctx *appcontext.App
 	}
 
 	_, err = r.collection().InsertOne(ctx.Context(), &doc)
-	if err != nil {
-		ctx.Logger().Error("failed to insert drink water profile", err, appcontext.Fields{"profile": profile})
-	}
-
-	// respond
 	return err
 }
 
@@ -72,10 +67,5 @@ func (r DrinkWaterProfileRepository) UpdateDrinkWaterProfile(ctx *appcontext.App
 	}
 
 	_, err = r.collection().UpdateByID(ctx.Context(), doc.ID, bson.M{"$set": doc})
-	if err != nil {
-		ctx.Logger().Error("failed to update drink water profile", err, appcontext.Fields{"profile": profile})
-	}
-
-	// respond
 	return err
 }
