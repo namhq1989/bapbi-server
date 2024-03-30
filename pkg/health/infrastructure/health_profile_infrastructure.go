@@ -2,8 +2,11 @@ package infrastructure
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
+
+	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
 
 	"github.com/namhq1989/bapbi-server/internal/database"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
@@ -56,10 +59,26 @@ func (r HealthProfileRepository) CreateHealthProfile(ctx *appcontext.AppContext,
 	}
 
 	_, err = r.collection().InsertOne(ctx.Context(), &doc)
+	return err
+}
+
+func (r HealthProfileRepository) FindHealthProfileByUserID(ctx *appcontext.AppContext, userID string) (*domain.HealthProfile, error) {
+	uid, err := database.ObjectIDFromString(userID)
 	if err != nil {
-		ctx.Logger().Error("failed to insert health profile", err, appcontext.Fields{"profile": profile})
+		return nil, apperrors.Common.InvalidID
+	}
+
+	// find
+	var doc model.HealthProfile
+	if err = r.collection().FindOne(ctx.Context(), bson.M{
+		"userId": uid,
+	}).Decode(&doc); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, err
+	} else if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, nil
 	}
 
 	// respond
-	return err
+	result := doc.ToDomain()
+	return &result, nil
 }

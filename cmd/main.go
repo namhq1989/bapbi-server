@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/namhq1989/bapbi-server/pkg/health"
 	"time"
 
 	"github.com/namhq1989/bapbi-server/internal/caching"
@@ -66,6 +67,7 @@ func main() {
 	a.modules = []monolith.Module{
 		&auth.Module{},
 		&user.Module{},
+		&health.Module{},
 	}
 
 	// start
