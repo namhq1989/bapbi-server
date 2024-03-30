@@ -23,3 +23,13 @@ auth_not_allowed = "Not allowed"
 # user
 user_invalid_id = "Invalid user id"
 user_not_found = "User not found"
+
+# health
+health_invalid_height = "Invalid height"
+health_invalid_weight = "Invalid weight"
+health_invalid_bmi = "Invalid BMI"
+health_invalid_waking_hours = "Invalid wake up time or sleep time"
+health_invalid_intake_amount = "Invalid intake amount"
+health_invalid_daily_intake_amount = "Invalid daily intake amount"
+health_invalid_hourly_intake_amount = "Invalid hourly intake amount"
+health_invalid_streak = "Invalid streak"

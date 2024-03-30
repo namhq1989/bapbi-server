@@ -22,3 +22,13 @@ auth_not_allowed = "Không được phép"
 # user
 user_invalid_id = "ID người dùng không hợp lệ"
 user_not_found = "Không tìm thấy người dùng"
+
+# health
+health_invalid_height = "Chiều cao không hợp lệ"
+health_invalid_weight = "Cân nặng không hợp lệ"
+health_invalid_bmi = "BMI không hợp lệ"
+health_invalid_waking_hours = "Giờ thức dậy hoặc giờ đi ngủ không hợp lệ"
+health_invalid_intake_amount = "Lượng nước uống không hợp lệ"
+health_invalid_daily_intake_amount = "Lượng nước uống hàng ngày không hợp lệ"
+health_invalid_hourly_intake_amount = "Lượng nước uống hàng giờ không hợp lệ"
+health_invalid_streak = "Giá trị chuỗi không hợp lệ"
