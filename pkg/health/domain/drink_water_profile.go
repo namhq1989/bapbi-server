@@ -34,7 +34,7 @@ func NewDrinkWaterProfile(userID string, dailyIntakeAmount int, hourlyIntakeAmou
 	}
 
 	if hourlyIntakeAmount == 0 {
-		return nil, apperrors.Health.InvalidDailyIntakeAmount
+		return nil, apperrors.Health.InvalidHourlyIntakeAmount
 	}
 
 	return &DrinkWaterProfile{
