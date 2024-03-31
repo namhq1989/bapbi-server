@@ -15,4 +15,5 @@ type SSOGoogle struct {
 type SSOGoogleUser struct {
 	ID    string
 	Email string
+	Name  string
 }

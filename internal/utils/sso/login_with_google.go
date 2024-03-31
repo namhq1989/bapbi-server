@@ -20,7 +20,7 @@ type GoogleUserData struct {
 	Avatar string `json:"picture"`
 }
 
-func LoginWithGoogle(ctx *appcontext.AppContext, clientID, token string) (*GoogleUserData, error) {
+func GetUserDataWithGoogleToken(ctx *appcontext.AppContext, clientID, token string) (*GoogleUserData, error) {
 	// call api
 	url := fmt.Sprintf(googleTokenInfoURL, token)
 	resp, err := http.Get(fmt.Sprintf(googleTokenInfoURL, token))

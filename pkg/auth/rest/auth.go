@@ -9,22 +9,38 @@ import (
 )
 
 func (s server) registerAuthRoutes() {
-	g := s.echo.Group("api/auth")
+	g := s.echo.Group("/api/auth")
 
-	g.POST("/login-with-google", func(c echo.Context) error {
+	g.POST("/signin-with-google", func(c echo.Context) error {
 		var (
 			ctx = c.Get("ctx").(*appcontext.AppContext)
-			req = c.Get("req").(dto.LoginWithGoogleRequest)
+			req = c.Get("req").(dto.SignInWithGoogleRequest)
 		)
 
-		resp, err := s.app.LoginWithGoogle(ctx, req)
+		resp, err := s.app.SignInWithGoogle(ctx, req)
 		if err != nil {
 			return httprespond.R400(c, err, nil)
 		}
 
 		return httprespond.R200(c, resp)
 	}, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPBody[dto.LoginWithGoogleRequest](next)
+		return validation.ValidateHTTPBody[dto.SignInWithGoogleRequest](next)
+	})
+
+	g.POST("/signup-with-google", func(c echo.Context) error {
+		var (
+			ctx = c.Get("ctx").(*appcontext.AppContext)
+			req = c.Get("req").(dto.SignUpWithGoogleRequest)
+		)
+
+		resp, err := s.app.SignUpWithGoogle(ctx, req)
+		if err != nil {
+			return httprespond.R400(c, err, nil)
+		}
+
+		return httprespond.R200(c, resp)
+	}, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return validation.ValidateHTTPBody[dto.SignUpWithGoogleRequest](next)
 	})
 
 	g.POST("/refresh-access-token", func(c echo.Context) error {

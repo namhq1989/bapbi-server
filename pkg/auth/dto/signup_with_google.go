@@ -1,10 +1,10 @@
 package dto
 
-type LoginWithGoogleRequest struct {
+type SignUpWithGoogleRequest struct {
 	Token string `json:"token" validate:"required" message:"auth_invalid_google_token"`
 }
 
-type LoginWithGoogleResponse struct {
+type SignUpWithGoogleResponse struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
 }

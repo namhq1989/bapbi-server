@@ -31,7 +31,7 @@ func CreateUser(name, email string) (*User, error) {
 		ID:        "",
 		Name:      name,
 		Email:     email,
-		Status:    UserStatusInactive,
+		Status:    UserStatusActive,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}, nil

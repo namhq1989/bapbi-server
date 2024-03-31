@@ -26,6 +26,9 @@ func (r UserHub) GetOneByEmail(ctx *appcontext.AppContext, email string) (*domai
 	}
 
 	user := resp.GetUser()
+	if user == nil {
+		return nil, nil
+	}
 	return &domain.User{
 		ID:    user.GetId(),
 		Name:  user.GetName(),
@@ -43,9 +46,25 @@ func (r UserHub) GetOneByID(ctx *appcontext.AppContext, id string) (*domain.User
 	}
 
 	user := resp.GetUser()
+	if user == nil {
+		return nil, nil
+	}
 	return &domain.User{
 		ID:    user.GetId(),
 		Name:  user.GetName(),
 		Email: user.GetEmail(),
 	}, nil
+}
+
+func (r UserHub) CreateUser(ctx *appcontext.AppContext, user domain.User) (string, error) {
+	resp, err := r.client.CreateUser(ctx.Context(), &userpb.CreateUserRequest{
+		Name:  user.Name,
+		Email: user.Email,
+	})
+	if err != nil {
+		ctx.Logger().Error("failed to create user", err, appcontext.Fields{"user": user})
+		return "", err
+	}
+
+	return resp.GetId(), nil
 }

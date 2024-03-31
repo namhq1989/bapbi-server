@@ -22,6 +22,10 @@ func (h GetUserByEmailHandler) GetUserByEmail(ctx *appcontext.AppContext, req *u
 		return nil, err
 	}
 
+	if user == nil {
+		return &userpb.GetUserByEmailResponse{User: nil}, nil
+	}
+
 	return &userpb.GetUserByEmailResponse{
 		User: &userpb.User{
 			Id:    user.ID,

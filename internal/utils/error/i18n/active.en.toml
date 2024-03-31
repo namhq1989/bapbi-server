@@ -24,6 +24,7 @@ auth_not_allowed = "Not allowed"
 # user
 user_invalid_id = "Invalid user id"
 user_not_found = "User not found"
+user_google_email_already_registered = "Google email already registered"
 
 # health
 health_invalid_height = "Invalid height"

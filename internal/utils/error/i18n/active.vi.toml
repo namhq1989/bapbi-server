@@ -23,6 +23,7 @@ auth_not_allowed = "Không được phép"
 # user
 user_invalid_id = "ID người dùng không hợp lệ"
 user_not_found = "Không tìm thấy người dùng"
+user_google_email_already_registered = "Email Google này đã được đăng ký trước đây"
 
 # health
 health_invalid_height = "Chiều cao không hợp lệ"
