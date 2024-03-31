@@ -19,8 +19,8 @@ func NewSSORepository(googleClientID, googleClientSecret string) SSORepository {
 }
 
 func (r SSORepository) GetUserDataWithGoogleToken(ctx *appcontext.AppContext, token string) (*domain.SSOGoogleUser, error) {
-	// login with Google
-	googleUser, err := sso.LoginWithGoogle(ctx, r.googleClientID, token)
+	// get Google user data from token
+	googleUser, err := sso.GetUserDataWithGoogleToken(ctx, r.googleClientID, token)
 	if err != nil {
 		return nil, err
 	}
@@ -28,5 +28,6 @@ func (r SSORepository) GetUserDataWithGoogleToken(ctx *appcontext.AppContext, to
 	return &domain.SSOGoogleUser{
 		ID:    googleUser.ID,
 		Email: googleUser.Email,
+		Name:  googleUser.Name,
 	}, nil
 }

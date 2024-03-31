@@ -37,8 +37,7 @@ func (r UserHub) FindOneByID(ctx *appcontext.AppContext, id string) (*domain.Use
 	// find
 	var doc model.User
 	if err = r.collection().FindOne(ctx.Context(), bson.M{
-		"_id":    oid,
-		"status": domain.UserStatusActive.String(),
+		"_id": oid,
 	}).Decode(&doc); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
 		ctx.Logger().Error("failed to find user by id", err, appcontext.Fields{"id": id})
 		return nil, err
@@ -55,8 +54,7 @@ func (r UserHub) FindOneByEmail(ctx *appcontext.AppContext, email string) (*doma
 	// find
 	var doc model.User
 	if err := r.collection().FindOne(ctx.Context(), bson.M{
-		"email":  email,
-		"status": domain.UserStatusActive.String(),
+		"email": email,
 	}).Decode(&doc); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
 		ctx.Logger().Error("failed to find user by email", err, appcontext.Fields{"email": email})
 		return nil, err

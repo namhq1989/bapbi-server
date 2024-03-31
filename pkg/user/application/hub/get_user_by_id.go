@@ -22,6 +22,10 @@ func (h GetUserByIDHandler) GetUserByID(ctx *appcontext.AppContext, req *userpb.
 		return nil, err
 	}
 
+	if user == nil {
+		return &userpb.GetUserByIDResponse{User: nil}, nil
+	}
+
 	return &userpb.GetUserByIDResponse{
 		User: &userpb.User{
 			Id:    user.ID,
