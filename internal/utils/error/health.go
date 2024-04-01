@@ -4,6 +4,7 @@ import "errors"
 
 var Health = struct {
 	HealthProfileNotFound     error
+	DrinkWaterProfileNotFound error
 	InvalidHeight             error
 	InvalidWeight             error
 	InvalidBMI                error
@@ -14,6 +15,7 @@ var Health = struct {
 	InvalidStreak             error
 }{
 	HealthProfileNotFound:     errors.New("health_profile_not_found"),
+	DrinkWaterProfileNotFound: errors.New("health_drink_water_profile_not_found"),
 	InvalidHeight:             errors.New("health_invalid_height"),
 	InvalidWeight:             errors.New("health_invalid_weight"),
 	InvalidBMI:                errors.New("health_invalid_bmi"),
