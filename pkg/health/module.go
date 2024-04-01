@@ -18,10 +18,11 @@ func (Module) Name() string {
 func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error {
 	var (
 		// infrastructure
-		healthProfileRepository     = infrastructure.NewHealthProfileRepository(mono.Mongo())
-		drinkWaterProfileRepository = infrastructure.NewDrinkWaterProfileRepository(mono.Mongo())
-		waterIntakeLogRepository    = infrastructure.NewWaterIntakeLogRepository(mono.Mongo())
-		queueRepository             = infrastructure.NewQueueRepository(mono.Queue())
+		healthProfileRepository        = infrastructure.NewHealthProfileRepository(mono.Mongo())
+		drinkWaterProfileRepository    = infrastructure.NewDrinkWaterProfileRepository(mono.Mongo())
+		waterIntakeLogRepository       = infrastructure.NewWaterIntakeLogRepository(mono.Mongo())
+		dailyHydrationReportRepository = infrastructure.NewDailyHydrationReportRepository(mono.Mongo())
+		queueRepository                = infrastructure.NewQueueRepository(mono.Queue())
 
 		// application
 		app = application.New(healthProfileRepository, drinkWaterProfileRepository, waterIntakeLogRepository, queueRepository)
@@ -33,7 +34,7 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 	}
 
 	// workers
-	w := workers.New(mono.Queue())
+	w := workers.New(mono.Queue(), drinkWaterProfileRepository, dailyHydrationReportRepository)
 	w.Start()
 
 	return nil

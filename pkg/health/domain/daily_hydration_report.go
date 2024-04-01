@@ -1,10 +1,17 @@
 package domain
 
 import (
+	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	"time"
 
 	"github.com/namhq1989/bapbi-server/internal/database"
 )
+
+type DailyHydrationReportRepository interface {
+	FindDailyHydrationReportByUserID(ctx *appcontext.AppContext, userID string, date time.Time) (*DailyHydrationReport, error)
+	CreateDailyHydrationReport(ctx *appcontext.AppContext, report DailyHydrationReport) error
+	UpdateDailyHydrationReport(ctx *appcontext.AppContext, report DailyHydrationReport) error
+}
 
 type DailyHydrationReport struct {
 	ID           string
@@ -16,16 +23,23 @@ type DailyHydrationReport struct {
 	Date         time.Time
 }
 
-func NewDailyHydrationReport(userID string, goalAmount, intakeAmount, intakeTimes int, date time.Time) (*DailyHydrationReport, error) {
+func NewDailyHydrationReport(userID string, goalAmount, intakeAmount int, date time.Time) (*DailyHydrationReport, error) {
 	report := &DailyHydrationReport{
 		ID:           database.NewStringID(),
 		UserID:       userID,
 		GoalAmount:   goalAmount,
 		IntakeAmount: intakeAmount,
-		IntakeTimes:  intakeTimes,
+		IntakeTimes:  1,
 		IsAchieved:   intakeAmount >= goalAmount,
 		Date:         date,
 	}
 
 	return report, nil
+}
+
+func (d *DailyHydrationReport) AddIntakeAmount(intakeAmount int) error {
+	d.IntakeAmount += intakeAmount
+	d.IntakeTimes += 1
+	d.IsAchieved = d.IntakeAmount >= d.GoalAmount
+	return nil
 }

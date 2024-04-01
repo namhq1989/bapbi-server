@@ -6,12 +6,16 @@ import (
 )
 
 type Workers struct {
-	queue *queue.Queue
+	queue                          *queue.Queue
+	drinkWaterProfileRepository    domain.DrinkWaterProfileRepository
+	dailyHydrationReportRepository domain.DailyHydrationReportRepository
 }
 
-func New(queue *queue.Queue) Workers {
+func New(queue *queue.Queue, drinkWaterProfileRepository domain.DrinkWaterProfileRepository, dailyHydrationReportRepository domain.DailyHydrationReportRepository) Workers {
 	return Workers{
-		queue: queue,
+		queue:                          queue,
+		drinkWaterProfileRepository:    drinkWaterProfileRepository,
+		dailyHydrationReportRepository: dailyHydrationReportRepository,
 	}
 }
 
