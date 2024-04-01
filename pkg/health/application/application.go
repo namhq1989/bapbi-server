@@ -11,6 +11,7 @@ type (
 	Commands interface {
 		CreateHealthProfile(ctx *appcontext.AppContext, performerID string, req dto.CreateHealthProfileRequest) (*dto.CreateHealthProfileResponse, error)
 		EnableDrinkWaterProfile(ctx *appcontext.AppContext, performerID string, req dto.EnableDrinkWaterProfileRequest) (*dto.EnableDrinkWaterProfileResponse, error)
+		DisableDrinkWaterProfile(ctx *appcontext.AppContext, performerID string, _ dto.DisableDrinkWaterProfileRequest) (*dto.DisableDrinkWaterProfileResponse, error)
 	}
 	Queries interface {
 	}
@@ -24,6 +25,7 @@ type (
 	appCommandHandlers struct {
 		command.CreateHealthProfileHandler
 		command.EnableDrinkWaterProfileHandler
+		command.DisableDrinkWaterProfileHandler
 	}
 	appQueryHandler struct {
 	}
@@ -43,8 +45,9 @@ func New(
 ) *Application {
 	return &Application{
 		appCommandHandlers: appCommandHandlers{
-			CreateHealthProfileHandler:     command.NewCreateHealthProfileHandler(healthProfileRepository),
-			EnableDrinkWaterProfileHandler: command.NewEnableDrinkWaterProfileHandler(healthProfileRepository, drinkWaterProfileRepository),
+			CreateHealthProfileHandler:      command.NewCreateHealthProfileHandler(healthProfileRepository),
+			EnableDrinkWaterProfileHandler:  command.NewEnableDrinkWaterProfileHandler(healthProfileRepository, drinkWaterProfileRepository),
+			DisableDrinkWaterProfileHandler: command.NewDisableDrinkWaterProfileHandler(healthProfileRepository, drinkWaterProfileRepository),
 		},
 		appQueryHandler: appQueryHandler{},
 		appHubHandler:   appHubHandler{},
