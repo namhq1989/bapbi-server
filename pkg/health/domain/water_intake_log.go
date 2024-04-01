@@ -1,8 +1,9 @@
 package domain
 
 import (
-	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	"time"
+
+	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 
 	"github.com/namhq1989/bapbi-server/internal/database"
 	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
