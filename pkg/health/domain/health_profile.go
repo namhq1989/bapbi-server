@@ -111,3 +111,13 @@ func (d *HealthProfile) SetWakingTimes(wakeUpHour int, bedtimeHour int) error {
 func (d *HealthProfile) SetUpdatedAt() {
 	d.UpdatedAt = time.Now()
 }
+
+const waterMlPerKg = 40
+
+func (d *HealthProfile) GetDailyAndHourlyIntakeAmount() (int, int) {
+	wakingHours := d.BedtimeHour - d.WakeUpHour
+	dailyAmount := d.WeightInKg * waterMlPerKg
+	hourlyAmount := dailyAmount / wakingHours
+
+	return dailyAmount, hourlyAmount
+}

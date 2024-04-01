@@ -10,6 +10,7 @@ import (
 )
 
 type DrinkWaterProfileRepository interface {
+	FindDrinkWaterProfileByUserID(ctx *appcontext.AppContext, userID string) (*DrinkWaterProfile, error)
 	CreateDrinkWaterProfile(ctx *appcontext.AppContext, profile DrinkWaterProfile) error
 	UpdateDrinkWaterProfile(ctx *appcontext.AppContext, profile DrinkWaterProfile) error
 }
@@ -25,7 +26,8 @@ type DrinkWaterProfile struct {
 	LongestSuccessStreakAt    time.Time
 	HighestIntakeAmountValue  int
 	HighestIntakeAmountAt     time.Time
-	EnableAt                  time.Time
+	EnabledAt                 time.Time
+	DisabledAt                time.Time
 }
 
 func NewDrinkWaterProfile(userID string, dailyIntakeAmount int, hourlyIntakeAmount int) (*DrinkWaterProfile, error) {
@@ -48,18 +50,20 @@ func NewDrinkWaterProfile(userID string, dailyIntakeAmount int, hourlyIntakeAmou
 		LongestSuccessStreakAt:    time.Time{},
 		HighestIntakeAmountValue:  0,
 		HighestIntakeAmountAt:     time.Time{},
-		EnableAt:                  time.Now(),
+		EnabledAt:                 time.Now(),
+		DisabledAt:                time.Time{},
 	}, nil
 }
 
 func (d *DrinkWaterProfile) Enable() error {
 	d.IsEnabled = true
-	d.EnableAt = time.Now()
+	d.EnabledAt = time.Now()
 	return nil
 }
 
 func (d *DrinkWaterProfile) Disable() error {
 	d.IsEnabled = false
+	d.DisabledAt = time.Now()
 	return nil
 }
 

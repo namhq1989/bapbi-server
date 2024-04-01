@@ -17,10 +17,11 @@ func (Module) Name() string {
 func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error {
 	var (
 		// infrastructure
-		healthProfileRepository = infrastructure.NewHealthProfileRepository(mono.Mongo())
+		healthProfileRepository     = infrastructure.NewHealthProfileRepository(mono.Mongo())
+		drinkWaterProfileRepository = infrastructure.NewDrinkWaterProfileRepository(mono.Mongo())
 
 		// application
-		app = application.New(healthProfileRepository)
+		app = application.New(healthProfileRepository, drinkWaterProfileRepository)
 	)
 
 	// rest server

@@ -10,6 +10,7 @@ import (
 type (
 	Commands interface {
 		CreateHealthProfile(ctx *appcontext.AppContext, performerID string, req dto.CreateHealthProfileRequest) (*dto.CreateHealthProfileResponse, error)
+		EnableDrinkWaterProfile(ctx *appcontext.AppContext, performerID string, req dto.EnableDrinkWaterProfileRequest) (*dto.EnableDrinkWaterProfileResponse, error)
 	}
 	Queries interface {
 	}
@@ -22,6 +23,7 @@ type (
 
 	appCommandHandlers struct {
 		command.CreateHealthProfileHandler
+		command.EnableDrinkWaterProfileHandler
 	}
 	appQueryHandler struct {
 	}
@@ -37,10 +39,12 @@ var _ App = (*Application)(nil)
 
 func New(
 	healthProfileRepository domain.HealthProfileRepository,
+	drinkWaterProfileRepository domain.DrinkWaterProfileRepository,
 ) *Application {
 	return &Application{
 		appCommandHandlers: appCommandHandlers{
-			CreateHealthProfileHandler: command.NewCreateHealthProfileHandler(healthProfileRepository),
+			CreateHealthProfileHandler:     command.NewCreateHealthProfileHandler(healthProfileRepository),
+			EnableDrinkWaterProfileHandler: command.NewEnableDrinkWaterProfileHandler(healthProfileRepository, drinkWaterProfileRepository),
 		},
 		appQueryHandler: appQueryHandler{},
 		appHubHandler:   appHubHandler{},
