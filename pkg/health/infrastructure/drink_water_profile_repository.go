@@ -2,7 +2,9 @@ package infrastructure
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
 	"time"
 
 	"github.com/namhq1989/bapbi-server/internal/database"
@@ -46,6 +48,27 @@ func (r DrinkWaterProfileRepository) ensureIndexes() {
 
 func (r DrinkWaterProfileRepository) collection() *mongo.Collection {
 	return r.db.Collection(r.collectionName)
+}
+
+func (r DrinkWaterProfileRepository) FindDrinkWaterProfileByUserID(ctx *appcontext.AppContext, userID string) (*domain.DrinkWaterProfile, error) {
+	uid, err := database.ObjectIDFromString(userID)
+	if err != nil {
+		return nil, apperrors.Common.InvalidID
+	}
+
+	// find
+	var doc model.DrinkWaterProfile
+	if err = r.collection().FindOne(ctx.Context(), bson.M{
+		"userId": uid,
+	}).Decode(&doc); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, err
+	} else if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, nil
+	}
+
+	// respond
+	result := doc.ToDomain()
+	return &result, nil
 }
 
 func (r DrinkWaterProfileRepository) CreateDrinkWaterProfile(ctx *appcontext.AppContext, profile domain.DrinkWaterProfile) error {

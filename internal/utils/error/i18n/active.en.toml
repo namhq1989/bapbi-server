@@ -27,6 +27,7 @@ user_not_found = "User not found"
 user_google_email_already_registered = "Google email already registered"
 
 # health
+health_profile_not_found = "Please setup your health profile before using this feature"
 health_invalid_height = "Invalid height"
 health_invalid_weight = "Invalid weight"
 health_invalid_bmi = "Invalid BMI"

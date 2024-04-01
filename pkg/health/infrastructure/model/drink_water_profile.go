@@ -20,7 +20,8 @@ type DrinkWaterProfile struct {
 	LongestSuccessStreakAt    time.Time          `bson:"longestSuccessStreakAt"`
 	HighestIntakeAmountValue  int                `bson:"highestIntakeAmountValue"`
 	HighestIntakeAmountAt     time.Time          `bson:"highestIntakeAmountAt"`
-	EnableAt                  time.Time          `bson:"enableAt"`
+	EnabledAt                 time.Time          `bson:"enabledAt"`
+	DisabledAt                time.Time          `bson:"disabledAt"`
 }
 
 func (m DrinkWaterProfile) ToDomain() domain.DrinkWaterProfile {
@@ -35,7 +36,8 @@ func (m DrinkWaterProfile) ToDomain() domain.DrinkWaterProfile {
 		LongestSuccessStreakAt:    m.LongestSuccessStreakAt,
 		HighestIntakeAmountValue:  m.HighestIntakeAmountValue,
 		HighestIntakeAmountAt:     m.HighestIntakeAmountAt,
-		EnableAt:                  m.EnableAt,
+		EnabledAt:                 m.EnabledAt,
+		DisabledAt:                m.DisabledAt,
 	}
 }
 
@@ -61,6 +63,7 @@ func (m DrinkWaterProfile) FromDomain(profile domain.DrinkWaterProfile) (*DrinkW
 		LongestSuccessStreakAt:    profile.LongestSuccessStreakAt,
 		HighestIntakeAmountValue:  profile.HighestIntakeAmountValue,
 		HighestIntakeAmountAt:     profile.HighestIntakeAmountAt,
-		EnableAt:                  profile.EnableAt,
+		EnabledAt:                 profile.EnabledAt,
+		DisabledAt:                profile.DisabledAt,
 	}, nil
 }

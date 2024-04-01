@@ -21,6 +21,7 @@ func RegisterServer(_ *appcontext.AppContext, app application.App, e *echo.Echo,
 	}
 
 	s.registerHealthProfileRoutes()
+	s.registerDrinkWaterRoutes()
 
 	return nil
 }

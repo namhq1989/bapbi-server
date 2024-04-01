@@ -3,6 +3,7 @@ package httprespond
 import (
 	"errors"
 	"net/http"
+	"reflect"
 
 	"golang.org/x/text/language"
 
@@ -11,13 +12,21 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func isDataNil(data interface{}) bool {
+	if data == nil {
+		return true
+	}
+	v := reflect.ValueOf(data)
+	return v.Kind() == reflect.Ptr && v.IsNil()
+}
+
 func sendResponse(c echo.Context, httpCode int, err error, data interface{}) error {
 	lang := c.Get("lang").(string)
 	if lang == "" {
 		lang = language.English.String()
 	}
 
-	if data == nil {
+	if isDataNil(data) {
 		data = echo.Map{}
 	}
 
