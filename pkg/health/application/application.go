@@ -11,8 +11,8 @@ type (
 	Commands interface {
 		CreateHealthProfile(ctx *appcontext.AppContext, performerID string, req dto.CreateHealthProfileRequest) (*dto.CreateHealthProfileResponse, error)
 
-		EnableDrinkWaterProfile(ctx *appcontext.AppContext, performerID string, req dto.EnableDrinkWaterProfileRequest) (*dto.EnableDrinkWaterProfileResponse, error)
-		DisableDrinkWaterProfile(ctx *appcontext.AppContext, performerID string, _ dto.DisableDrinkWaterProfileRequest) (*dto.DisableDrinkWaterProfileResponse, error)
+		EnableHydrationProfile(ctx *appcontext.AppContext, performerID string, _ dto.EnableHydrationProfileRequest) (*dto.EnableHydrationProfileResponse, error)
+		DisableHydrationProfile(ctx *appcontext.AppContext, performerID string, _ dto.DisableHydrationProfileRequest) (*dto.DisableHydrationProfileResponse, error)
 		WaterIntake(ctx *appcontext.AppContext, performerID string, req dto.WaterIntakeRequest) (*dto.WaterIntakeResponse, error)
 	}
 	Queries interface {
@@ -27,8 +27,8 @@ type (
 	appCommandHandlers struct {
 		command.CreateHealthProfileHandler
 
-		command.EnableDrinkWaterProfileHandler
-		command.DisableDrinkWaterProfileHandler
+		command.EnableHydrationProfileHandler
+		command.DisableHydrationProfileHandler
 		command.WaterIntakeHandler
 	}
 	appQueryHandler struct {
@@ -45,7 +45,7 @@ var _ App = (*Application)(nil)
 
 func New(
 	healthProfileRepository domain.HealthProfileRepository,
-	drinkWaterProfileRepository domain.DrinkWaterProfileRepository,
+	hydrationProfileRepository domain.HydrationProfileRepository,
 	waterIntakeLogRepository domain.WaterIntakeLogRepository,
 	queueRepository domain.QueueRepository,
 ) *Application {
@@ -53,9 +53,9 @@ func New(
 		appCommandHandlers: appCommandHandlers{
 			CreateHealthProfileHandler: command.NewCreateHealthProfileHandler(healthProfileRepository),
 
-			EnableDrinkWaterProfileHandler:  command.NewEnableDrinkWaterProfileHandler(healthProfileRepository, drinkWaterProfileRepository),
-			DisableDrinkWaterProfileHandler: command.NewDisableDrinkWaterProfileHandler(healthProfileRepository, drinkWaterProfileRepository),
-			WaterIntakeHandler:              command.NewWaterIntakeHandler(drinkWaterProfileRepository, waterIntakeLogRepository, queueRepository),
+			EnableHydrationProfileHandler:  command.NewEnableHydrationProfileHandler(healthProfileRepository, hydrationProfileRepository),
+			DisableHydrationProfileHandler: command.NewDisableHydrationProfileHandler(healthProfileRepository, hydrationProfileRepository),
+			WaterIntakeHandler:             command.NewWaterIntakeHandler(hydrationProfileRepository, waterIntakeLogRepository, queueRepository),
 		},
 		appQueryHandler: appQueryHandler{},
 		appHubHandler:   appHubHandler{},

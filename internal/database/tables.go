@@ -6,15 +6,15 @@ var Tables = struct {
 
 	// health
 	HealthProfile              string
-	HealthDrinkWaterProfile    string
+	HealthHydrationProfile     string
 	HealthWaterIntakeLog       string
-	HealthDailyHydrationReport string
+	HealthHydrationDailyReport string
 }{
 	User:      "user.users",
 	AuthToken: "auth.tokens",
 
 	HealthProfile:              "health.profiles",
-	HealthDrinkWaterProfile:    "health.drinkWater.profiles",
-	HealthWaterIntakeLog:       "health.drinkWater.waterIntakeLogs",
-	HealthDailyHydrationReport: "health.drinkWater.dailyHydrationReports",
+	HealthHydrationProfile:     "health.hydration.profiles",
+	HealthWaterIntakeLog:       "health.hydration.waterIntakeLogs",
+	HealthHydrationDailyReport: "health.hydration.dailyReports",
 }

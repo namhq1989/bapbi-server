@@ -27,7 +27,7 @@ user_google_email_already_registered = "Email Google này đã được đăng k
 
 # health
 health_profile_not_found = "Vui lòng cài đặt hồ sơ sức khỏe trước khi sử dụng tính năng này"
-health_drink_water_profile_not_found = "Vui lòng cài đặt lịch nhắc nhở uống nước trước khi sử dụng tính năng này"
+health_hydration_profile_not_found = "Vui lòng cài đặt lịch nhắc nhở uống nước trước khi sử dụng tính năng này"
 health_invalid_height = "Chiều cao không hợp lệ"
 health_invalid_weight = "Cân nặng không hợp lệ"
 health_invalid_bmi = "BMI không hợp lệ"

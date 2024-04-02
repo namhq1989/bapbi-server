@@ -17,21 +17,21 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type DailyHydrationReportRepository struct {
+type HydrationDailyReportRepository struct {
 	db             *mongo.Database
 	collectionName string
 }
 
-func NewDailyHydrationReportRepository(db *mongo.Database) DailyHydrationReportRepository {
-	r := DailyHydrationReportRepository{
+func NewHydrationDailyReportRepository(db *mongo.Database) HydrationDailyReportRepository {
+	r := HydrationDailyReportRepository{
 		db:             db,
-		collectionName: database.Tables.HealthDailyHydrationReport,
+		collectionName: database.Tables.HealthHydrationDailyReport,
 	}
 	r.ensureIndexes()
 	return r
 }
 
-func (r DailyHydrationReportRepository) ensureIndexes() {
+func (r HydrationDailyReportRepository) ensureIndexes() {
 	var (
 		ctx     = context.Background()
 		opts    = options.CreateIndexes().SetMaxTime(time.Minute * 30)
@@ -47,18 +47,18 @@ func (r DailyHydrationReportRepository) ensureIndexes() {
 	}
 }
 
-func (r DailyHydrationReportRepository) collection() *mongo.Collection {
+func (r HydrationDailyReportRepository) collection() *mongo.Collection {
 	return r.db.Collection(r.collectionName)
 }
 
-func (r DailyHydrationReportRepository) FindDailyHydrationReportByUserID(ctx *appcontext.AppContext, userID string, date time.Time) (*domain.DailyHydrationReport, error) {
+func (r HydrationDailyReportRepository) FindHydrationDailyReportByUserID(ctx *appcontext.AppContext, userID string, date time.Time) (*domain.HydrationDailyReport, error) {
 	uid, err := database.ObjectIDFromString(userID)
 	if err != nil {
 		return nil, apperrors.Common.InvalidID
 	}
 
 	// find
-	var doc model.DailyHydrationReport
+	var doc model.HydrationDailyReport
 	if err = r.collection().FindOne(ctx.Context(), bson.M{
 		"userId": uid,
 		"date":   date,
@@ -73,9 +73,9 @@ func (r DailyHydrationReportRepository) FindDailyHydrationReportByUserID(ctx *ap
 	return &result, nil
 }
 
-func (r DailyHydrationReportRepository) CreateDailyHydrationReport(ctx *appcontext.AppContext, report domain.DailyHydrationReport) error {
+func (r HydrationDailyReportRepository) CreateHydrationDailyReport(ctx *appcontext.AppContext, report domain.HydrationDailyReport) error {
 	// convert to mongodb model
-	doc, err := model.DailyHydrationReport{}.FromDomain(report)
+	doc, err := model.HydrationDailyReport{}.FromDomain(report)
 	if err != nil {
 		return err
 	}
@@ -84,9 +84,9 @@ func (r DailyHydrationReportRepository) CreateDailyHydrationReport(ctx *appconte
 	return err
 }
 
-func (r DailyHydrationReportRepository) UpdateDailyHydrationReport(ctx *appcontext.AppContext, report domain.DailyHydrationReport) error {
+func (r HydrationDailyReportRepository) UpdateHydrationDailyReport(ctx *appcontext.AppContext, report domain.HydrationDailyReport) error {
 	// convert to mongodb model
-	doc, err := model.DailyHydrationReport{}.FromDomain(report)
+	doc, err := model.HydrationDailyReport{}.FromDomain(report)
 	if err != nil {
 		return err
 	}

@@ -7,15 +7,19 @@ import (
 
 type Workers struct {
 	queue                          *queue.Queue
-	drinkWaterProfileRepository    domain.DrinkWaterProfileRepository
-	dailyHydrationReportRepository domain.DailyHydrationReportRepository
+	hydrationProfileRepository     domain.HydrationProfileRepository
+	hydrationDailyReportRepository domain.HydrationDailyReportRepository
 }
 
-func New(queue *queue.Queue, drinkWaterProfileRepository domain.DrinkWaterProfileRepository, dailyHydrationReportRepository domain.DailyHydrationReportRepository) Workers {
+func New(
+	queue *queue.Queue,
+	hydrationProfileRepository domain.HydrationProfileRepository,
+	hydrationDailyReportRepository domain.HydrationDailyReportRepository,
+) Workers {
 	return Workers{
 		queue:                          queue,
-		drinkWaterProfileRepository:    drinkWaterProfileRepository,
-		dailyHydrationReportRepository: dailyHydrationReportRepository,
+		hydrationProfileRepository:     hydrationProfileRepository,
+		hydrationDailyReportRepository: hydrationDailyReportRepository,
 	}
 }
 

@@ -9,13 +9,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type DrinkWaterProfile struct {
+type HydrationProfile struct {
 	ID                        primitive.ObjectID `bson:"_id"`
 	UserID                    primitive.ObjectID `bson:"userId"`
 	IsEnabled                 bool               `bson:"isEnabled"`
 	DailyIntakeAmount         int                `bson:"dailyIntakeAmount"`
 	HourlyIntakeAmount        int                `bson:"hourlyIntakeAmount"`
-	CurrentStreak             int                `bson:"currentStreak"`
+	CurrentStreakValue        int                `bson:"currentStreakValue"`
+	CurrentStreakDate         time.Time          `bson:"currentStreakDate"`
 	LongestSuccessStreakValue int                `bson:"longestSuccessStreakValue"`
 	LongestSuccessStreakAt    time.Time          `bson:"longestSuccessStreakAt"`
 	HighestIntakeAmountValue  int                `bson:"highestIntakeAmountValue"`
@@ -24,14 +25,15 @@ type DrinkWaterProfile struct {
 	DisabledAt                time.Time          `bson:"disabledAt"`
 }
 
-func (m DrinkWaterProfile) ToDomain() domain.DrinkWaterProfile {
-	return domain.DrinkWaterProfile{
+func (m HydrationProfile) ToDomain() domain.HydrationProfile {
+	return domain.HydrationProfile{
 		ID:                        m.ID.Hex(),
 		UserID:                    m.UserID.Hex(),
 		IsEnabled:                 m.IsEnabled,
 		DailyIntakeAmount:         m.DailyIntakeAmount,
 		HourlyIntakeAmount:        m.HourlyIntakeAmount,
-		CurrentStreak:             m.CurrentStreak,
+		CurrentStreakValue:        m.CurrentStreakValue,
+		CurrentStreakDate:         m.CurrentStreakDate,
 		LongestSuccessStreakValue: m.LongestSuccessStreakValue,
 		LongestSuccessStreakAt:    m.LongestSuccessStreakAt,
 		HighestIntakeAmountValue:  m.HighestIntakeAmountValue,
@@ -41,7 +43,7 @@ func (m DrinkWaterProfile) ToDomain() domain.DrinkWaterProfile {
 	}
 }
 
-func (m DrinkWaterProfile) FromDomain(profile domain.DrinkWaterProfile) (*DrinkWaterProfile, error) {
+func (m HydrationProfile) FromDomain(profile domain.HydrationProfile) (*HydrationProfile, error) {
 	id, err := database.ObjectIDFromString(profile.ID)
 	if err != nil {
 		return nil, apperrors.Common.InvalidID
@@ -52,13 +54,14 @@ func (m DrinkWaterProfile) FromDomain(profile domain.DrinkWaterProfile) (*DrinkW
 		return nil, apperrors.User.InvalidUserID
 	}
 
-	return &DrinkWaterProfile{
+	return &HydrationProfile{
 		ID:                        id,
 		UserID:                    userID,
 		IsEnabled:                 profile.IsEnabled,
 		DailyIntakeAmount:         profile.DailyIntakeAmount,
 		HourlyIntakeAmount:        profile.HourlyIntakeAmount,
-		CurrentStreak:             profile.CurrentStreak,
+		CurrentStreakValue:        profile.CurrentStreakValue,
+		CurrentStreakDate:         profile.CurrentStreakDate,
 		LongestSuccessStreakValue: profile.LongestSuccessStreakValue,
 		LongestSuccessStreakAt:    profile.LongestSuccessStreakAt,
 		HighestIntakeAmountValue:  profile.HighestIntakeAmountValue,

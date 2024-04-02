@@ -8,36 +8,36 @@ import (
 )
 
 type WaterIntakeHandler struct {
-	drinkWaterProfileRepository domain.DrinkWaterProfileRepository
-	waterIntakeRepository       domain.WaterIntakeLogRepository
-	queueRepository             domain.QueueRepository
+	hydrationProfileRepository domain.HydrationProfileRepository
+	waterIntakeRepository      domain.WaterIntakeLogRepository
+	queueRepository            domain.QueueRepository
 }
 
 func NewWaterIntakeHandler(
-	drinkWaterProfileRepository domain.DrinkWaterProfileRepository,
+	hydrationProfileRepository domain.HydrationProfileRepository,
 	waterIntakeRepository domain.WaterIntakeLogRepository,
 	queueRepository domain.QueueRepository,
 ) WaterIntakeHandler {
 	return WaterIntakeHandler{
-		drinkWaterProfileRepository: drinkWaterProfileRepository,
-		waterIntakeRepository:       waterIntakeRepository,
-		queueRepository:             queueRepository,
+		hydrationProfileRepository: hydrationProfileRepository,
+		waterIntakeRepository:      waterIntakeRepository,
+		queueRepository:            queueRepository,
 	}
 }
 
 func (h WaterIntakeHandler) WaterIntake(ctx *appcontext.AppContext, performerID string, req dto.WaterIntakeRequest) (*dto.WaterIntakeResponse, error) {
 	ctx.Logger().Info("new water intake", appcontext.Fields{"performerID": performerID, "amount": req.Amount, "intakeAt": req.IntakeAt})
 
-	// find drink water profile
-	ctx.Logger().Text("find drink water profile")
-	dwProfile, err := h.drinkWaterProfileRepository.FindDrinkWaterProfileByUserID(ctx, performerID)
+	// find hydration profile
+	ctx.Logger().Text("find hydration profile")
+	hydrationProfile, err := h.hydrationProfileRepository.FindHydrationProfileByUserID(ctx, performerID)
 	if err != nil {
-		ctx.Logger().Error("failed to find drink water profile", err, appcontext.Fields{})
+		ctx.Logger().Error("failed to find hydration profile", err, appcontext.Fields{})
 		return nil, err
 	}
-	if dwProfile == nil || !dwProfile.IsEnabled {
-		ctx.Logger().Error("drink water profile not found or disabled", nil, appcontext.Fields{})
-		return nil, apperrors.Health.DrinkWaterProfileNotFound
+	if hydrationProfile == nil || !hydrationProfile.IsEnabled {
+		ctx.Logger().Error("hydration profile not found or disabled", nil, appcontext.Fields{})
+		return nil, apperrors.Health.HydrationProfileNotFound
 	}
 
 	// convert to domain model

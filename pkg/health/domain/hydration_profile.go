@@ -1,27 +1,31 @@
 package domain
 
 import (
-	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	"time"
+
+	"github.com/namhq1989/bapbi-server/internal/utils/manipulation"
+
+	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 
 	"github.com/namhq1989/bapbi-server/internal/database"
 
 	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
 )
 
-type DrinkWaterProfileRepository interface {
-	FindDrinkWaterProfileByUserID(ctx *appcontext.AppContext, userID string) (*DrinkWaterProfile, error)
-	CreateDrinkWaterProfile(ctx *appcontext.AppContext, profile DrinkWaterProfile) error
-	UpdateDrinkWaterProfile(ctx *appcontext.AppContext, profile DrinkWaterProfile) error
+type HydrationProfileRepository interface {
+	FindHydrationProfileByUserID(ctx *appcontext.AppContext, userID string) (*HydrationProfile, error)
+	CreateHydrationProfile(ctx *appcontext.AppContext, profile HydrationProfile) error
+	UpdateHydrationProfile(ctx *appcontext.AppContext, profile HydrationProfile) error
 }
 
-type DrinkWaterProfile struct {
+type HydrationProfile struct {
 	ID                        string
 	UserID                    string
 	IsEnabled                 bool
 	DailyIntakeAmount         int
 	HourlyIntakeAmount        int
-	CurrentStreak             int
+	CurrentStreakValue        int
+	CurrentStreakDate         time.Time
 	LongestSuccessStreakValue int
 	LongestSuccessStreakAt    time.Time
 	HighestIntakeAmountValue  int
@@ -30,7 +34,7 @@ type DrinkWaterProfile struct {
 	DisabledAt                time.Time
 }
 
-func NewDrinkWaterProfile(userID string, dailyIntakeAmount int, hourlyIntakeAmount int) (*DrinkWaterProfile, error) {
+func NewHydrationProfile(userID string, dailyIntakeAmount int, hourlyIntakeAmount int) (*HydrationProfile, error) {
 	if dailyIntakeAmount == 0 {
 		return nil, apperrors.Health.InvalidDailyIntakeAmount
 	}
@@ -39,13 +43,14 @@ func NewDrinkWaterProfile(userID string, dailyIntakeAmount int, hourlyIntakeAmou
 		return nil, apperrors.Health.InvalidHourlyIntakeAmount
 	}
 
-	return &DrinkWaterProfile{
+	return &HydrationProfile{
 		ID:                        database.NewStringID(),
 		UserID:                    userID,
 		IsEnabled:                 true,
 		DailyIntakeAmount:         dailyIntakeAmount,
 		HourlyIntakeAmount:        hourlyIntakeAmount,
-		CurrentStreak:             0,
+		CurrentStreakValue:        0,
+		CurrentStreakDate:         time.Time{},
 		LongestSuccessStreakValue: 0,
 		LongestSuccessStreakAt:    time.Time{},
 		HighestIntakeAmountValue:  0,
@@ -55,19 +60,19 @@ func NewDrinkWaterProfile(userID string, dailyIntakeAmount int, hourlyIntakeAmou
 	}, nil
 }
 
-func (d *DrinkWaterProfile) Enable() error {
+func (d *HydrationProfile) Enable() error {
 	d.IsEnabled = true
 	d.EnabledAt = time.Now()
 	return nil
 }
 
-func (d *DrinkWaterProfile) Disable() error {
+func (d *HydrationProfile) Disable() error {
 	d.IsEnabled = false
 	d.DisabledAt = time.Now()
 	return nil
 }
 
-func (d *DrinkWaterProfile) SetDailyIntakeAmount(value int) error {
+func (d *HydrationProfile) SetDailyIntakeAmount(value int) error {
 	if value < 0 {
 		return apperrors.Health.InvalidIntakeAmount
 	}
@@ -75,7 +80,7 @@ func (d *DrinkWaterProfile) SetDailyIntakeAmount(value int) error {
 	return nil
 }
 
-func (d *DrinkWaterProfile) SetHourlyIntakeAmount(value int) error {
+func (d *HydrationProfile) SetHourlyIntakeAmount(value int) error {
 	if value < 0 {
 		return apperrors.Health.InvalidIntakeAmount
 	}
@@ -83,26 +88,25 @@ func (d *DrinkWaterProfile) SetHourlyIntakeAmount(value int) error {
 	return nil
 }
 
-func (d *DrinkWaterProfile) ResetStreak() error {
-	d.CurrentStreak = 0
-	return nil
+func (d *HydrationProfile) ResetStreak() {
+	d.CurrentStreakValue = 1
+	d.CurrentStreakDate = manipulation.StartOfToday()
+	if d.CurrentStreakValue > d.LongestSuccessStreakValue {
+		d.LongestSuccessStreakValue = d.CurrentStreakValue
+		d.LongestSuccessStreakAt = manipulation.StartOfToday()
+	}
 }
 
-func (d *DrinkWaterProfile) SetStreak(value int) error {
-	if value < 0 {
-		return apperrors.Health.InvalidStreak
-
+func (d *HydrationProfile) IncreaseStreak() {
+	d.CurrentStreakValue += 1
+	d.CurrentStreakDate = manipulation.StartOfToday()
+	if d.CurrentStreakValue > d.LongestSuccessStreakValue {
+		d.LongestSuccessStreakValue = d.CurrentStreakValue
+		d.LongestSuccessStreakAt = manipulation.StartOfToday()
 	}
-
-	d.CurrentStreak = value
-	if d.CurrentStreak > d.LongestSuccessStreakValue {
-		d.LongestSuccessStreakValue = d.CurrentStreak
-		d.LongestSuccessStreakAt = time.Now()
-	}
-	return nil
 }
 
-func (d *DrinkWaterProfile) SetHighestIntakeAmount(value int) error {
+func (d *HydrationProfile) SetHighestIntakeAmount(value int) error {
 	if value < 0 {
 		return apperrors.Health.InvalidIntakeAmount
 	}
