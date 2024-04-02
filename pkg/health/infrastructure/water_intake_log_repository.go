@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
+
 	"github.com/namhq1989/bapbi-server/internal/database"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	"github.com/namhq1989/bapbi-server/pkg/health/domain"
@@ -57,4 +59,45 @@ func (r WaterIntakeLogRepository) CreateWaterIntakeLog(ctx *appcontext.AppContex
 
 	_, err = r.collection().InsertOne(ctx.Context(), &doc)
 	return err
+}
+
+func (r WaterIntakeLogRepository) FindWaterIntakeLogsByUserID(ctx *appcontext.AppContext, userID string, filter domain.WaterIntakeLogFilter) ([]domain.WaterIntakeLog, error) {
+	uid, err := database.ObjectIDFromString(userID)
+	if err != nil {
+		return nil, apperrors.Common.InvalidID
+	}
+
+	var (
+		condition = bson.M{"userId": uid}
+		result    = make([]domain.WaterIntakeLog, 0)
+	)
+
+	if !filter.From.IsZero() {
+		condition["intakeAt"] = bson.M{"$gte": filter.From}
+	}
+	if !filter.To.IsZero() {
+		condition["intakeAt"] = bson.M{"$lte": filter.To}
+	}
+
+	// find
+	cursor, err := r.collection().Find(ctx.Context(), condition, &options.FindOptions{
+		Sort: bson.M{"createdAt": -1},
+	})
+	if err != nil {
+		return result, err
+	}
+	// parse
+	defer func() { _ = cursor.Close(ctx.Context()) }()
+
+	// parse
+	var docs []model.WaterIntakeLog
+	if err = cursor.All(ctx.Context(), &docs); err != nil {
+		return result, err
+	}
+
+	// map data
+	for _, doc := range docs {
+		result = append(result, doc.ToDomain())
+	}
+	return result, nil
 }

@@ -25,7 +25,7 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 		queueRepository                = infrastructure.NewQueueRepository(mono.Queue())
 
 		// application
-		app = application.New(healthProfileRepository, hydrationProfileRepository, waterIntakeLogRepository, queueRepository)
+		app = application.New(healthProfileRepository, hydrationProfileRepository, hydrationDailyReportRepository, waterIntakeLogRepository, queueRepository)
 	)
 
 	// rest server
