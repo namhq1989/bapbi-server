@@ -11,6 +11,7 @@ import (
 
 type WaterIntakeLogRepository interface {
 	CreateWaterIntakeLog(ctx *appcontext.AppContext, log WaterIntakeLog) error
+	FindWaterIntakeLogsByUserID(ctx *appcontext.AppContext, userID string, filter WaterIntakeLogFilter) ([]WaterIntakeLog, error)
 }
 
 type WaterIntakeLog struct {
@@ -38,4 +39,9 @@ func NewWaterIntakeLog(userID string, amount int, intakeAt time.Time) (*WaterInt
 		IntakeAt:  intakeAt,
 		CreatedAt: createdAt,
 	}, nil
+}
+
+type WaterIntakeLogFilter struct {
+	From time.Time
+	To   time.Time
 }
