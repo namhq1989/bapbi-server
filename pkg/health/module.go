@@ -19,13 +19,13 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 	var (
 		// infrastructure
 		healthProfileRepository        = infrastructure.NewHealthProfileRepository(mono.Mongo())
-		drinkWaterProfileRepository    = infrastructure.NewDrinkWaterProfileRepository(mono.Mongo())
+		hydrationProfileRepository     = infrastructure.NewHydrationProfileRepository(mono.Mongo())
 		waterIntakeLogRepository       = infrastructure.NewWaterIntakeLogRepository(mono.Mongo())
-		dailyHydrationReportRepository = infrastructure.NewDailyHydrationReportRepository(mono.Mongo())
+		hydrationDailyReportRepository = infrastructure.NewHydrationDailyReportRepository(mono.Mongo())
 		queueRepository                = infrastructure.NewQueueRepository(mono.Queue())
 
 		// application
-		app = application.New(healthProfileRepository, drinkWaterProfileRepository, waterIntakeLogRepository, queueRepository)
+		app = application.New(healthProfileRepository, hydrationProfileRepository, waterIntakeLogRepository, queueRepository)
 	)
 
 	// rest server
@@ -34,7 +34,7 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 	}
 
 	// workers
-	w := workers.New(mono.Queue(), drinkWaterProfileRepository, dailyHydrationReportRepository)
+	w := workers.New(mono.Queue(), hydrationProfileRepository, hydrationDailyReportRepository)
 	w.Start()
 
 	return nil

@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
 	"time"
+
+	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
 
 	"github.com/namhq1989/bapbi-server/internal/database"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
@@ -16,21 +17,21 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type DrinkWaterProfileRepository struct {
+type HydrationProfileRepository struct {
 	db             *mongo.Database
 	collectionName string
 }
 
-func NewDrinkWaterProfileRepository(db *mongo.Database) DrinkWaterProfileRepository {
-	r := DrinkWaterProfileRepository{
+func NewHydrationProfileRepository(db *mongo.Database) HydrationProfileRepository {
+	r := HydrationProfileRepository{
 		db:             db,
-		collectionName: database.Tables.HealthDrinkWaterProfile,
+		collectionName: database.Tables.HealthHydrationProfile,
 	}
 	r.ensureIndexes()
 	return r
 }
 
-func (r DrinkWaterProfileRepository) ensureIndexes() {
+func (r HydrationProfileRepository) ensureIndexes() {
 	var (
 		ctx     = context.Background()
 		opts    = options.CreateIndexes().SetMaxTime(time.Minute * 30)
@@ -46,18 +47,18 @@ func (r DrinkWaterProfileRepository) ensureIndexes() {
 	}
 }
 
-func (r DrinkWaterProfileRepository) collection() *mongo.Collection {
+func (r HydrationProfileRepository) collection() *mongo.Collection {
 	return r.db.Collection(r.collectionName)
 }
 
-func (r DrinkWaterProfileRepository) FindDrinkWaterProfileByUserID(ctx *appcontext.AppContext, userID string) (*domain.DrinkWaterProfile, error) {
+func (r HydrationProfileRepository) FindHydrationProfileByUserID(ctx *appcontext.AppContext, userID string) (*domain.HydrationProfile, error) {
 	uid, err := database.ObjectIDFromString(userID)
 	if err != nil {
 		return nil, apperrors.Common.InvalidID
 	}
 
 	// find
-	var doc model.DrinkWaterProfile
+	var doc model.HydrationProfile
 	if err = r.collection().FindOne(ctx.Context(), bson.M{
 		"userId": uid,
 	}).Decode(&doc); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
@@ -71,9 +72,9 @@ func (r DrinkWaterProfileRepository) FindDrinkWaterProfileByUserID(ctx *appconte
 	return &result, nil
 }
 
-func (r DrinkWaterProfileRepository) CreateDrinkWaterProfile(ctx *appcontext.AppContext, profile domain.DrinkWaterProfile) error {
+func (r HydrationProfileRepository) CreateHydrationProfile(ctx *appcontext.AppContext, profile domain.HydrationProfile) error {
 	// convert to mongodb model
-	doc, err := model.DrinkWaterProfile{}.FromDomain(profile)
+	doc, err := model.HydrationProfile{}.FromDomain(profile)
 	if err != nil {
 		return err
 	}
@@ -82,9 +83,9 @@ func (r DrinkWaterProfileRepository) CreateDrinkWaterProfile(ctx *appcontext.App
 	return err
 }
 
-func (r DrinkWaterProfileRepository) UpdateDrinkWaterProfile(ctx *appcontext.AppContext, profile domain.DrinkWaterProfile) error {
+func (r HydrationProfileRepository) UpdateHydrationProfile(ctx *appcontext.AppContext, profile domain.HydrationProfile) error {
 	// convert to mongodb model
-	doc, err := model.DrinkWaterProfile{}.FromDomain(profile)
+	doc, err := model.HydrationProfile{}.FromDomain(profile)
 	if err != nil {
 		return err
 	}

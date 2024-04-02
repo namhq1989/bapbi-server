@@ -8,41 +8,41 @@ import (
 	"github.com/namhq1989/bapbi-server/pkg/health/dto"
 )
 
-func (s server) registerDrinkWaterRoutes() {
-	g := s.echo.Group("/api/health/drink-water")
+func (s server) registerHydrationRoutes() {
+	g := s.echo.Group("/api/health/hydration")
 
 	g.PATCH("/enable-profile", func(c echo.Context) error {
 		var (
 			ctx         = c.Get("ctx").(*appcontext.AppContext)
-			req         = c.Get("req").(dto.EnableDrinkWaterProfileRequest)
+			req         = c.Get("req").(dto.EnableHydrationProfileRequest)
 			performerID = ctx.GetUserID()
 		)
 
-		resp, err := s.app.EnableDrinkWaterProfile(ctx, performerID, req)
+		resp, err := s.app.EnableHydrationProfile(ctx, performerID, req)
 		if err != nil {
 			return httprespond.R400(c, err, nil)
 		}
 
 		return httprespond.R200(c, resp)
 	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPBody[dto.EnableDrinkWaterProfileRequest](next)
+		return validation.ValidateHTTPBody[dto.EnableHydrationProfileRequest](next)
 	})
 
 	g.PATCH("/disable-profile", func(c echo.Context) error {
 		var (
 			ctx         = c.Get("ctx").(*appcontext.AppContext)
-			req         = c.Get("req").(dto.DisableDrinkWaterProfileRequest)
+			req         = c.Get("req").(dto.DisableHydrationProfileRequest)
 			performerID = ctx.GetUserID()
 		)
 
-		resp, err := s.app.DisableDrinkWaterProfile(ctx, performerID, req)
+		resp, err := s.app.DisableHydrationProfile(ctx, performerID, req)
 		if err != nil {
 			return httprespond.R400(c, err, nil)
 		}
 
 		return httprespond.R200(c, resp)
 	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPBody[dto.DisableDrinkWaterProfileRequest](next)
+		return validation.ValidateHTTPBody[dto.DisableHydrationProfileRequest](next)
 	})
 
 	g.POST("/water-intake", func(c echo.Context) error {

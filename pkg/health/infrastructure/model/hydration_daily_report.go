@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type DailyHydrationReport struct {
+type HydrationDailyReport struct {
 	ID           primitive.ObjectID `bson:"_id"`
 	UserID       primitive.ObjectID `bson:"userId"`
 	GoalAmount   int                `bson:"goalAmount"`
@@ -19,8 +19,8 @@ type DailyHydrationReport struct {
 	Date         time.Time          `bson:"date"`
 }
 
-func (d DailyHydrationReport) ToDomain() domain.DailyHydrationReport {
-	return domain.DailyHydrationReport{
+func (d HydrationDailyReport) ToDomain() domain.HydrationDailyReport {
+	return domain.HydrationDailyReport{
 		ID:           d.ID.Hex(),
 		UserID:       d.UserID.Hex(),
 		GoalAmount:   d.GoalAmount,
@@ -31,7 +31,7 @@ func (d DailyHydrationReport) ToDomain() domain.DailyHydrationReport {
 	}
 }
 
-func (d DailyHydrationReport) FromDomain(report domain.DailyHydrationReport) (*DailyHydrationReport, error) {
+func (d HydrationDailyReport) FromDomain(report domain.HydrationDailyReport) (*HydrationDailyReport, error) {
 	id, err := database.ObjectIDFromString(report.ID)
 	if err != nil {
 		return nil, apperrors.Common.InvalidID
@@ -42,7 +42,7 @@ func (d DailyHydrationReport) FromDomain(report domain.DailyHydrationReport) (*D
 		return nil, apperrors.User.InvalidUserID
 	}
 
-	return &DailyHydrationReport{
+	return &HydrationDailyReport{
 		ID:           id,
 		UserID:       userID,
 		GoalAmount:   report.GoalAmount,

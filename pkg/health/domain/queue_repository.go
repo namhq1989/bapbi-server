@@ -7,7 +7,7 @@ import (
 var QueueTypeNames = struct {
 	NewWaterIntakeLog string
 }{
-	NewWaterIntakeLog: "health:drinkWater.new",
+	NewWaterIntakeLog: "health:hydration.newWaterIntakeLog",
 }
 
 type QueueRepository interface {
