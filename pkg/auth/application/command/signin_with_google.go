@@ -2,7 +2,6 @@ package command
 
 import (
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
-	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
 	"github.com/namhq1989/bapbi-server/pkg/auth/domain"
 	"github.com/namhq1989/bapbi-server/pkg/auth/dto"
 )
@@ -34,35 +33,49 @@ func (h SignInWithGoogleHandler) SignInWithGoogle(ctx *appcontext.AppContext, re
 		return nil, err
 	}
 
+	var userID string
+
 	// find user by email
 	ctx.Logger().Info("find user in database with email", appcontext.Fields{"email": googleUser.Email})
-	user, err := h.userHub.GetOneByEmail(ctx, googleUser.Email)
+	dbUser, err := h.userHub.GetOneByEmail(ctx, googleUser.Email)
 	if err != nil {
 		ctx.Logger().Error("failed to get user by email", err, appcontext.Fields{"email": googleUser.Email})
 		return nil, err
 	}
-	if user == nil {
+	if dbUser == nil {
 		ctx.Logger().Info("user not found", appcontext.Fields{"email": googleUser.Email})
-		return nil, apperrors.User.UserNotFound
+
+		// create user
+		ctx.Logger().Info("create user in database", appcontext.Fields{})
+		userID, err = h.userHub.CreateUser(ctx, domain.User{
+			Name:  googleUser.Name,
+			Email: googleUser.Email,
+		})
+		if err != nil {
+			ctx.Logger().Error("failed to create user", err, appcontext.Fields{"email": googleUser.Email})
+			return nil, err
+		}
+	} else {
+		userID = dbUser.ID
 	}
 
 	// generate tokens
-	ctx.Logger().Info("user found, generate token", appcontext.Fields{})
-	generatedTokens, err := h.jwtRepository.GenerateTokens(ctx, user.ID)
+	ctx.Logger().Info("generate token", appcontext.Fields{})
+	generatedTokens, err := h.jwtRepository.GenerateTokens(ctx, userID)
 	if err != nil {
-		ctx.Logger().Error("failed to generate tokens", err, appcontext.Fields{"userId": user.ID})
+		ctx.Logger().Error("failed to generate tokens", err, appcontext.Fields{"userId": userID})
 		return nil, err
 	}
 
 	// persist refresh token
 	ctx.Logger().Info("persist refresh token to database", appcontext.Fields{})
 	err = h.authTokenRepository.CreateAuthToken(ctx, domain.RefreshToken{
-		UserID: user.ID,
+		UserID: userID,
 		Token:  generatedTokens.RefreshToken,
 		Expiry: generatedTokens.RefreshTokenExpiry,
 	})
 	if err != nil {
-		ctx.Logger().Error("failed to persist refresh token", err, appcontext.Fields{"userId": user.ID})
+		ctx.Logger().Error("failed to persist refresh token", err, appcontext.Fields{"userId": userID})
 		return nil, err
 	}
 
