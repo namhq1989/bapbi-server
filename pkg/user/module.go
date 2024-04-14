@@ -6,6 +6,7 @@ import (
 	"github.com/namhq1989/bapbi-server/pkg/user/application"
 	"github.com/namhq1989/bapbi-server/pkg/user/grpc"
 	"github.com/namhq1989/bapbi-server/pkg/user/infrastructure"
+	"github.com/namhq1989/bapbi-server/pkg/user/messaging"
 	"github.com/namhq1989/bapbi-server/pkg/user/rest"
 	"github.com/namhq1989/bapbi-server/pkg/user/workers"
 )
@@ -22,6 +23,7 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 		_               = infrastructure.NewUserRepository(mono.Mongo())
 		queueRepository = infrastructure.NewQueueRepository(mono.Queue())
 		userHub         = infrastructure.NewUserHub(mono.Mongo())
+		realtimeService = infrastructure.NewRealtimeService(mono.Realtime())
 
 		// application
 		app = application.New(queueRepository, userHub)
@@ -40,6 +42,10 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 	// workers
 	w := workers.New(mono.Queue())
 	w.Start()
+
+	// messaging
+	m := messaging.New(realtimeService)
+	m.Start()
 
 	return nil
 }

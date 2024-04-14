@@ -20,6 +20,12 @@ auth_invalid_google_token = "Token Google không hợp lệ"
 auth_invalid_refresh_token = "Token xác thực không hợp lệ"
 auth_not_allowed = "Không được phép"
 
+# realtime
+realtime_channel_not_found = "Kênh không tìm thấy"
+realtime_cannot_subscribe_event = "Không thể đăng ký vào kênh"
+realtime_cannot_publish_event = "Không thể gửi tin vào kênh"
+
+
 # user
 user_invalid_id = "ID người dùng không hợp lệ"
 user_not_found = "Không tìm thấy người dùng"

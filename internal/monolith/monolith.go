@@ -6,6 +6,7 @@ import (
 	"github.com/namhq1989/bapbi-server/internal/config"
 	"github.com/namhq1989/bapbi-server/internal/monitoring"
 	"github.com/namhq1989/bapbi-server/internal/queue"
+	"github.com/namhq1989/bapbi-server/internal/realtime"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	appjwt "github.com/namhq1989/bapbi-server/internal/utils/jwt"
 	"github.com/namhq1989/bapbi-server/internal/utils/waiter"
@@ -21,6 +22,7 @@ type Monolith interface {
 	Waiter() waiter.Waiter
 	JWT() *appjwt.JWT
 	Caching() *caching.Caching
+	Realtime() *realtime.Realtime
 	Monitoring() *monitoring.Monitoring
 	Queue() *queue.Queue
 }

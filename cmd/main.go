@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/namhq1989/bapbi-server/pkg/health"
 	"time"
+
+	"github.com/namhq1989/bapbi-server/internal/realtime"
+	"github.com/namhq1989/bapbi-server/pkg/health"
 
 	"github.com/namhq1989/bapbi-server/internal/caching"
 	"github.com/namhq1989/bapbi-server/internal/config"
@@ -59,6 +61,9 @@ func main() {
 
 	// monitoring
 	a.monitoring = monitoring.Init(a.Rest(), cfg.SentryDSN, cfg.SentryMachine, cfg.Environment)
+
+	// realtime
+	a.realtime = realtime.NewRealtimeClient(cfg.AblyAPIKey)
 
 	// waiter
 	a.waiter = waiter.New(waiter.CatchSignals())

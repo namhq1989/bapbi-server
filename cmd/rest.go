@@ -101,6 +101,10 @@ func addCorsMiddleware(e *echo.Echo) {
 	allowedOrigins := []string{
 		"http://localhost:5173",
 		"http://127.0.0.1:5173",
+		"wails://localhost:5173",
+		"wails://127.0.0.1:5173",
+                "wails://127.0.0.1",
+                "wails://localhost",
 	}
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     allowedOrigins,

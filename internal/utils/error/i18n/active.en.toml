@@ -21,6 +21,11 @@ auth_invalid_google_token = "Invalid Google token"
 auth_invalid_refresh_token = "Invalid refresh token"
 auth_not_allowed = "Not allowed"
 
+# realtime
+realtime_channel_not_found = "Channel not found"
+realtime_cannot_subscribe_event = "Cannot subscribe to event"
+realtime_cannot_publish_event = "Cannot publish event"
+
 # user
 user_invalid_id = "Invalid user id"
 user_not_found = "User not found"

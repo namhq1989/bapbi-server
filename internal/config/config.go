@@ -29,6 +29,9 @@ type (
 		// Redis
 		RedisURL string
 
+		// Ably
+		AblyAPIKey string
+
 		// Queue
 		QueueUsername    string
 		QueuePassword    string
@@ -62,6 +65,8 @@ func Init() Server {
 
 		RedisURL: getEnvStr("REDIS_URL"),
 
+		AblyAPIKey: getEnvStr("ABLY_API_KEY"),
+
 		QueueUsername:    getEnvStr("QUEUE_USERNAME"),
 		QueuePassword:    getEnvStr("QUEUE_PASSWORD"),
 		QueueConcurrency: getEnvInt("QUEUE_CONCURRENCY"),
@@ -85,6 +90,17 @@ func Init() Server {
 
 	if cfg.RedisURL == "" {
 		panic(errors.New("missing REDIS_URL"))
+	}
+
+	if cfg.AblyAPIKey == "" {
+		panic(errors.New("missing ABLY_API_KEY"))
+	}
+
+	if cfg.SentryDSN == "" {
+		panic(errors.New("missing SENTRY_DSN"))
+	}
+	if cfg.SentryMachine == "" {
+		panic(errors.New("missing SENTRY_MACHINE"))
 	}
 
 	if cfg.AccessTokenSecret == "" {

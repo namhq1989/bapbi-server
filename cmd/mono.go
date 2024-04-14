@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/namhq1989/bapbi-server/internal/realtime"
+
 	"github.com/namhq1989/bapbi-server/internal/queue"
 
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
@@ -33,6 +35,7 @@ type app struct {
 	jwt        *appjwt.JWT
 	caching    *caching.Caching
 	monitoring *monitoring.Monitoring
+	realtime   *realtime.Realtime
 	queue      *queue.Queue
 	waiter     waiter.Waiter
 	modules    []monolith.Module
@@ -68,6 +71,10 @@ func (a *app) Caching() *caching.Caching {
 
 func (a *app) Monitoring() *monitoring.Monitoring {
 	return a.monitoring
+}
+
+func (a *app) Realtime() *realtime.Realtime {
+	return a.realtime
 }
 
 func (a *app) Queue() *queue.Queue {
