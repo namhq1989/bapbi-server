@@ -33,7 +33,7 @@ func (h SignInWithGoogleHandler) SignInWithGoogle(ctx *appcontext.AppContext, re
 		return nil, err
 	}
 
-	var userID = ""
+	var userID string
 
 	// find user by email
 	ctx.Logger().Info("find user in database with email", appcontext.Fields{"email": googleUser.Email})
