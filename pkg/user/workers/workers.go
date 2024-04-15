@@ -6,16 +6,18 @@ import (
 )
 
 type Workers struct {
-	queue *queue.Queue
+	queue           *queue.Queue
+	queueRepository domain.QueueRepository
 }
 
-func New(queue *queue.Queue) Workers {
+func New(queue *queue.Queue, queueRepository domain.QueueRepository) Workers {
 	return Workers{
-		queue: queue,
+		queue:           queue,
+		queueRepository: queueRepository,
 	}
 }
 
 func (w Workers) Start() {
-	w.queue.Server.HandleFunc(w.queue.GenerateTypename(domain.QueueTypeNames.UserCreated), w.UserCreated)
-	w.queue.Server.HandleFunc(w.queue.GenerateTypename(domain.QueueTypeNames.UserUpdated), w.UserUpdated)
+	w.queue.Server.HandleFunc(w.queue.GenerateTypename(queue.TypeNames.User.UserCreated), w.UserCreated)
+	w.queue.Server.HandleFunc(w.queue.GenerateTypename(queue.TypeNames.User.UserUpdated), w.UserUpdated)
 }

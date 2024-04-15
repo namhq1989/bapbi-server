@@ -17,7 +17,7 @@ func (w Workers) UserUpdated(bgCtx context.Context, t *asynq.Task) error {
 
 	ctx.Logger().Info("[worker] process new task", appcontext.Fields{"type": t.Type(), "payload": string(t.Payload())})
 
-	ctx.Logger().Info("unmarshal task payload", appcontext.Fields{})
+	ctx.Logger().Text("unmarshal task payload")
 	if err := json.Unmarshal(t.Payload(), &user); err != nil {
 		ctx.Logger().Error("failed to unmarshal task payload", err, appcontext.Fields{})
 		return err

@@ -3,6 +3,8 @@ package workers
 import (
 	"context"
 
+	"github.com/namhq1989/bapbi-server/internal/queue"
+
 	"github.com/goccy/go-json"
 	"github.com/hibiken/asynq"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
@@ -17,13 +19,17 @@ func (w Workers) UserCreated(bgCtx context.Context, t *asynq.Task) error {
 
 	ctx.Logger().Info("[worker] process new task", appcontext.Fields{"type": t.Type(), "payload": string(t.Payload())})
 
-	ctx.Logger().Info("unmarshal task payload", appcontext.Fields{})
+	ctx.Logger().Text("unmarshal task payload")
 	if err := json.Unmarshal(t.Payload(), &user); err != nil {
 		ctx.Logger().Error("failed to unmarshal task payload", err, appcontext.Fields{})
 		return err
 	}
 
-	ctx.Logger().Text("*** CURRENTLY DO NOTHING WITH THIS TASK ***")
+	// add queue
+	ctx.Logger().Text("add health queue task")
+	if err := w.queueRepository.EnqueueUserCreatedForHealth(ctx, queue.User{ID: user.ID}); err != nil {
+		return err
+	}
 
 	ctx.Logger().Info("[worker] done task", appcontext.Fields{"type": t.Type()})
 	return nil

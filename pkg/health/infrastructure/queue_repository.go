@@ -17,7 +17,7 @@ func NewQueueRepository(queue *queue.Queue) QueueRepository {
 }
 
 func (r QueueRepository) EnqueueNewWaterIntakeLog(ctx *appcontext.AppContext, log domain.WaterIntakeLog) error {
-	typename := r.queue.GenerateTypename(domain.QueueTypeNames.NewWaterIntakeLog)
+	typename := r.queue.GenerateTypename(queue.TypeNames.Health.NewWaterIntakeLog)
 	t, err := r.queue.RunTask(typename, log, -1)
 	if err != nil {
 		ctx.Logger().Error("failed to enqueue task", err, appcontext.Fields{"typename": typename, "log": log})

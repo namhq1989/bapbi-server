@@ -34,7 +34,7 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 	}
 
 	// workers
-	w := workers.New(mono.Queue(), hydrationProfileRepository, hydrationDailyReportRepository)
+	w := workers.New(mono.Queue(), healthProfileRepository, hydrationProfileRepository, hydrationDailyReportRepository)
 	w.Start()
 
 	return nil
