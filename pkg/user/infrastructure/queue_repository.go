@@ -17,7 +17,7 @@ func NewQueueRepository(queue *queue.Queue) QueueRepository {
 }
 
 func (r QueueRepository) EnqueueUserCreated(ctx *appcontext.AppContext, user domain.User) error {
-	typename := r.queue.GenerateTypename(domain.QueueTypeNames.UserCreated)
+	typename := r.queue.GenerateTypename(queue.TypeNames.User.UserCreated)
 	t, err := r.queue.RunTask(typename, user, -1)
 	if err != nil {
 		ctx.Logger().Error("failed to enqueue task", err, appcontext.Fields{"typename": typename, "user": user})
@@ -29,7 +29,19 @@ func (r QueueRepository) EnqueueUserCreated(ctx *appcontext.AppContext, user dom
 }
 
 func (r QueueRepository) EnqueueUserUpdated(ctx *appcontext.AppContext, user domain.User) error {
-	typename := r.queue.GenerateTypename(domain.QueueTypeNames.UserUpdated)
+	typename := r.queue.GenerateTypename(queue.TypeNames.User.UserUpdated)
+	t, err := r.queue.RunTask(typename, user, -1)
+	if err != nil {
+		ctx.Logger().Error("failed to enqueue task", err, appcontext.Fields{"typename": typename, "user": user})
+		return err
+	}
+
+	ctx.Logger().Info("enqueued task", appcontext.Fields{"taskId": t.ID, "typename": typename})
+	return nil
+}
+
+func (r QueueRepository) EnqueueUserCreatedForHealth(ctx *appcontext.AppContext, user queue.User) error {
+	typename := r.queue.GenerateTypename(queue.TypeNames.Health.UserCreated)
 	t, err := r.queue.RunTask(typename, user, -1)
 	if err != nil {
 		ctx.Logger().Error("failed to enqueue task", err, appcontext.Fields{"typename": typename, "user": user})
