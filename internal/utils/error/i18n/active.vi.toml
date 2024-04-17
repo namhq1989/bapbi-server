@@ -36,3 +36,7 @@ health_invalid_intake_amount = "Lượng nước uống không hợp lệ"
 health_invalid_daily_intake_amount = "Lượng nước uống hàng ngày không hợp lệ"
 health_invalid_hourly_intake_amount = "Lượng nước uống hàng giờ không hợp lệ"
 health_invalid_streak = "Giá trị chuỗi không hợp lệ"
+
+# english
+english_invalid_term = "Từ không hợp lệ"
+english_invalid_language = "Ngôn ngữ không hợp lệ"
