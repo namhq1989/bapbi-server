@@ -5,7 +5,9 @@ import (
 	"github.com/namhq1989/bapbi-server/internal/caching"
 	"github.com/namhq1989/bapbi-server/internal/config"
 	"github.com/namhq1989/bapbi-server/internal/monitoring"
+	"github.com/namhq1989/bapbi-server/internal/openai"
 	"github.com/namhq1989/bapbi-server/internal/queue"
+	"github.com/namhq1989/bapbi-server/internal/scraper"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	appjwt "github.com/namhq1989/bapbi-server/internal/utils/jwt"
 	"github.com/namhq1989/bapbi-server/internal/utils/waiter"
@@ -21,6 +23,8 @@ type Monolith interface {
 	Waiter() waiter.Waiter
 	JWT() *appjwt.JWT
 	Caching() *caching.Caching
+	OpenAI() *openai.OpenAI
+	Scraper() *scraper.Scraper
 	Monitoring() *monitoring.Monitoring
 	Queue() *queue.Queue
 }

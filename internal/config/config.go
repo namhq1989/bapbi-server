@@ -37,6 +37,9 @@ type (
 		// Sentry
 		SentryDSN     string
 		SentryMachine string
+
+		// OpenAI
+		OpenAIToken string
 	}
 )
 
@@ -68,6 +71,8 @@ func Init() Server {
 
 		SentryDSN:     getEnvStr("SENTRY_DSN"),
 		SentryMachine: getEnvStr("SENTRY_MACHINE"),
+
+		OpenAIToken: getEnvStr("OPENAI_TOKEN"),
 	}
 	cfg.IsEnvRelease = cfg.Environment == "release"
 
@@ -92,6 +97,10 @@ func Init() Server {
 	}
 	if cfg.RefreshTokenSecret == "" {
 		panic(errors.New("missing REFRESH_TOKEN_SECRET"))
+	}
+
+	if cfg.OpenAIToken == "" {
+		panic(errors.New("missing OPENAI_TOKEN"))
 	}
 
 	return cfg

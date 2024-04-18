@@ -38,6 +38,8 @@ health_invalid_daily_intake_amount = "Invalid daily intake amount"
 health_invalid_hourly_intake_amount = "Invalid hourly intake amount"
 health_invalid_streak = "Invalid streak"
 
-# english
-english_invalid_term = "Invalid term"
-english_invalid_language = "Invalid language"
+# language
+language_invalid_term = "Invalid term"
+language_invalid_language = "Invalid language"
+language_invalid_language_data = "Invalid language data"
+
