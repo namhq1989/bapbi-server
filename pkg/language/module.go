@@ -18,11 +18,12 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 	var (
 		// infrastructure
 		termRepository    = infrastructure.NewTermRepository(mono.Mongo())
+		userSearchHistory = infrastructure.NewUserSearchRepository(mono.Mongo())
 		openaiRepository  = infrastructure.NewOpenAIRepository(mono.OpenAI())
 		scraperRepository = infrastructure.NewScraperRepository(mono.Scraper())
 
 		// application
-		app = application.New(termRepository, openaiRepository, scraperRepository)
+		app = application.New(termRepository, userSearchHistory, openaiRepository, scraperRepository)
 	)
 
 	// rest server

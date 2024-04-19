@@ -10,12 +10,10 @@ import (
 )
 
 type SearchTermResult struct {
-	IsValid  bool           `json:"isValid"`
-	Term     string         `json:"term"`
-	From     TermByLanguage `json:"from"`
-	To       TermByLanguage `json:"to"`
-	Synonyms []string       `json:"synonyms"`
-	Antonyms []string       `json:"antonyms"`
+	IsValid bool           `json:"isValid"`
+	Term    string         `json:"term"`
+	From    TermByLanguage `json:"from"`
+	To      TermByLanguage `json:"to"`
 }
 
 type TermByLanguage struct {
@@ -31,8 +29,6 @@ const searchTermPrompt = `
 	- "term": The input word or phrase.
 	- "from": Object with "language" is the source language, "definition" is the definition in the source language and "example" is an example sentence in the source language. All fields are mandatory.
 	- "to": Object with "language" is the target language, "definition" is the definition in the target language and "example" is a translated sentence of source language's example. All fields are mandatory.
-	- "synonyms": List max 3 synonyms of the term in source language, or provide an empty list if none are applicable.
-	- "antonyms": List max 3 antonyms of the term in source language, or provide an empty list if none are applicable.
 	If the term is not valid, return only: { "isValid": false }
 `
 
@@ -52,11 +48,11 @@ func (o *OpenAI) SearchTerm(ctx *appcontext.AppContext, term, fromLanguage, toLa
 		return nil, err
 	}
 
-	// Cleaning the input JSON string
+	// cleaning the input JSON string
 	jsonStr := resp.Choices[0].Message.Content
-	cleanJsonStr := strings.Replace(jsonStr, "`json\n", "", 1) // Removes the initial backtick, `json, and newline
-	cleanJsonStr = strings.Replace(cleanJsonStr, "\n", "", -1) // Removes all newline characters
-	cleanJsonStr = strings.Trim(cleanJsonStr, "`")             // Removes any remaining backticks
+	cleanJsonStr := strings.Replace(jsonStr, "`json\n", "", 1)
+	cleanJsonStr = strings.Replace(cleanJsonStr, "\n", "", -1)
+	cleanJsonStr = strings.Trim(cleanJsonStr, "`")
 
 	var result SearchTermResult
 	if err = json.Unmarshal([]byte(cleanJsonStr), &result); err != nil {

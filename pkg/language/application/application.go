@@ -36,13 +36,14 @@ var _ App = (*Application)(nil)
 
 func New(
 	termRepository domain.TermRepository,
+	userSearchHistoryRepository domain.UserSearchHistoryRepository,
 	openaiRepository domain.OpenAIRepository,
 	scraperRepository domain.ScraperRepository,
 ) *Application {
 	return &Application{
 		appCommandHandlers: appCommandHandlers{},
 		appQueryHandler: appQueryHandler{
-			SearchTermHandler: query.NewSearchTermHandler(termRepository, openaiRepository, scraperRepository),
+			SearchTermHandler: query.NewSearchTermHandler(termRepository, userSearchHistoryRepository, openaiRepository, scraperRepository),
 		},
 		appHubHandler: appHubHandler{},
 	}

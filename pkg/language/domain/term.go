@@ -18,24 +18,30 @@ type TermRepository interface {
 }
 
 type Term struct {
-	ID           string
-	Term         string
-	From         TermByLanguage
-	To           TermByLanguage
-	Level        string
-	PartOfSpeech string
-	Phonetic     string
-	AudioURL     string
-	Synonyms     []string
-	Antonyms     []string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	ID                  string
+	Term                string
+	From                TermByLanguage
+	To                  TermByLanguage
+	Level               string
+	PartOfSpeech        string
+	Phonetic            string
+	AudioURL            string
+	Synonyms            []string
+	Antonyms            []string
+	PossibleDefinitions []TermPossibleDefinition
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
 }
 
 type TermByLanguage struct {
 	Language   Language
 	Definition string
 	Example    string
+}
+
+type TermPossibleDefinition struct {
+	Definition   string
+	PartOfSpeech string
 }
 
 func NewTerm(term, fromLanguage, toLanguage string) (*Term, error) {
@@ -66,13 +72,14 @@ func NewTerm(term, fromLanguage, toLanguage string) (*Term, error) {
 			Definition: "",
 			Example:    "",
 		},
-		Level:        "",
-		PartOfSpeech: "",
-		Phonetic:     "",
-		Synonyms:     make([]string, 0),
-		Antonyms:     make([]string, 0),
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
+		Level:               "",
+		PartOfSpeech:        "",
+		Phonetic:            "",
+		Synonyms:            make([]string, 0),
+		Antonyms:            make([]string, 0),
+		PossibleDefinitions: make([]TermPossibleDefinition, 0),
+		CreatedAt:           time.Now(),
+		UpdatedAt:           time.Now(),
 	}, nil
 }
 
@@ -121,6 +128,10 @@ func (d *Term) SetSynonyms(synonyms []string) {
 
 func (d *Term) SetAntonyms(antonyms []string) {
 	d.Antonyms = antonyms
+}
+
+func (d *Term) SetPossibleDefinitions(definitions []TermPossibleDefinition) {
+	d.PossibleDefinitions = definitions
 }
 
 func (d *Term) SetUpdatedAt() {

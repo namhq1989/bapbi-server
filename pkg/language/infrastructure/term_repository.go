@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/namhq1989/bapbi-server/internal/database"
@@ -53,7 +54,7 @@ func (r TermRepository) FindByTerm(ctx *appcontext.AppContext, term, fromLanguag
 	// find
 	var doc model.Term
 	if err := r.collection().FindOne(ctx.Context(), bson.M{
-		"term":          term,
+		"term":          strings.ToLower(term),
 		"from.language": fromLanguage,
 	}).Decode(&doc); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
 		return nil, err

@@ -5,6 +5,7 @@ go 1.22
 toolchain go1.22.2
 
 require (
+	github.com/brianvoe/gofakeit/v7 v7.0.2
 	github.com/getsentry/sentry-go v0.27.0
 	github.com/goccy/go-json v0.10.2
 	github.com/gocolly/colly/v2 v2.1.0
@@ -32,7 +33,6 @@ require (
 	github.com/antchfx/htmlquery v1.3.1 // indirect
 	github.com/antchfx/xmlquery v1.4.0 // indirect
 	github.com/antchfx/xpath v1.3.0 // indirect
-	github.com/brianvoe/gofakeit/v7 v7.0.2 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gobwas/glob v0.2.3 // indirect

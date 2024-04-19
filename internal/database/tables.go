@@ -11,7 +11,8 @@ var Tables = struct {
 	HealthHydrationDailyReport string
 
 	// language
-	LanguageTerm string
+	LanguageTerm              string
+	LanguageUserSearchHistory string
 }{
 	User:      "user.users",
 	AuthToken: "auth.tokens",
@@ -21,5 +22,6 @@ var Tables = struct {
 	HealthWaterIntakeLog:       "health.hydration.waterIntakeLogs",
 	HealthHydrationDailyReport: "health.hydration.dailyReports",
 
-	LanguageTerm: "language.terms",
+	LanguageTerm:              "language.terms",
+	LanguageUserSearchHistory: "language.userSearchHistories",
 }
