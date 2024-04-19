@@ -58,40 +58,26 @@ func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID st
 		return &result, nil
 	}
 
-	// determine the term is valid or not
-	ctx.Logger().Text("search term with Open AI")
-	openaiData, err := h.openaiRepository.SearchTerm(ctx, req.Term, req.From, req.To)
+	ctx.Logger().Text("term not found in db, scrape from online dictionary")
+	scrapeData, err := h.scraperRepository.GetEnglishDictionaryData(ctx, req.Term)
 	if err != nil {
-		ctx.Logger().Error("failed to search term with Open AI", err, appcontext.Fields{})
-		return nil, err
+		ctx.Logger().Error("scrape Cambridge dictionary data failed", err, appcontext.Fields{})
 	}
-	if openaiData == nil || !openaiData.IsValid {
-		ctx.Logger().Error("invalid term, save history and respond", nil, appcontext.Fields{})
-
+	if scrapeData == nil {
+		ctx.Logger().Text("this term is an invalid vocabulary")
 		if err = h.insertUserSearchHistory(ctx, performerID, req.Term, false); err != nil {
 			return nil, err
 		}
-
 		return nil, apperrors.Language.InvalidTerm
 	}
 
 	var (
 		wg                    sync.WaitGroup
-		possibleDefinitions   *domain.OpenAISearchPossibleDefinitionsResult
+		searchTermData        *domain.OpenAISearchTermResult
 		semanticRelationsData *domain.OpenAISearchSemanticRelationsResult
-		scrapeData            *domain.EnglishDictionaryScraperData
 	)
 
-	wg.Add(3)
-	go func() {
-		defer wg.Done()
-
-		ctx.Logger().Text("search possible definitions with Open AI")
-		possibleDefinitions, err = h.openaiRepository.SearchPossibleDefinitions(ctx, req.Term, req.From, req.To)
-		if err != nil {
-			ctx.Logger().Error("failed to search possible definitions with Open AI", err, appcontext.Fields{})
-		}
-	}()
+	wg.Add(2)
 
 	go func() {
 		defer wg.Done()
@@ -106,21 +92,20 @@ func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID st
 	go func() {
 		defer wg.Done()
 
-		ctx.Logger().Text("scrape Cambridge dictionary data")
-		scrapeData, err = h.scraperRepository.GetEnglishDictionaryData(ctx, req.Term)
+		// determine the term is valid or not
+		ctx.Logger().Text("search term with Open AI")
+		searchTermData, err = h.openaiRepository.SearchTerm(ctx, req.Term, req.From, req.To)
 		if err != nil {
-			ctx.Logger().Error("scrape Cambridge dictionary data failed", err, appcontext.Fields{})
+			ctx.Logger().Error("failed to search term with Open AI", err, appcontext.Fields{})
 		}
 	}()
 
 	wg.Wait()
 
 	// assign term data
-	_ = domainTerm.SetLanguage(openaiData.From.Language, openaiData.From.Definition, openaiData.From.Example)
-	_ = domainTerm.SetLanguage(openaiData.To.Language, openaiData.To.Definition, openaiData.To.Example)
-
-	if possibleDefinitions != nil {
-		domainTerm.SetPossibleDefinitions(possibleDefinitions.List)
+	if searchTermData != nil {
+		_ = domainTerm.SetLanguage(searchTermData.From.Language, searchTermData.From.Definition, searchTermData.From.Example)
+		_ = domainTerm.SetLanguage(searchTermData.To.Language, searchTermData.To.Definition, searchTermData.To.Example)
 	}
 
 	if semanticRelationsData != nil {
@@ -128,12 +113,11 @@ func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID st
 		domainTerm.SetAntonyms(semanticRelationsData.Antonyms)
 	}
 
-	if scrapeData != nil {
-		domainTerm.SetLevel(scrapeData.Level)
-		domainTerm.SetPartOfSpeech(scrapeData.PartOfSpeech)
-		domainTerm.SetPhonetic(scrapeData.Phonetic)
-		domainTerm.SetAudioURL(scrapeData.AudioURL)
-	}
+	domainTerm.SetLevel(scrapeData.Level)
+	domainTerm.SetPartOfSpeech(scrapeData.PartOfSpeech)
+	domainTerm.SetPhonetic(scrapeData.Phonetic)
+	domainTerm.SetAudioURL(scrapeData.AudioURL)
+	domainTerm.SetReferenceURL(scrapeData.ReferenceURL)
 
 	ctx.Logger().Text("insert to database")
 	if err = h.termRepository.CreateTerm(ctx, *domainTerm); err != nil {

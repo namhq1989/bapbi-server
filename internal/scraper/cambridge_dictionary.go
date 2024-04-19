@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/namhq1989/bapbi-server/internal/utils/manipulation"
+
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/gocolly/colly/v2"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
@@ -17,6 +19,7 @@ type CambridgeEnglishDictionaryData struct {
 	Phonetic     string
 	PartOfSpeech string
 	AudioURL     string
+	ReferenceURL string
 }
 
 func (s *Scraper) GetCambridgeEnglishDictionaryData(ctx *appcontext.AppContext, term string) (*CambridgeEnglishDictionaryData, error) {
@@ -28,8 +31,9 @@ func (s *Scraper) GetCambridgeEnglishDictionaryData(ctx *appcontext.AppContext, 
 func (s *Scraper) scrapeCambridgeEnglishDictionary(ctx *appcontext.AppContext, term string, retryTimes int) (*CambridgeEnglishDictionaryData, error) {
 	var (
 		headwordFound = false
-		result        = &CambridgeEnglishDictionaryData{}
-		url           = fmt.Sprintf(cambridgeDictionaryURL, term)
+		result        = &CambridgeEnglishDictionaryData{
+			ReferenceURL: fmt.Sprintf(cambridgeDictionaryURL, manipulation.Slugify(term)),
+		}
 	)
 
 	c := colly.NewCollector(
@@ -80,7 +84,7 @@ func (s *Scraper) scrapeCambridgeEnglishDictionary(ctx *appcontext.AppContext, t
 		ctx.Logger().Text("Url scraped successfully")
 	})
 
-	if err := c.Visit(url); err != nil {
+	if err := c.Visit(result.ReferenceURL); err != nil {
 		if retryTimes < 3 {
 			return s.scrapeCambridgeEnglishDictionary(ctx, term, retryTimes+1)
 		}

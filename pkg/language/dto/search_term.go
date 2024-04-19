@@ -1,8 +1,6 @@
 package dto
 
 import (
-	"fmt"
-
 	"github.com/namhq1989/bapbi-server/pkg/language/domain"
 )
 
@@ -13,18 +11,17 @@ type SearchTermRequest struct {
 }
 
 type SearchTermResponse struct {
-	ID                  string                   `json:"id"`
-	Term                string                   `json:"term"`
-	From                TermByLanguage           `json:"from"`
-	To                  TermByLanguage           `json:"to"`
-	Level               string                   `json:"level"`
-	PartOfSpeech        string                   `json:"pos"`
-	Phonetic            string                   `json:"phonetic"`
-	ReferenceURL        string                   `json:"referenceUrl"`
-	AudioURL            string                   `json:"audioUrl"`
-	Synonyms            []string                 `json:"synonyms"`
-	Antonyms            []string                 `json:"antonyms"`
-	PossibleDefinitions []TermPossibleDefinition `json:"possibleDefinitions"`
+	ID           string         `json:"id"`
+	Term         string         `json:"term"`
+	From         TermByLanguage `json:"from"`
+	To           TermByLanguage `json:"to"`
+	Level        string         `json:"level"`
+	PartOfSpeech string         `json:"pos"`
+	Phonetic     string         `json:"phonetic"`
+	ReferenceURL string         `json:"referenceUrl"`
+	AudioURL     string         `json:"audioUrl"`
+	Synonyms     []string       `json:"synonyms"`
+	Antonyms     []string       `json:"antonyms"`
 }
 
 type TermByLanguage struct {
@@ -33,22 +30,7 @@ type TermByLanguage struct {
 	Example    string `json:"example"`
 }
 
-type TermPossibleDefinition struct {
-	Definition   string `json:"definition"`
-	PartOfSpeech string `json:"pos"`
-}
-
 func (d SearchTermResponse) FromDomain(term domain.Term) SearchTermResponse {
-	refUrl := fmt.Sprintf("https://dictionary.cambridge.org/dictionary/english/%s", term.Term)
-
-	possibleDefinitions := make([]TermPossibleDefinition, len(term.PossibleDefinitions))
-	for i, item := range term.PossibleDefinitions {
-		possibleDefinitions[i] = TermPossibleDefinition{
-			Definition:   item.Definition,
-			PartOfSpeech: item.PartOfSpeech,
-		}
-	}
-
 	return SearchTermResponse{
 		ID:   term.ID,
 		Term: term.Term,
@@ -62,13 +44,12 @@ func (d SearchTermResponse) FromDomain(term domain.Term) SearchTermResponse {
 			Definition: term.To.Definition,
 			Example:    term.To.Example,
 		},
-		Level:               term.Level,
-		PartOfSpeech:        term.PartOfSpeech,
-		Phonetic:            term.Phonetic,
-		ReferenceURL:        refUrl,
-		AudioURL:            term.AudioURL,
-		Synonyms:            term.Synonyms,
-		Antonyms:            term.Antonyms,
-		PossibleDefinitions: possibleDefinitions,
+		Level:        term.Level,
+		PartOfSpeech: term.PartOfSpeech,
+		Phonetic:     term.Phonetic,
+		ReferenceURL: term.ReferenceURL,
+		AudioURL:     term.AudioURL,
+		Synonyms:     term.Synonyms,
+		Antonyms:     term.Antonyms,
 	}
 }

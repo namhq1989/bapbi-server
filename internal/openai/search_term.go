@@ -24,7 +24,9 @@ type TermByLanguage struct {
 
 const searchTermPrompt = `
 	Term is "{{term}}", its language is {{fromLanguage}} (source language) and you have to translate it to {{toLanguage}} (target language).
-	Check if the term is a valid {{fromLanguage}} word or phrase. If valid, generate a detailed JSON-formatted (only data, no redundant information) response including:
+	Is the term a commonly used piece of English vocabulary in general language use, or is it a specific name or title for an event, organization, or concept?
+	Check if the term is a valid {{fromLanguage}} vocabulary or not.
+	If valid, generate a detailed JSON-formatted (only data, no redundant information) response including:
 	- "isValid": True
 	- "term": The input word or phrase.
 	- "from": Object with "language" is the source language, "definition" is the definition in the source language and "example" is an example sentence in the source language. All fields are mandatory.

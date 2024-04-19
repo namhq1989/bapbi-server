@@ -21,11 +21,15 @@ func (r ScraperRepository) GetEnglishDictionaryData(ctx *appcontext.AppContext, 
 	if err != nil {
 		return nil, err
 	}
+	if result == nil {
+		return nil, nil
+	}
 
 	return &domain.EnglishDictionaryScraperData{
 		Level:        result.Level,
 		Phonetic:     result.Phonetic,
 		PartOfSpeech: result.PartOfSpeech,
 		AudioURL:     result.AudioURL,
+		ReferenceURL: result.ReferenceURL,
 	}, nil
 }

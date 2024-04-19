@@ -11,4 +11,5 @@ type EnglishDictionaryScraperData struct {
 	Phonetic     string
 	PartOfSpeech string
 	AudioURL     string
+	ReferenceURL string
 }
