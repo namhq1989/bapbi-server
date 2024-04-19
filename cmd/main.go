@@ -2,20 +2,24 @@ package main
 
 import (
 	"fmt"
-	"github.com/namhq1989/bapbi-server/pkg/health"
 	"time"
+
+	"github.com/namhq1989/bapbi-server/internal/scraper"
 
 	"github.com/namhq1989/bapbi-server/internal/caching"
 	"github.com/namhq1989/bapbi-server/internal/config"
 	"github.com/namhq1989/bapbi-server/internal/database"
 	"github.com/namhq1989/bapbi-server/internal/monitoring"
 	"github.com/namhq1989/bapbi-server/internal/monolith"
+	"github.com/namhq1989/bapbi-server/internal/openai"
 	"github.com/namhq1989/bapbi-server/internal/queue"
 	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
 	appjwt "github.com/namhq1989/bapbi-server/internal/utils/jwt"
 	"github.com/namhq1989/bapbi-server/internal/utils/logger"
 	"github.com/namhq1989/bapbi-server/internal/utils/waiter"
 	"github.com/namhq1989/bapbi-server/pkg/auth"
+	"github.com/namhq1989/bapbi-server/pkg/health"
+	"github.com/namhq1989/bapbi-server/pkg/language"
 	"github.com/namhq1989/bapbi-server/pkg/user"
 )
 
@@ -57,6 +61,12 @@ func main() {
 	// caching
 	a.caching = caching.NewCachingClient(cfg.RedisURL)
 
+	// open ai
+	a.openai = openai.NewOpenAIClient(cfg.OpenAIToken)
+
+	// scraper
+	a.scraper = scraper.NewScraper()
+
 	// monitoring
 	a.monitoring = monitoring.Init(a.Rest(), cfg.SentryDSN, cfg.SentryMachine, cfg.Environment)
 
@@ -68,6 +78,7 @@ func main() {
 		&auth.Module{},
 		&user.Module{},
 		&health.Module{},
+		&language.Module{},
 	}
 
 	// start

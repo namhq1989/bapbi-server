@@ -4,20 +4,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/namhq1989/bapbi-server/internal/scraper"
 	"net"
 	"net/http"
 	"time"
 
-	"github.com/namhq1989/bapbi-server/internal/queue"
-
-	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
-
-	"github.com/namhq1989/bapbi-server/internal/monitoring"
-
 	"github.com/labstack/echo/v4"
 	"github.com/namhq1989/bapbi-server/internal/caching"
 	"github.com/namhq1989/bapbi-server/internal/config"
+	"github.com/namhq1989/bapbi-server/internal/monitoring"
 	"github.com/namhq1989/bapbi-server/internal/monolith"
+	"github.com/namhq1989/bapbi-server/internal/openai"
+	"github.com/namhq1989/bapbi-server/internal/queue"
+	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	appjwt "github.com/namhq1989/bapbi-server/internal/utils/jwt"
 	"github.com/namhq1989/bapbi-server/internal/utils/waiter"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -32,6 +31,8 @@ type app struct {
 	rpc        *grpc.Server
 	jwt        *appjwt.JWT
 	caching    *caching.Caching
+	openai     *openai.OpenAI
+	scraper    *scraper.Scraper
 	monitoring *monitoring.Monitoring
 	queue      *queue.Queue
 	waiter     waiter.Waiter
@@ -64,6 +65,14 @@ func (a *app) JWT() *appjwt.JWT {
 
 func (a *app) Caching() *caching.Caching {
 	return a.caching
+}
+
+func (a *app) OpenAI() *openai.OpenAI {
+	return a.openai
+}
+
+func (a *app) Scraper() *scraper.Scraper {
+	return a.scraper
 }
 
 func (a *app) Monitoring() *monitoring.Monitoring {

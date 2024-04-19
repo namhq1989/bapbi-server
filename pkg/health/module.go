@@ -6,7 +6,7 @@ import (
 	"github.com/namhq1989/bapbi-server/pkg/health/application"
 	"github.com/namhq1989/bapbi-server/pkg/health/infrastructure"
 	"github.com/namhq1989/bapbi-server/pkg/health/rest"
-	"github.com/namhq1989/bapbi-server/pkg/health/workers"
+	"github.com/namhq1989/bapbi-server/pkg/health/worker"
 )
 
 type Module struct{}
@@ -34,7 +34,7 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 	}
 
 	// workers
-	w := workers.New(mono.Queue(), healthProfileRepository, hydrationProfileRepository, hydrationDailyReportRepository)
+	w := worker.New(mono.Queue(), healthProfileRepository, hydrationProfileRepository, hydrationDailyReportRepository)
 	w.Start()
 
 	return nil

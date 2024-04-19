@@ -1,4 +1,4 @@
-package workers
+package worker
 
 import (
 	"github.com/namhq1989/bapbi-server/internal/queue"

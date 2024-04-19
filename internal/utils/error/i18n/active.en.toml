@@ -28,7 +28,7 @@ user_google_email_already_registered = "Google email already registered"
 
 # health
 health_profile_not_found = "Please setup your health profile before using this feature"
-health_hydration_profile_not_found = "Please setup your drink water profile before using this feature"
+health_hydration_profile_not_found = "Please setup your hydration profile before using this feature"
 health_invalid_height = "Invalid height"
 health_invalid_weight = "Invalid weight"
 health_invalid_bmi = "Invalid BMI"
@@ -37,3 +37,9 @@ health_invalid_intake_amount = "Invalid intake amount"
 health_invalid_daily_intake_amount = "Invalid daily intake amount"
 health_invalid_hourly_intake_amount = "Invalid hourly intake amount"
 health_invalid_streak = "Invalid streak"
+
+# language
+language_invalid_term = "Invalid term"
+language_invalid_language = "Invalid language"
+language_invalid_language_data = "Invalid language data"
+
