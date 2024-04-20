@@ -10,7 +10,7 @@ func Slugify(text string) string {
 	hyphens := strings.ReplaceAll(lower, " ", "-")
 	reg, err := regexp.Compile("[^a-zA-Z0-9-]+")
 	if err != nil {
-		panic(err)
+		return ""
 	}
 	safe := reg.ReplaceAllString(hyphens, "")
 	return strings.Trim(safe, "-")

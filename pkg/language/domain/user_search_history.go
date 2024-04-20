@@ -14,12 +14,11 @@ type UserSearchHistoryRepository interface {
 }
 
 type UserSearchHistory struct {
-	ID          string
-	UserID      string
-	Term        string
-	IsValid     bool
-	IsFavourite bool
-	CreatedAt   time.Time
+	ID        string
+	UserID    string
+	Term      string
+	IsValid   bool
+	CreatedAt time.Time
 }
 
 func NewUserSearchHistory(userID, term string, isValid bool) (*UserSearchHistory, error) {
@@ -28,11 +27,10 @@ func NewUserSearchHistory(userID, term string, isValid bool) (*UserSearchHistory
 	}
 
 	return &UserSearchHistory{
-		ID:          database.NewStringID(),
-		UserID:      userID,
-		Term:        term,
-		IsValid:     isValid,
-		IsFavourite: false,
-		CreatedAt:   time.Now(),
+		ID:        database.NewStringID(),
+		UserID:    userID,
+		Term:      term,
+		IsValid:   isValid,
+		CreatedAt: time.Now(),
 	}, nil
 }

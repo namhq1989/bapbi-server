@@ -31,3 +31,11 @@ func (s server) CreateUser(bgCtx context.Context, req *userpb.CreateUserRequest)
 
 	return s.app.CreateUser(ctx, req)
 }
+
+func (s server) GetUserSubscriptionPlan(bgCtx context.Context, req *userpb.GetUserSubscriptionPlanRequest) (*userpb.GetUserSubscriptionPlanResponse, error) {
+	var (
+		ctx = appcontext.New(bgCtx)
+	)
+
+	return s.app.GetUserSubscriptionPlan(ctx, req)
+}

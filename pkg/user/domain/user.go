@@ -3,6 +3,8 @@ package domain
 import (
 	"time"
 
+	"github.com/namhq1989/bapbi-server/internal/database"
+
 	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
 	"github.com/namhq1989/bapbi-server/internal/utils/validation"
 )
@@ -10,12 +12,14 @@ import (
 type UserRepository interface{}
 
 type User struct {
-	ID        string
-	Name      string
-	Email     string
-	Status    UserStatus
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID                   string
+	Name                 string
+	Email                string
+	Status               UserStatus
+	SubscriptionPlan     SubscriptionPlan
+	SubscriptionExpireAt time.Time
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
 }
 
 func CreateUser(name, email string) (*User, error) {
@@ -28,11 +32,13 @@ func CreateUser(name, email string) (*User, error) {
 	}
 
 	return &User{
-		ID:        "",
-		Name:      name,
-		Email:     email,
-		Status:    UserStatusActive,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		ID:                   database.NewStringID(),
+		Name:                 name,
+		Email:                email,
+		Status:               UserStatusActive,
+		SubscriptionPlan:     SubscriptionPlanFree,
+		SubscriptionExpireAt: time.Time{},
+		CreatedAt:            time.Now(),
+		UpdatedAt:            time.Now(),
 	}, nil
 }

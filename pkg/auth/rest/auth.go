@@ -24,7 +24,7 @@ func (s server) registerAuthRoutes() {
 
 		return httprespond.R200(c, resp)
 	}, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPBody[dto.SignInWithGoogleRequest](next)
+		return validation.ValidateHTTPPayload[dto.SignInWithGoogleRequest](next)
 	})
 
 	g.POST("/signup-with-google", func(c echo.Context) error {
@@ -40,7 +40,7 @@ func (s server) registerAuthRoutes() {
 
 		return httprespond.R200(c, resp)
 	}, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPBody[dto.SignUpWithGoogleRequest](next)
+		return validation.ValidateHTTPPayload[dto.SignUpWithGoogleRequest](next)
 	})
 
 	g.POST("/refresh-access-token", func(c echo.Context) error {
@@ -56,7 +56,7 @@ func (s server) registerAuthRoutes() {
 
 		return httprespond.R200(c, resp)
 	}, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPBody[dto.RefreshAccessTokenRequest](next)
+		return validation.ValidateHTTPPayload[dto.RefreshAccessTokenRequest](next)
 	})
 
 	g.GET("/access-token", func(c echo.Context) error {
@@ -76,7 +76,7 @@ func (s server) registerAuthRoutes() {
 
 		return httprespond.R200(c, resp)
 	}, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPQuery[dto.GetAccessTokenByUserIDRequest](next)
+		return validation.ValidateHTTPPayload[dto.GetAccessTokenByUserIDRequest](next)
 	})
 
 	g.GET("/me", func(c echo.Context) error {
@@ -92,6 +92,6 @@ func (s server) registerAuthRoutes() {
 
 		return httprespond.R200(c, resp)
 	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPQuery[dto.MeRequest](next)
+		return validation.ValidateHTTPPayload[dto.MeRequest](next)
 	})
 }

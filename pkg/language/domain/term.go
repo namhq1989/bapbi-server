@@ -12,6 +12,7 @@ import (
 )
 
 type TermRepository interface {
+	FindByID(ctx *appcontext.AppContext, termID string) (*Term, error)
 	FindByTerm(ctx *appcontext.AppContext, term, fromLanguage string) (*Term, error)
 	CreateTerm(ctx *appcontext.AppContext, term Term) error
 	UpdateTerm(ctx *appcontext.AppContext, term Term) error

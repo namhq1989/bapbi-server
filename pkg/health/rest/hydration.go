@@ -25,7 +25,7 @@ func (s server) registerHydrationRoutes() {
 
 		return httprespond.R200(c, resp)
 	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPBody[dto.EnableHydrationProfileRequest](next)
+		return validation.ValidateHTTPPayload[dto.EnableHydrationProfileRequest](next)
 	})
 
 	g.PATCH("/disable-profile", func(c echo.Context) error {
@@ -42,7 +42,7 @@ func (s server) registerHydrationRoutes() {
 
 		return httprespond.R200(c, resp)
 	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPBody[dto.DisableHydrationProfileRequest](next)
+		return validation.ValidateHTTPPayload[dto.DisableHydrationProfileRequest](next)
 	})
 
 	g.POST("/water-intake", func(c echo.Context) error {
@@ -59,7 +59,7 @@ func (s server) registerHydrationRoutes() {
 
 		return httprespond.R200(c, resp)
 	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPBody[dto.WaterIntakeRequest](next)
+		return validation.ValidateHTTPPayload[dto.WaterIntakeRequest](next)
 	})
 
 	g.GET("/stats", func(c echo.Context) error {
@@ -76,6 +76,6 @@ func (s server) registerHydrationRoutes() {
 
 		return httprespond.R200(c, resp)
 	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPQuery[dto.HydrationStatsRequest](next)
+		return validation.ValidateHTTPPayload[dto.HydrationStatsRequest](next)
 	})
 }

@@ -25,6 +25,6 @@ func (s server) registerHealthProfileRoutes() {
 
 		return httprespond.R200(c, resp)
 	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPBody[dto.CreateHealthProfileRequest](next)
+		return validation.ValidateHTTPPayload[dto.CreateHealthProfileRequest](next)
 	})
 }

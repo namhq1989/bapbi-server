@@ -1,6 +1,7 @@
 package language
 
 import (
+	"github.com/namhq1989/bapbi-server/internal/grpcclient"
 	"github.com/namhq1989/bapbi-server/internal/monolith"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	"github.com/namhq1989/bapbi-server/pkg/language/application"
@@ -15,19 +16,28 @@ func (Module) Name() string {
 }
 
 func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error {
+	userGRPCClient, err := grpcclient.NewUserClient(ctx, mono.Config().GRPCPort)
+	if err != nil {
+		return err
+	}
+
 	var (
 		// infrastructure
-		termRepository    = infrastructure.NewTermRepository(mono.Mongo())
-		userSearchHistory = infrastructure.NewUserSearchRepository(mono.Mongo())
-		openaiRepository  = infrastructure.NewOpenAIRepository(mono.OpenAI())
-		scraperRepository = infrastructure.NewScraperRepository(mono.Scraper())
+		termRepository              = infrastructure.NewTermRepository(mono.Mongo())
+		userTermRepository          = infrastructure.NewUserTermRepository(mono.Mongo())
+		userSearchHistoryRepository = infrastructure.NewUserSearchHistoryRepository(mono.Mongo())
+		openaiRepository            = infrastructure.NewOpenAIRepository(mono.OpenAI())
+		scraperRepository           = infrastructure.NewScraperRepository(mono.Scraper())
+
+		// hub
+		userHub = infrastructure.NewUserHub(userGRPCClient)
 
 		// application
-		app = application.New(termRepository, userSearchHistory, openaiRepository, scraperRepository)
+		app = application.New(termRepository, userTermRepository, userSearchHistoryRepository, openaiRepository, scraperRepository, userHub)
 	)
 
 	// rest server
-	if err := rest.RegisterServer(ctx, app, mono.Rest(), mono.JWT()); err != nil {
+	if err = rest.RegisterServer(ctx, app, mono.Rest(), mono.JWT()); err != nil {
 		return err
 	}
 
