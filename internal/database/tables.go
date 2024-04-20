@@ -12,6 +12,7 @@ var Tables = struct {
 
 	// language
 	LanguageTerm              string
+	LanguageUserTerm          string
 	LanguageUserSearchHistory string
 }{
 	User:      "user.users",
@@ -23,5 +24,6 @@ var Tables = struct {
 	HealthHydrationDailyReport: "health.hydration.dailyReports",
 
 	LanguageTerm:              "language.terms",
+	LanguageUserTerm:          "language.userTerms",
 	LanguageUserSearchHistory: "language.userSearchHistories",
 }

@@ -24,6 +24,8 @@ auth_not_allowed = "Không được phép"
 user_invalid_id = "ID người dùng không hợp lệ"
 user_not_found = "Không tìm thấy người dùng"
 user_google_email_already_registered = "Email Google này đã được đăng ký trước đây"
+user_invalid_subscription_plan = "Gói người dùng không hợp lệ"
+user_exceeded_plan_limitation = "Đã hết hạn mức sử dụng ngày hôm nay"
 
 # health
 health_profile_not_found = "Vui lòng cài đặt hồ sơ sức khỏe trước khi sử dụng tính năng này"
@@ -38,6 +40,7 @@ health_invalid_hourly_intake_amount = "Lượng nước uống hàng giờ khôn
 health_invalid_streak = "Giá trị chuỗi không hợp lệ"
 
 # language
+language_term_not_found = "Không tìm thấy từ"
 language_invalid_term = "Từ không hợp lệ"
 language_invalid_language = "Ngôn ngữ không hợp lệ"
 language_invalid_language_data = "Dữ liệu ngôn ngữ không hợp lệ"

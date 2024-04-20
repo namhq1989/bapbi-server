@@ -10,22 +10,20 @@ import (
 )
 
 type UserSearchHistory struct {
-	ID          primitive.ObjectID `bson:"_id"`
-	UserID      primitive.ObjectID `bson:"userId"`
-	Term        string             `bson:"term"`
-	IsValid     bool               `bson:"isValid"`
-	IsFavourite bool               `bson:"isFavourite"`
-	CreatedAt   time.Time          `bson:"createdAt"`
+	ID        primitive.ObjectID `bson:"_id"`
+	UserID    primitive.ObjectID `bson:"userId"`
+	Term      string             `bson:"term"`
+	IsValid   bool               `bson:"isValid"`
+	CreatedAt time.Time          `bson:"createdAt"`
 }
 
 func (m UserSearchHistory) ToDomain() domain.UserSearchHistory {
 	return domain.UserSearchHistory{
-		ID:          m.ID.Hex(),
-		UserID:      m.UserID.Hex(),
-		Term:        m.Term,
-		IsValid:     m.IsValid,
-		IsFavourite: m.IsFavourite,
-		CreatedAt:   m.CreatedAt,
+		ID:        m.ID.Hex(),
+		UserID:    m.UserID.Hex(),
+		Term:      m.Term,
+		IsValid:   m.IsValid,
+		CreatedAt: m.CreatedAt,
 	}
 }
 
@@ -41,11 +39,10 @@ func (m UserSearchHistory) FromDomain(history domain.UserSearchHistory) (*UserSe
 	}
 
 	return &UserSearchHistory{
-		ID:          id,
-		UserID:      uid,
-		Term:        history.Term,
-		IsValid:     history.IsValid,
-		IsFavourite: history.IsFavourite,
-		CreatedAt:   history.CreatedAt,
+		ID:        id,
+		UserID:    uid,
+		Term:      history.Term,
+		IsValid:   history.IsValid,
+		CreatedAt: history.CreatedAt,
 	}, nil
 }

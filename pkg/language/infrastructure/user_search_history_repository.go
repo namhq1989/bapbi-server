@@ -14,13 +14,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type UserSearchRepository struct {
+type UserSearchHistoryRepository struct {
 	db             *mongo.Database
 	collectionName string
 }
 
-func NewUserSearchRepository(db *mongo.Database) UserSearchRepository {
-	r := UserSearchRepository{
+func NewUserSearchHistoryRepository(db *mongo.Database) UserSearchHistoryRepository {
+	r := UserSearchHistoryRepository{
 		db:             db,
 		collectionName: database.Tables.LanguageUserSearchHistory,
 	}
@@ -28,13 +28,13 @@ func NewUserSearchRepository(db *mongo.Database) UserSearchRepository {
 	return r
 }
 
-func (r UserSearchRepository) ensureIndexes() {
+func (r UserSearchHistoryRepository) ensureIndexes() {
 	var (
 		ctx     = context.Background()
 		opts    = options.CreateIndexes().SetMaxTime(time.Minute * 30)
 		indexes = []mongo.IndexModel{
 			{
-				Keys: bson.D{{Key: "user", Value: 1}, {Key: "term", Value: 1}, {Key: "createdAt", Value: -1}},
+				Keys: bson.D{{Key: "userId", Value: 1}, {Key: "term", Value: 1}, {Key: "createdAt", Value: -1}},
 			},
 		}
 	)
@@ -44,11 +44,11 @@ func (r UserSearchRepository) ensureIndexes() {
 	}
 }
 
-func (r UserSearchRepository) collection() *mongo.Collection {
+func (r UserSearchHistoryRepository) collection() *mongo.Collection {
 	return r.db.Collection(r.collectionName)
 }
 
-func (r UserSearchRepository) CreateUserSearchHistory(ctx *appcontext.AppContext, history domain.UserSearchHistory) error {
+func (r UserSearchHistoryRepository) CreateUserSearchHistory(ctx *appcontext.AppContext, history domain.UserSearchHistory) error {
 	// convert to mongodb model
 	doc, err := model.UserSearchHistory{}.FromDomain(history)
 	if err != nil {

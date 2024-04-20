@@ -25,6 +25,24 @@ func (s server) registerTermRoutes() {
 
 		return httprespond.R200(c, resp)
 	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPBody[dto.SearchTermRequest](next)
+		return validation.ValidateHTTPPayload[dto.SearchTermRequest](next)
+	})
+
+	g.POST("/:id/add", func(c echo.Context) error {
+		var (
+			ctx         = c.Get("ctx").(*appcontext.AppContext)
+			req         = c.Get("req").(dto.AddTermRequest)
+			termID      = c.Param("id")
+			performerID = ctx.GetUserID()
+		)
+
+		resp, err := s.app.AddTerm(ctx, performerID, termID, req)
+		if err != nil {
+			return httprespond.R400(c, err, nil)
+		}
+
+		return httprespond.R200(c, resp)
+	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return validation.ValidateHTTPPayload[dto.AddTermRequest](next)
 	})
 }

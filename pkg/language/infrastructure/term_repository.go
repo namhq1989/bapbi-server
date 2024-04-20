@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
+
 	"github.com/namhq1989/bapbi-server/internal/database"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	"github.com/namhq1989/bapbi-server/pkg/language/domain"
@@ -48,6 +50,27 @@ func (r TermRepository) ensureIndexes() {
 
 func (r TermRepository) collection() *mongo.Collection {
 	return r.db.Collection(r.collectionName)
+}
+
+func (r TermRepository) FindByID(ctx *appcontext.AppContext, termID string) (*domain.Term, error) {
+	id, err := database.ObjectIDFromString(termID)
+	if err != nil {
+		return nil, apperrors.Common.InvalidID
+	}
+
+	// find
+	var doc model.Term
+	if err = r.collection().FindOne(ctx.Context(), bson.M{
+		"_id": id,
+	}).Decode(&doc); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, err
+	} else if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, nil
+	}
+
+	// respond
+	result := doc.ToDomain()
+	return &result, nil
 }
 
 func (r TermRepository) FindByTerm(ctx *appcontext.AppContext, term, fromLanguage string) (*domain.Term, error) {

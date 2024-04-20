@@ -1,5 +1,7 @@
 package domain
 
+import "strings"
+
 type Language string
 
 const (
@@ -22,7 +24,7 @@ func (s Language) IsValid() bool {
 }
 
 func ToLanguage(value string) Language {
-	switch value {
+	switch strings.ToLower(value) {
 	case LanguageEnglish.String():
 		return LanguageEnglish
 	case LanguageVietnamese.String():

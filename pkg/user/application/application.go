@@ -16,6 +16,7 @@ type (
 		CreateUser(ctx *appcontext.AppContext, req *userpb.CreateUserRequest) (*userpb.CreateUserResponse, error)
 		GetUserByID(ctx *appcontext.AppContext, req *userpb.GetUserByIDRequest) (*userpb.GetUserByIDResponse, error)
 		GetUserByEmail(ctx *appcontext.AppContext, req *userpb.GetUserByEmailRequest) (*userpb.GetUserByEmailResponse, error)
+		GetUserSubscriptionPlan(ctx *appcontext.AppContext, req *userpb.GetUserSubscriptionPlanRequest) (*userpb.GetUserSubscriptionPlanResponse, error)
 	}
 	App interface {
 		Commands
@@ -31,6 +32,7 @@ type (
 		hub.CreateUserHandler
 		hub.GetUserByIDHandler
 		hub.GetUserByEmailHandler
+		hub.GetUserSubscriptionPlanHandler
 	}
 	Application struct {
 		appCommandHandlers
@@ -49,9 +51,10 @@ func New(
 		appCommandHandlers: appCommandHandlers{},
 		appQueryHandler:    appQueryHandler{},
 		appHubHandler: appHubHandler{
-			CreateUserHandler:     hub.NewCreateUserHandler(queueRepository, userHub),
-			GetUserByIDHandler:    hub.NewGetUserByIDHandler(userHub),
-			GetUserByEmailHandler: hub.NewGetUserByEmailHandler(userHub),
+			CreateUserHandler:              hub.NewCreateUserHandler(queueRepository, userHub),
+			GetUserByIDHandler:             hub.NewGetUserByIDHandler(userHub),
+			GetUserByEmailHandler:          hub.NewGetUserByEmailHandler(userHub),
+			GetUserSubscriptionPlanHandler: hub.NewGetUserSubscriptionPlanHandler(userHub),
 		},
 	}
 }

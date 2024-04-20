@@ -8,6 +8,7 @@ service UserService {
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {}
   rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse) {}
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
+  rpc GetUserSubscriptionPlan(GetUserSubscriptionPlanRequest) returns (GetUserSubscriptionPlanResponse) {}
 }
 
 // GET USER BY ID
@@ -40,4 +41,14 @@ message CreateUserRequest {
 
 message CreateUserResponse {
   string id = 1;
+}
+
+// GET USER SUBSCRIPTION PLAN
+
+message GetUserSubscriptionPlanRequest {
+  string id = 1;
+}
+
+message GetUserSubscriptionPlanResponse {
+  string plan = 1;
 }
