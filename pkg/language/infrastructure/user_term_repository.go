@@ -120,3 +120,49 @@ func (r UserTermRepository) CountTotalTermAddedByTimeRange(ctx *appcontext.AppCo
 	})
 	return total, err
 }
+
+func (r UserTermRepository) FindUserTerms(ctx *appcontext.AppContext, filter domain.UserTermFilter) ([]domain.UserTerm, error) {
+	uid, err := database.ObjectIDFromString(filter.UserID)
+	if err != nil {
+		return nil, apperrors.User.InvalidUserID
+	}
+
+	var (
+		condition = bson.M{"userId": uid}
+		result    = make([]domain.UserTerm, 0)
+	)
+
+	if !filter.Time.IsZero() {
+		condition["createdAt"] = bson.M{"$lte": filter.Time}
+	}
+	if filter.IsFavourite != nil {
+		condition["isFavourite"] = *filter.IsFavourite
+	}
+	if filter.Keyword != "" {
+		condition["term"] = bson.M{"$regex": filter.Keyword, "$options": "i"}
+	}
+
+	// find
+	cursor, err := r.collection().Find(ctx.Context(), condition, &options.FindOptions{
+		Sort: bson.M{"createdAt": -1},
+	}, &options.FindOptions{
+		Limit: &filter.Limit,
+	})
+	if err != nil {
+		return result, err
+	}
+	// parse
+	defer func() { _ = cursor.Close(ctx.Context()) }()
+
+	// parse
+	var docs []model.UserTerm
+	if err = cursor.All(ctx.Context(), &docs); err != nil {
+		return result, err
+	}
+
+	// map data
+	for _, doc := range docs {
+		result = append(result, doc.ToDomain())
+	}
+	return result, nil
+}

@@ -72,7 +72,7 @@ func (h AddTermHandler) AddTerm(ctx *appcontext.AppContext, performerID, termID 
 	}
 
 	ctx.Logger().Info("still available to add term, create new user term", appcontext.Fields{"added": totalAdded})
-	userTerm, err := domain.NewUserTerm(performerID, term.Term)
+	userTerm, err := domain.NewUserTerm(performerID, term.ID, term.Term)
 	if err != nil {
 		ctx.Logger().Error("failed to create new user term", err, appcontext.Fields{})
 		return nil, err
