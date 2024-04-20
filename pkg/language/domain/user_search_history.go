@@ -11,6 +11,7 @@ import (
 
 type UserSearchHistoryRepository interface {
 	CreateUserSearchHistory(ctx *appcontext.AppContext, history UserSearchHistory) error
+	CountTotalSearchedByTimeRange(ctx *appcontext.AppContext, userID string, start, end time.Time) (int64, error)
 }
 
 type UserSearchHistory struct {

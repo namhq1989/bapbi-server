@@ -56,7 +56,7 @@ func New(
 			ChangeTermFavouriteHandler: command.NewChangeTermFavouriteHandler(userTermRepository),
 		},
 		appQueryHandler: appQueryHandler{
-			SearchTermHandler:   query.NewSearchTermHandler(termRepository, userSearchHistoryRepository, openaiRepository, scraperRepository),
+			SearchTermHandler:   query.NewSearchTermHandler(termRepository, userSearchHistoryRepository, openaiRepository, scraperRepository, userHub),
 			GetUserTermsHandler: query.NewGetUserTermsHandler(termRepository, userTermRepository),
 		},
 		appHubHandler: appHubHandler{},

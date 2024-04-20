@@ -67,7 +67,7 @@ func (h AddTermHandler) AddTerm(ctx *appcontext.AppContext, performerID, termID 
 		return nil, err
 	}
 	if isExceeded := plan.IsExceededAddTermLimitation(totalAdded); isExceeded {
-		ctx.Logger().Error("exceeded add term limitation", nil, appcontext.Fields{})
+		ctx.Logger().Error("exceeded add term limitation", nil, appcontext.Fields{"plan": plan.String(), "added": totalAdded})
 		return nil, apperrors.User.ExceededPlanLimitation
 	}
 

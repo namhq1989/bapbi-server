@@ -10,10 +10,9 @@ import (
 )
 
 type SearchTermResult struct {
-	IsValid bool           `json:"isValid"`
-	Term    string         `json:"term"`
-	From    TermByLanguage `json:"from"`
-	To      TermByLanguage `json:"to"`
+	From     TermByLanguage `json:"from"`
+	To       TermByLanguage `json:"to"`
+	Examples []TermExample  `json:"examples"`
 }
 
 type TermByLanguage struct {
@@ -22,16 +21,19 @@ type TermByLanguage struct {
 	Example    string `json:"example"`
 }
 
+type TermExample struct {
+	PartOfSpeech string `json:"pos"`
+	From         string `json:"from"`
+	To           string `json:"to"`
+}
+
 const searchTermPrompt = `
-	Term is "{{term}}", its language is {{fromLanguage}} (source language) and you have to translate it to {{toLanguage}} (target language).
-	Is the term a commonly used piece of English vocabulary in general language use, or is it a specific name or title for an event, organization, or concept?
-	Check if the term is a valid {{fromLanguage}} vocabulary or not.
-	If valid, generate a detailed JSON-formatted (only data, no redundant information) response including:
-	- "isValid": True
-	- "term": The input word or phrase.
-	- "from": Object with "language" is the source language, "definition" is the definition in the source language and "example" is an example sentence in the source language. All fields are mandatory.
-	- "to": Object with "language" is the target language, "definition" is the definition in the target language and "example" is a translated sentence of source language's example. All fields are mandatory.
-	If the term is not valid, return only: { "isValid": false }
+	Term is "{{term}}", its language is {{fromLanguage}} and you have to translate it to {{toLanguage}}.
+	Generate a detailed JSON-formatted structured as follows:
+	- "from": { "language": "{{fromLanguage}}", "definition": "{{fromLanguage}} definition", "example": "{{fromLanguage}} example" }.
+	- "to": {  "language": "{{toLanguage}}", "definition": "{{toLanguage}} definition", "example": "{{toLanguage}} translation" }.
+	- "examples": [{ "pos": "part of speech", "from": "{{fromLanguage}} sentence", "to": "{{toLanguage}} translation"}].
+	Field "examples" has up to three examples with each show a distinct usage in English. If distinct usages aren't available, provide fewer examples
 `
 
 func (o *OpenAI) SearchTerm(ctx *appcontext.AppContext, term, fromLanguage, toLanguage string) (*SearchTermResult, error) {
@@ -42,8 +44,8 @@ func (o *OpenAI) SearchTerm(ctx *appcontext.AppContext, term, fromLanguage, toLa
 	resp, err := o.client.CreateChatCompletion(ctx.Context(), oai.ChatCompletionRequest{
 		Model:       oai.GPT3Dot5Turbo1106,
 		Messages:    []oai.ChatCompletionMessage{{Role: oai.ChatMessageRoleUser, Content: prompt}},
-		MaxTokens:   500,
-		Temperature: 0.3,
+		MaxTokens:   700,
+		Temperature: 0.5,
 	})
 
 	if err != nil {
@@ -58,7 +60,7 @@ func (o *OpenAI) SearchTerm(ctx *appcontext.AppContext, term, fromLanguage, toLa
 
 	var result SearchTermResult
 	if err = json.Unmarshal([]byte(cleanJsonStr), &result); err != nil {
-		ctx.Logger().Print("data", string(resp.Choices[0].Message.Content))
+		ctx.Logger().Print("data", resp.Choices[0].Message.Content)
 		return nil, err
 	}
 

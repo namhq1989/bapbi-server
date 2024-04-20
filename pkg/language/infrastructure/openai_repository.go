@@ -23,25 +23,33 @@ func (r OpenAIRepository) SearchTerm(ctx *appcontext.AppContext, term, fromLangu
 	if err != nil {
 		return nil, err
 	}
-	if result == nil || !result.IsValid {
+	if result == nil {
 		return nil, nil
 	}
 
 	ctx.Logger().Print("got new term", result)
 
+	examples := make([]domain.TermExample, len(result.Examples))
+	for i, example := range result.Examples {
+		examples[i] = domain.TermExample{
+			PartOfSpeech: example.PartOfSpeech,
+			From:         example.From,
+			To:           example.To,
+		}
+	}
+
 	return &domain.OpenAISearchTermResult{
-		IsValid: result.IsValid,
-		Term:    term,
-		From: domain.OpenAITermByLanguage{
-			Language:   strings.ToLower(result.From.Language),
+		From: domain.TermByLanguage{
+			Language:   domain.ToLanguage(strings.ToLower(result.From.Language)),
 			Definition: result.From.Definition,
 			Example:    result.From.Example,
 		},
-		To: domain.OpenAITermByLanguage{
-			Language:   strings.ToLower(result.To.Language),
+		To: domain.TermByLanguage{
+			Language:   domain.ToLanguage(strings.ToLower(result.To.Language)),
 			Definition: result.To.Definition,
 			Example:    result.To.Example,
 		},
+		Examples: examples,
 	}, nil
 }
 

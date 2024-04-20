@@ -14,6 +14,7 @@ type Term struct {
 	AudioURL     string         `json:"audioUrl"`
 	Synonyms     []string       `json:"synonyms"`
 	Antonyms     []string       `json:"antonyms"`
+	Examples     []TermExample  `json:"examples"`
 	IsFavourite  bool           `json:"isFavourite"`
 }
 
@@ -23,7 +24,22 @@ type TermByLanguage struct {
 	Example    string `json:"example"`
 }
 
+type TermExample struct {
+	PartOfSpeech string `json:"pos"`
+	From         string `json:"from"`
+	To           string `json:"to"`
+}
+
 func (d Term) FromDomain(term domain.Term, isFavourite bool) Term {
+	examples := make([]TermExample, len(term.Examples))
+	for i, example := range term.Examples {
+		examples[i] = TermExample{
+			PartOfSpeech: example.PartOfSpeech,
+			From:         example.From,
+			To:           example.To,
+		}
+	}
+
 	return Term{
 		ID:   term.ID,
 		Term: term.Term,
@@ -44,6 +60,7 @@ func (d Term) FromDomain(term domain.Term, isFavourite bool) Term {
 		AudioURL:     term.AudioURL,
 		Synonyms:     term.Synonyms,
 		Antonyms:     term.Antonyms,
+		Examples:     examples,
 		IsFavourite:  isFavourite,
 	}
 }

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
+
 	"github.com/namhq1989/bapbi-server/internal/database"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	"github.com/namhq1989/bapbi-server/pkg/language/domain"
@@ -49,7 +51,6 @@ func (r UserSearchHistoryRepository) collection() *mongo.Collection {
 }
 
 func (r UserSearchHistoryRepository) CreateUserSearchHistory(ctx *appcontext.AppContext, history domain.UserSearchHistory) error {
-	// convert to mongodb model
 	doc, err := model.UserSearchHistory{}.FromDomain(history)
 	if err != nil {
 		return err
@@ -57,4 +58,20 @@ func (r UserSearchHistoryRepository) CreateUserSearchHistory(ctx *appcontext.App
 
 	_, err = r.collection().InsertOne(ctx.Context(), &doc)
 	return err
+}
+
+func (r UserSearchHistoryRepository) CountTotalSearchedByTimeRange(ctx *appcontext.AppContext, userID string, start, end time.Time) (int64, error) {
+	uid, err := database.ObjectIDFromString(userID)
+	if err != nil {
+		return 0, apperrors.Common.InvalidID
+	}
+
+	total, err := r.collection().CountDocuments(ctx.Context(), bson.M{
+		"userId": uid,
+		"createdAt": bson.M{
+			"$gte": start,
+			"$lte": end,
+		},
+	})
+	return total, err
 }
