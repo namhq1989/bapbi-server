@@ -2,6 +2,9 @@ package query
 
 import (
 	"sync"
+	"time"
+
+	"github.com/namhq1989/bapbi-server/internal/utils/manipulation"
 
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
@@ -14,6 +17,7 @@ type SearchTermHandler struct {
 	userSearchHistoryRepository domain.UserSearchHistoryRepository
 	openaiRepository            domain.OpenAIRepository
 	scraperRepository           domain.ScraperRepository
+	userHub                     domain.UserHub
 }
 
 func NewSearchTermHandler(
@@ -21,19 +25,43 @@ func NewSearchTermHandler(
 	userSearchHistoryRepository domain.UserSearchHistoryRepository,
 	openaiRepository domain.OpenAIRepository,
 	scraperRepository domain.ScraperRepository,
+	userHub domain.UserHub,
 ) SearchTermHandler {
 	return SearchTermHandler{
 		termRepository:              termRepository,
 		userSearchHistoryRepository: userSearchHistoryRepository,
 		openaiRepository:            openaiRepository,
 		scraperRepository:           scraperRepository,
+		userHub:                     userHub,
 	}
 }
 
 func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID string, req dto.SearchTermRequest) (*dto.SearchTermResponse, error) {
 	ctx.Logger().Info("new search term request", appcontext.Fields{"term": req.Term, "from": req.From, "to": req.To})
 
-	ctx.Logger().Text("new domain model")
+	ctx.Logger().Text("get user's subscription plan")
+	plan, err := h.userHub.GetUserPlan(ctx, performerID)
+	if err != nil {
+		ctx.Logger().Error("failed to get user's subscription plan", err, appcontext.Fields{})
+		return nil, err
+	}
+
+	ctx.Logger().Text("count total searched today")
+	var (
+		start = manipulation.StartOfToday()
+		end   = time.Now()
+	)
+	totalSearched, err := h.userSearchHistoryRepository.CountTotalSearchedByTimeRange(ctx, performerID, start, end)
+	if err != nil {
+		ctx.Logger().Error("failed to count total searched today", err, appcontext.Fields{})
+		return nil, err
+	}
+	if isExceeded := plan.IsExceededSearchLimitation(totalSearched); isExceeded {
+		ctx.Logger().Error("exceeded search term limitation", nil, appcontext.Fields{"plan": plan.String(), "searched": totalSearched})
+		return nil, apperrors.User.ExceededPlanLimitation
+	}
+
+	ctx.Logger().Info("still available to search term, create new domain model", appcontext.Fields{"searched": totalSearched})
 	domainTerm, err := domain.NewTerm(req.Term, req.From, req.To)
 	if err != nil {
 		ctx.Logger().Error("failed to create new domain term", err, appcontext.Fields{})
@@ -55,7 +83,7 @@ func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID st
 
 		ctx.Logger().Text("respond")
 		return &dto.SearchTermResponse{
-			Term: dto.Term{}.FromDomain(*domainTerm, false),
+			Term: dto.Term{}.FromDomain(*term, false),
 		}, nil
 	}
 
@@ -107,6 +135,7 @@ func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID st
 	if searchTermData != nil {
 		_ = domainTerm.SetLanguage(searchTermData.From.Language, searchTermData.From.Definition, searchTermData.From.Example)
 		_ = domainTerm.SetLanguage(searchTermData.To.Language, searchTermData.To.Definition, searchTermData.To.Example)
+		domainTerm.SetExamples(searchTermData.Examples)
 	}
 
 	if semanticRelationsData != nil {

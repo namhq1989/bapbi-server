@@ -21,6 +21,7 @@ type Term struct {
 	ReferenceURL string             `bson:"referenceUrl"`
 	Synonyms     []string           `bson:"synonyms"`
 	Antonyms     []string           `bson:"antonyms"`
+	Examples     []TermExample      `bson:"examples"`
 	CreatedAt    time.Time          `bson:"createdAt"`
 	UpdatedAt    time.Time          `bson:"updatedAt"`
 }
@@ -31,7 +32,21 @@ type TermByLanguage struct {
 	Example    string `bson:"example"`
 }
 
+type TermExample struct {
+	PartOfSpeech string `bson:"pos"`
+	From         string `bson:"from"`
+	To           string `bson:"to"`
+}
+
 func (m Term) ToDomain() domain.Term {
+	examples := make([]domain.TermExample, len(m.Examples))
+	for i, example := range m.Examples {
+		examples[i] = domain.TermExample{
+			PartOfSpeech: example.PartOfSpeech,
+			From:         example.From,
+			To:           example.To,
+		}
+	}
 	return domain.Term{
 		ID:   m.ID.Hex(),
 		Term: m.Term,
@@ -52,6 +67,7 @@ func (m Term) ToDomain() domain.Term {
 		ReferenceURL: m.ReferenceURL,
 		Synonyms:     m.Synonyms,
 		Antonyms:     m.Antonyms,
+		Examples:     examples,
 		CreatedAt:    m.CreatedAt,
 		UpdatedAt:    m.UpdatedAt,
 	}
@@ -61,6 +77,15 @@ func (m Term) FromDomain(term domain.Term) (*Term, error) {
 	id, err := database.ObjectIDFromString(term.ID)
 	if err != nil {
 		return nil, apperrors.Common.InvalidID
+	}
+
+	examples := make([]TermExample, len(term.Examples))
+	for i, example := range term.Examples {
+		examples[i] = TermExample{
+			PartOfSpeech: example.PartOfSpeech,
+			From:         example.From,
+			To:           example.To,
+		}
 	}
 
 	return &Term{
@@ -75,6 +100,7 @@ func (m Term) FromDomain(term domain.Term) (*Term, error) {
 		ReferenceURL: term.ReferenceURL,
 		Synonyms:     term.Synonyms,
 		Antonyms:     term.Antonyms,
+		Examples:     examples,
 		CreatedAt:    term.CreatedAt,
 		UpdatedAt:    term.UpdatedAt,
 	}, nil

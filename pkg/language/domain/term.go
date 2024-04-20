@@ -30,6 +30,7 @@ type Term struct {
 	ReferenceURL string
 	Synonyms     []string
 	Antonyms     []string
+	Examples     []TermExample
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
@@ -38,6 +39,12 @@ type TermByLanguage struct {
 	Language   Language
 	Definition string
 	Example    string
+}
+
+type TermExample struct {
+	PartOfSpeech string
+	From         string
+	To           string
 }
 
 func NewTerm(term, fromLanguage, toLanguage string) (*Term, error) {
@@ -73,14 +80,14 @@ func NewTerm(term, fromLanguage, toLanguage string) (*Term, error) {
 		Phonetic:     "",
 		Synonyms:     make([]string, 0),
 		Antonyms:     make([]string, 0),
+		Examples:     make([]TermExample, 0),
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}, nil
 }
 
-func (d *Term) SetLanguage(language, definition, example string) error {
-	lang := ToLanguage(language)
-	if !lang.IsValid() {
+func (d *Term) SetLanguage(language Language, definition, example string) error {
+	if !language.IsValid() {
 		return apperrors.Language.InvalidLanguage
 	}
 
@@ -88,10 +95,10 @@ func (d *Term) SetLanguage(language, definition, example string) error {
 		return apperrors.Language.InvalidLanguageData
 	}
 
-	if d.From.Language == lang {
+	if d.From.Language == language {
 		d.From.Definition = definition
 		d.From.Example = example
-	} else if d.To.Language == lang {
+	} else if d.To.Language == language {
 		d.To.Definition = definition
 		d.To.Example = example
 	} else {
@@ -123,6 +130,10 @@ func (d *Term) SetReferenceURL(url string) {
 
 func (d *Term) SetSynonyms(synonyms []string) {
 	d.Synonyms = synonyms
+}
+
+func (d *Term) SetExamples(examples []TermExample) {
+	d.Examples = examples
 }
 
 func (d *Term) SetAntonyms(antonyms []string) {

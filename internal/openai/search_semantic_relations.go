@@ -44,7 +44,7 @@ func (o *OpenAI) SearchSemanticRelations(ctx *appcontext.AppContext, term, langu
 
 	var result SearchSemanticRelationsResult
 	if err = json.Unmarshal([]byte(cleanJsonStr), &result); err != nil {
-		ctx.Logger().Print("data", string(resp.Choices[0].Message.Content))
+		ctx.Logger().Print("data", resp.Choices[0].Message.Content)
 		return nil, err
 	}
 

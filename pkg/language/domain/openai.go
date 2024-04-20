@@ -8,16 +8,9 @@ type OpenAIRepository interface {
 }
 
 type OpenAISearchTermResult struct {
-	IsValid bool
-	Term    string
-	From    OpenAITermByLanguage
-	To      OpenAITermByLanguage
-}
-
-type OpenAITermByLanguage struct {
-	Language   string
-	Definition string
-	Example    string
+	From     TermByLanguage
+	To       TermByLanguage
+	Examples []TermExample
 }
 
 type OpenAISearchSemanticRelationsResult struct {
