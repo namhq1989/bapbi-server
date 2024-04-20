@@ -15,6 +15,7 @@ type (
 	}
 	Queries interface {
 		SearchTerm(ctx *appcontext.AppContext, performerID string, req dto.SearchTermRequest) (*dto.SearchTermResponse, error)
+		GetUserTerms(ctx *appcontext.AppContext, performerID string, req dto.GetUserTermsRequest) (*dto.GetUserTermsResponse, error)
 	}
 	Hubs interface{}
 	App  interface {
@@ -29,6 +30,7 @@ type (
 	}
 	appQueryHandler struct {
 		query.SearchTermHandler
+		query.GetUserTermsHandler
 	}
 	appHubHandler struct{}
 	Application   struct {
@@ -54,7 +56,8 @@ func New(
 			ChangeTermFavouriteHandler: command.NewChangeTermFavouriteHandler(userTermRepository),
 		},
 		appQueryHandler: appQueryHandler{
-			SearchTermHandler: query.NewSearchTermHandler(termRepository, userSearchHistoryRepository, openaiRepository, scraperRepository),
+			SearchTermHandler:   query.NewSearchTermHandler(termRepository, userSearchHistoryRepository, openaiRepository, scraperRepository),
+			GetUserTermsHandler: query.NewGetUserTermsHandler(termRepository, userTermRepository),
 		},
 		appHubHandler: appHubHandler{},
 	}

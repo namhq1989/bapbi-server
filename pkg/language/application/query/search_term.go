@@ -54,8 +54,9 @@ func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID st
 		}
 
 		ctx.Logger().Text("respond")
-		result := dto.SearchTermResponse{}.FromDomain(*term)
-		return &result, nil
+		return &dto.SearchTermResponse{
+			Term: dto.Term{}.FromDomain(*domainTerm, false),
+		}, nil
 	}
 
 	ctx.Logger().Text("term not found in db, scrape from online dictionary")
@@ -130,8 +131,9 @@ func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID st
 	}
 
 	ctx.Logger().Text("done search term request")
-	result := dto.SearchTermResponse{}.FromDomain(*domainTerm)
-	return &result, nil
+	return &dto.SearchTermResponse{
+		Term: dto.Term{}.FromDomain(*domainTerm, false),
+	}, nil
 }
 
 func (h SearchTermHandler) insertUserSearchHistory(ctx *appcontext.AppContext, performerID, term string, isValid bool) error {

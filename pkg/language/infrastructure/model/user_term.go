@@ -12,6 +12,7 @@ import (
 type UserTerm struct {
 	ID          primitive.ObjectID `bson:"_id"`
 	UserID      primitive.ObjectID `bson:"userId"`
+	TermID      primitive.ObjectID `bson:"termId"`
 	Term        string             `bson:"term"`
 	IsFavourite bool               `bson:"isFavourite"`
 	CreatedAt   time.Time          `bson:"createdAt"`
@@ -21,6 +22,7 @@ func (d UserTerm) ToDomain() domain.UserTerm {
 	return domain.UserTerm{
 		ID:          d.ID.Hex(),
 		UserID:      d.UserID.Hex(),
+		TermID:      d.TermID.Hex(),
 		Term:        d.Term,
 		IsFavourite: d.IsFavourite,
 		CreatedAt:   d.CreatedAt,
@@ -38,9 +40,15 @@ func (d UserTerm) FromDomain(term domain.UserTerm) (*UserTerm, error) {
 		return nil, apperrors.User.InvalidUserID
 	}
 
+	tid, err := database.ObjectIDFromString(term.TermID)
+	if err != nil {
+		return nil, apperrors.Common.InvalidID
+	}
+
 	return &UserTerm{
 		ID:          id,
 		UserID:      uid,
+		TermID:      tid,
 		Term:        term.Term,
 		IsFavourite: term.IsFavourite,
 		CreatedAt:   term.CreatedAt,
