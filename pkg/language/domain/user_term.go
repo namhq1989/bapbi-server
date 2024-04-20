@@ -9,9 +9,11 @@ import (
 )
 
 type UserTermRepository interface {
-	IsTermAdded(ctx *appcontext.AppContext, userID, termID string) (bool, error)
+	IsUserTermAdded(ctx *appcontext.AppContext, userID, termID string) (bool, error)
 	CountTotalTermAddedByTimeRange(ctx *appcontext.AppContext, userID string, start, end time.Time) (int64, error)
-	AddTerm(ctx *appcontext.AppContext, term UserTerm) error
+	FindUserTermByID(ctx *appcontext.AppContext, termID string) (*UserTerm, error)
+	AddUserTerm(ctx *appcontext.AppContext, term UserTerm) error
+	UpdateUserTerm(ctx *appcontext.AppContext, term UserTerm) error
 }
 
 type UserTerm struct {

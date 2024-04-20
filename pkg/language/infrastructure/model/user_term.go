@@ -43,6 +43,6 @@ func (d UserTerm) FromDomain(term domain.UserTerm) (*UserTerm, error) {
 		UserID:      uid,
 		Term:        term.Term,
 		IsFavourite: term.IsFavourite,
-		CreatedAt:   time.Now(),
+		CreatedAt:   term.CreatedAt,
 	}, nil
 }
