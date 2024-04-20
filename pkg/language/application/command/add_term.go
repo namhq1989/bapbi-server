@@ -39,7 +39,7 @@ func (h AddTermHandler) AddTerm(ctx *appcontext.AppContext, performerID, termID 
 	}
 
 	ctx.Logger().Text("check if user already added this term or not")
-	isAdded, err := h.userTermRepository.IsTermAdded(ctx, performerID, term.Term)
+	isAdded, err := h.userTermRepository.IsUserTermAdded(ctx, performerID, term.Term)
 	if err != nil {
 		ctx.Logger().Error("failed to check if user already added this term or not", err, appcontext.Fields{})
 		return nil, err
@@ -79,7 +79,7 @@ func (h AddTermHandler) AddTerm(ctx *appcontext.AppContext, performerID, termID 
 	}
 
 	ctx.Logger().Text("insert user term into database")
-	if err = h.userTermRepository.AddTerm(ctx, *userTerm); err != nil {
+	if err = h.userTermRepository.AddUserTerm(ctx, *userTerm); err != nil {
 		ctx.Logger().Error("failed to insert user term into database", err, appcontext.Fields{})
 		return nil, err
 	}

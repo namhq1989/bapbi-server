@@ -45,4 +45,22 @@ func (s server) registerTermRoutes() {
 	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
 		return validation.ValidateHTTPPayload[dto.AddTermRequest](next)
 	})
+
+	g.PATCH("/:userTermId/favourite", func(c echo.Context) error {
+		var (
+			ctx         = c.Get("ctx").(*appcontext.AppContext)
+			req         = c.Get("req").(dto.ChangeTermFavouriteRequest)
+			userTermID  = c.Param("userTermId")
+			performerID = ctx.GetUserID()
+		)
+
+		resp, err := s.app.ChangeTermFavourite(ctx, performerID, userTermID, req)
+		if err != nil {
+			return httprespond.R400(c, err, nil)
+		}
+
+		return httprespond.R200(c, resp)
+	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return validation.ValidateHTTPPayload[dto.ChangeTermFavouriteRequest](next)
+	})
 }

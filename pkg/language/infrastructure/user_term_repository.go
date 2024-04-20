@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -50,7 +51,28 @@ func (r UserTermRepository) collection() *mongo.Collection {
 	return r.db.Collection(r.collectionName)
 }
 
-func (r UserTermRepository) AddTerm(ctx *appcontext.AppContext, term domain.UserTerm) error {
+func (r UserTermRepository) FindUserTermByID(ctx *appcontext.AppContext, termID string) (*domain.UserTerm, error) {
+	id, err := database.ObjectIDFromString(termID)
+	if err != nil {
+		return nil, apperrors.Common.InvalidID
+	}
+
+	// find
+	var doc model.UserTerm
+	if err = r.collection().FindOne(ctx.Context(), bson.M{
+		"_id": id,
+	}).Decode(&doc); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, err
+	} else if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, nil
+	}
+
+	// respond
+	result := doc.ToDomain()
+	return &result, nil
+}
+
+func (r UserTermRepository) AddUserTerm(ctx *appcontext.AppContext, term domain.UserTerm) error {
 	doc, err := model.UserTerm{}.FromDomain(term)
 	if err != nil {
 		return err
@@ -60,7 +82,17 @@ func (r UserTermRepository) AddTerm(ctx *appcontext.AppContext, term domain.User
 	return err
 }
 
-func (r UserTermRepository) IsTermAdded(ctx *appcontext.AppContext, userID, term string) (bool, error) {
+func (r UserTermRepository) UpdateUserTerm(ctx *appcontext.AppContext, term domain.UserTerm) error {
+	doc, err := model.UserTerm{}.FromDomain(term)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.collection().UpdateByID(ctx.Context(), doc.ID, bson.M{"$set": doc})
+	return err
+}
+
+func (r UserTermRepository) IsUserTermAdded(ctx *appcontext.AppContext, userID, term string) (bool, error) {
 	uid, err := database.ObjectIDFromString(userID)
 	if err != nil {
 		return false, apperrors.Common.InvalidID
