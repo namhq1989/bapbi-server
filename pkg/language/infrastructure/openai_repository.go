@@ -67,3 +67,17 @@ func (r OpenAIRepository) SearchSemanticRelations(ctx *appcontext.AppContext, te
 		Antonyms: result.Antonyms,
 	}, nil
 }
+
+func (r OpenAIRepository) FeaturedWord(ctx *appcontext.AppContext, language string) (*domain.OpenAIFeaturedWordResult, error) {
+	result, err := r.openai.FeaturedWord(ctx, language)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil {
+		return nil, nil
+	}
+
+	return &domain.OpenAIFeaturedWordResult{
+		Word: result.Word,
+	}, nil
+}

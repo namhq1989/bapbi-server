@@ -36,14 +36,8 @@ func (o *OpenAI) SearchSemanticRelations(ctx *appcontext.AppContext, term, langu
 		return nil, err
 	}
 
-	// cleaning the input JSON string
-	jsonStr := resp.Choices[0].Message.Content
-	cleanJsonStr := strings.Replace(jsonStr, "`json\n", "", 1)
-	cleanJsonStr = strings.Replace(cleanJsonStr, "\n", "", -1)
-	cleanJsonStr = strings.Trim(cleanJsonStr, "`")
-
 	var result SearchSemanticRelationsResult
-	if err = json.Unmarshal([]byte(cleanJsonStr), &result); err != nil {
+	if err = json.Unmarshal([]byte(resp.Choices[0].Message.Content), &result); err != nil {
 		ctx.Logger().Print("data", resp.Choices[0].Message.Content)
 		return nil, err
 	}

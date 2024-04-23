@@ -93,7 +93,7 @@ func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID st
 		ctx.Logger().Error("scrape Cambridge dictionary data failed", err, appcontext.Fields{})
 	}
 	if scrapeData == nil {
-		ctx.Logger().Text("this term is an invalid vocabulary")
+		ctx.Logger().Error("this term is an invalid vocabulary", nil, appcontext.Fields{})
 		if err = h.insertUserSearchHistory(ctx, performerID, req.Term, false); err != nil {
 			return nil, err
 		}
@@ -121,7 +121,6 @@ func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID st
 	go func() {
 		defer wg.Done()
 
-		// determine the term is valid or not
 		ctx.Logger().Text("search term with Open AI")
 		searchTermData, err = h.openaiRepository.SearchTerm(ctx, req.Term, req.From, req.To)
 		if err != nil {

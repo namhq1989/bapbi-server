@@ -5,6 +5,7 @@ import "github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 type OpenAIRepository interface {
 	SearchTerm(ctx *appcontext.AppContext, term, fromLanguage, toLanguage string) (*OpenAISearchTermResult, error)
 	SearchSemanticRelations(ctx *appcontext.AppContext, term, language string) (*OpenAISearchSemanticRelationsResult, error)
+	FeaturedWord(ctx *appcontext.AppContext, language string) (*OpenAIFeaturedWordResult, error)
 }
 
 type OpenAISearchTermResult struct {
@@ -16,4 +17,8 @@ type OpenAISearchTermResult struct {
 type OpenAISearchSemanticRelationsResult struct {
 	Synonyms []string
 	Antonyms []string
+}
+
+type OpenAIFeaturedWordResult struct {
+	Word string `json:"word"`
 }

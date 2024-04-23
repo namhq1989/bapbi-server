@@ -80,4 +80,20 @@ func (s server) registerTermRoutes() {
 	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
 		return validation.ValidateHTTPPayload[dto.GetUserTermsRequest](next)
 	})
+
+	g.GET("/featured-term", func(c echo.Context) error {
+		var (
+			ctx = c.Get("ctx").(*appcontext.AppContext)
+			req = c.Get("req").(dto.GetFeaturedTermRequest)
+		)
+
+		resp, err := s.app.GetFeaturedTerm(ctx, req)
+		if err != nil {
+			return httprespond.R400(c, err, nil)
+		}
+
+		return httprespond.R200(c, resp)
+	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return validation.ValidateHTTPPayload[dto.GetFeaturedTermRequest](next)
+	})
 }

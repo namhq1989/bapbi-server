@@ -22,6 +22,7 @@ type Term struct {
 	Synonyms     []string           `bson:"synonyms"`
 	Antonyms     []string           `bson:"antonyms"`
 	Examples     []TermExample      `bson:"examples"`
+	IsFeatured   bool               `bson:"isFeatured"`
 	CreatedAt    time.Time          `bson:"createdAt"`
 	UpdatedAt    time.Time          `bson:"updatedAt"`
 }
@@ -68,6 +69,7 @@ func (m Term) ToDomain() domain.Term {
 		Synonyms:     m.Synonyms,
 		Antonyms:     m.Antonyms,
 		Examples:     examples,
+		IsFeatured:   m.IsFeatured,
 		CreatedAt:    m.CreatedAt,
 		UpdatedAt:    m.UpdatedAt,
 	}
@@ -101,6 +103,7 @@ func (m Term) FromDomain(term domain.Term) (*Term, error) {
 		Synonyms:     term.Synonyms,
 		Antonyms:     term.Antonyms,
 		Examples:     examples,
+		IsFeatured:   term.IsFeatured,
 		CreatedAt:    term.CreatedAt,
 		UpdatedAt:    term.UpdatedAt,
 	}, nil
