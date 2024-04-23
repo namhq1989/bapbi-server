@@ -38,7 +38,7 @@ func (r TermRepository) ensureIndexes() {
 		opts    = options.CreateIndexes().SetMaxTime(time.Minute * 30)
 		indexes = []mongo.IndexModel{
 			{
-				Keys: bson.D{{Key: "term", Value: 1}, {Key: "from.language", Value: 1}},
+				Keys: bson.D{{Key: "term", Value: 1}, {Key: "from.language", Value: 1}, {Key: "isFeatured", Value: 1}, {Key: "createdAt", Value: -1}},
 			},
 		}
 	)
@@ -110,4 +110,23 @@ func (r TermRepository) UpdateTerm(ctx *appcontext.AppContext, term domain.Term)
 
 	_, err = r.collection().UpdateByID(ctx.Context(), doc.ID, bson.M{"$set": doc})
 	return err
+}
+
+func (r TermRepository) FindFeaturedWord(ctx *appcontext.AppContext, language string) (*domain.Term, error) {
+	// find
+	var doc model.Term
+	if err := r.collection().FindOne(ctx.Context(), bson.M{
+		"from.language": language,
+		"isFeatured":    true,
+	}, &options.FindOneOptions{
+		Sort: bson.M{"createdAt": -1},
+	}).Decode(&doc); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, err
+	} else if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, nil
+	}
+
+	// respond
+	result := doc.ToDomain()
+	return &result, nil
 }

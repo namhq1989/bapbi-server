@@ -7,6 +7,7 @@ import (
 	"github.com/namhq1989/bapbi-server/pkg/language/application"
 	"github.com/namhq1989/bapbi-server/pkg/language/infrastructure"
 	"github.com/namhq1989/bapbi-server/pkg/language/rest"
+	"github.com/namhq1989/bapbi-server/pkg/language/worker"
 )
 
 type Module struct{}
@@ -40,6 +41,10 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 	if err = rest.RegisterServer(ctx, app, mono.Rest(), mono.JWT()); err != nil {
 		return err
 	}
+
+	// worker
+	w := worker.New(mono.Queue(), termRepository, openaiRepository, scraperRepository)
+	w.Start()
 
 	return nil
 }

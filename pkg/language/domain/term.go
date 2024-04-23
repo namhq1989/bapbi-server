@@ -16,6 +16,7 @@ type TermRepository interface {
 	FindByTerm(ctx *appcontext.AppContext, term, fromLanguage string) (*Term, error)
 	CreateTerm(ctx *appcontext.AppContext, term Term) error
 	UpdateTerm(ctx *appcontext.AppContext, term Term) error
+	FindFeaturedWord(ctx *appcontext.AppContext, language string) (*Term, error)
 }
 
 type Term struct {
@@ -31,6 +32,7 @@ type Term struct {
 	Synonyms     []string
 	Antonyms     []string
 	Examples     []TermExample
+	IsFeatured   bool
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
@@ -81,6 +83,7 @@ func NewTerm(term, fromLanguage, toLanguage string) (*Term, error) {
 		Synonyms:     make([]string, 0),
 		Antonyms:     make([]string, 0),
 		Examples:     make([]TermExample, 0),
+		IsFeatured:   false,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}, nil
@@ -138,6 +141,10 @@ func (d *Term) SetExamples(examples []TermExample) {
 
 func (d *Term) SetAntonyms(antonyms []string) {
 	d.Antonyms = antonyms
+}
+
+func (d *Term) SetIsFeatured(isFeatured bool) {
+	d.IsFeatured = isFeatured
 }
 
 func (d *Term) SetUpdatedAt() {

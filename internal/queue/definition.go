@@ -10,9 +10,14 @@ type TypeUserNames struct {
 	UserUpdated string
 }
 
+type LanguageNames struct {
+	FeaturedWord string
+}
+
 var TypeNames = struct {
-	Health TypeHealthNames
-	User   TypeUserNames
+	Health   TypeHealthNames
+	User     TypeUserNames
+	Language LanguageNames
 }{
 	Health: TypeHealthNames{
 		UserCreated:       "health:user.created",
@@ -21,6 +26,9 @@ var TypeNames = struct {
 	User: TypeUserNames{
 		UserCreated: "user:user.created",
 		UserUpdated: "user:user.updated",
+	},
+	Language: LanguageNames{
+		FeaturedWord: "language:term.featuredWord",
 	},
 }
 

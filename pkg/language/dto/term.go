@@ -15,6 +15,7 @@ type Term struct {
 	Synonyms     []string       `json:"synonyms"`
 	Antonyms     []string       `json:"antonyms"`
 	Examples     []TermExample  `json:"examples"`
+	IsFeatured   bool           `json:"isFeatured"`
 	IsFavourite  bool           `json:"isFavourite"`
 }
 
@@ -61,6 +62,7 @@ func (d Term) FromDomain(term domain.Term, isFavourite bool) Term {
 		Synonyms:     term.Synonyms,
 		Antonyms:     term.Antonyms,
 		Examples:     examples,
+		IsFeatured:   term.IsFeatured,
 		IsFavourite:  isFavourite,
 	}
 }
