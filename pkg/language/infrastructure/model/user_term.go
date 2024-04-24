@@ -18,18 +18,18 @@ type UserTerm struct {
 	CreatedAt   time.Time          `bson:"createdAt"`
 }
 
-func (d UserTerm) ToDomain() domain.UserTerm {
+func (m UserTerm) ToDomain() domain.UserTerm {
 	return domain.UserTerm{
-		ID:          d.ID.Hex(),
-		UserID:      d.UserID.Hex(),
-		TermID:      d.TermID.Hex(),
-		Term:        d.Term,
-		IsFavourite: d.IsFavourite,
-		CreatedAt:   d.CreatedAt,
+		ID:          m.ID.Hex(),
+		UserID:      m.UserID.Hex(),
+		TermID:      m.TermID.Hex(),
+		Term:        m.Term,
+		IsFavourite: m.IsFavourite,
+		CreatedAt:   m.CreatedAt,
 	}
 }
 
-func (d UserTerm) FromDomain(term domain.UserTerm) (*UserTerm, error) {
+func (UserTerm) FromDomain(term domain.UserTerm) (*UserTerm, error) {
 	id, err := database.ObjectIDFromString(term.ID)
 	if err != nil {
 		return nil, apperrors.Common.InvalidID

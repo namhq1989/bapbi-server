@@ -133,7 +133,7 @@ func (r UserTermRepository) FindUserTerms(ctx *appcontext.AppContext, filter dom
 	)
 
 	if !filter.Time.IsZero() {
-		condition["createdAt"] = bson.M{"$lte": filter.Time}
+		condition["createdAt"] = bson.M{"$lt": filter.Time}
 	}
 	if filter.IsFavourite != nil {
 		condition["isFavourite"] = *filter.IsFavourite

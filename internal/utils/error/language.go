@@ -3,13 +3,17 @@ package apperrors
 import "errors"
 
 var Language = struct {
-	TermNotFound        error
-	InvalidTerm         error
-	InvalidLanguage     error
-	InvalidLanguageData error
+	TermNotFound               error
+	InvalidTerm                error
+	InvalidLevel               error
+	InvalidLanguage            error
+	InvalidLanguageData        error
+	InvalidWritingExerciseData error
 }{
-	TermNotFound:        errors.New("language_term_not_found"),
-	InvalidTerm:         errors.New("language_invalid_term"),
-	InvalidLanguage:     errors.New("language_invalid_language"),
-	InvalidLanguageData: errors.New("language_invalid_language_data"),
+	TermNotFound:               errors.New("language_term_not_found"),
+	InvalidTerm:                errors.New("language_invalid_term"),
+	InvalidLevel:               errors.New("language_invalid_level"),
+	InvalidLanguage:            errors.New("language_invalid_language"),
+	InvalidLanguageData:        errors.New("language_invalid_language_data"),
+	InvalidWritingExerciseData: errors.New("language_invalid_writing_exercise_data"),
 }

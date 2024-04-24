@@ -42,5 +42,7 @@ health_invalid_streak = "Giá trị chuỗi không hợp lệ"
 # language
 language_term_not_found = "Không tìm thấy từ"
 language_invalid_term = "Từ không hợp lệ"
+language_invalid_level = "Cấp độ không hợp lệ"
 language_invalid_language = "Ngôn ngữ không hợp lệ"
 language_invalid_language_data = "Dữ liệu ngôn ngữ không hợp lệ"
+language_invalid_writing_exercise_data = "Dữ liệu bài tập viết không hợp lệ"

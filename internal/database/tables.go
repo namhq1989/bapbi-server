@@ -14,6 +14,7 @@ var Tables = struct {
 	LanguageTerm              string
 	LanguageUserTerm          string
 	LanguageUserSearchHistory string
+	LanguageWritingExercise   string
 }{
 	User:      "user.users",
 	AuthToken: "auth.tokens",
@@ -26,4 +27,5 @@ var Tables = struct {
 	LanguageTerm:              "language.terms",
 	LanguageUserTerm:          "language.userTerms",
 	LanguageUserSearchHistory: "language.userSearchHistories",
+	LanguageWritingExercise:   "language.writingExercises",
 }

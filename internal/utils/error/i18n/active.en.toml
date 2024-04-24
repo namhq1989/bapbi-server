@@ -43,6 +43,8 @@ health_invalid_streak = "Invalid streak"
 # language
 language_term_not_found = "Term not found"
 language_invalid_term = "Invalid term"
+language_invalid_level = "Invalid level"
 language_invalid_language = "Invalid language"
 language_invalid_language_data = "Invalid language data"
+language_invalid_writing_exercise_data = "Invalid writing exercise data"
 
