@@ -5,7 +5,6 @@ import "github.com/namhq1989/bapbi-server/pkg/language/domain"
 type GetWritingExerciseRequest struct {
 	PageToken string `query:"pageToken"`
 	Language  string `query:"language" validate:"required" message:"language_invalid_language"`
-	Status    string `query:"status"`
 	Level     string `query:"level"`
 }
 

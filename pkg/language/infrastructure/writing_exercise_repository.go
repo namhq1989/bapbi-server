@@ -6,15 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/namhq1989/bapbi-server/pkg/language/infrastructure/mapping"
-
-	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
-
-	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
-	"github.com/namhq1989/bapbi-server/pkg/language/domain"
-	"github.com/namhq1989/bapbi-server/pkg/language/infrastructure/model"
-
 	"github.com/namhq1989/bapbi-server/internal/database"
+	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
+	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
+	"github.com/namhq1989/bapbi-server/pkg/language/domain"
+	"github.com/namhq1989/bapbi-server/pkg/language/infrastructure/mapping"
+	"github.com/namhq1989/bapbi-server/pkg/language/infrastructure/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -126,11 +123,6 @@ func (r WritingExerciseRepository) FindWritingExercises(ctx *appcontext.AppConte
 		}},
 	}
 
-	filterStatusCondition := bson.D{}
-	if filter.Status != "" {
-		filterStatusCondition = append(filterStatusCondition, bson.E{Key: "status", Value: filter.Status.String()})
-	}
-
 	projectState := bson.D{{"$project", bson.M{
 		"_id":        1,
 		"language":   1,
@@ -151,7 +143,6 @@ func (r WritingExerciseRepository) FindWritingExercises(ctx *appcontext.AppConte
 			"status": bson.M{"$ifNull": bson.A{bson.M{"$arrayElemAt": bson.A{"$userWritingExercise.status", 0}}, ""}},
 		}}},
 		projectState,
-		bson.D{{"$match", filterStatusCondition}},
 		bson.D{{"$sort", bson.M{"createdAt": -1}}},
 		bson.D{{"$limit", filter.Limit}},
 	}

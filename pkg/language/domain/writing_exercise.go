@@ -25,13 +25,12 @@ type WritingExerciseRepository interface {
 type WritingExerciseFilter struct {
 	UserID   string
 	Language Language
-	Status   ExerciseStatus
 	Level    Level
 	Time     time.Time
 	Limit    int64
 }
 
-func NewWritingExerciseFilter(uId, lang, lvl, stt, pageToken string) WritingExerciseFilter {
+func NewWritingExerciseFilter(uId, lang, lvl, pageToken string) WritingExerciseFilter {
 	language := ToLanguage(lang)
 	if !language.IsValid() {
 		language = LanguageEnglish
@@ -42,7 +41,6 @@ func NewWritingExerciseFilter(uId, lang, lvl, stt, pageToken string) WritingExer
 		UserID:   uId,
 		Language: language,
 		Level:    ToLevel(lvl),
-		Status:   ToExerciseStatus(stt),
 		Time:     pt.Timestamp,
 		Limit:    10,
 	}

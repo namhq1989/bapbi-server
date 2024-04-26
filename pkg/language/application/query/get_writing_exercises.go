@@ -18,10 +18,10 @@ func NewGetWritingExercisesHandler(writingExerciseRepository domain.WritingExerc
 }
 
 func (h GetWritingExercisesHandler) GetWritingExercises(ctx *appcontext.AppContext, performerID string, req dto.GetWritingExerciseRequest) (*dto.GetWritingExerciseResponse, error) {
-	ctx.Logger().Info("new get writing exercises request", appcontext.Fields{"performer": performerID, "language": req.Language, "level": req.Level, "status": req.Status, "pageToken": req.PageToken})
+	ctx.Logger().Info("new get writing exercises request", appcontext.Fields{"performer": performerID, "language": req.Language, "level": req.Level, "pageToken": req.PageToken})
 
 	ctx.Logger().Text("new filter model")
-	filter := domain.NewWritingExerciseFilter(performerID, req.Language, req.Level, req.Status, req.PageToken)
+	filter := domain.NewWritingExerciseFilter(performerID, req.Language, req.Level, req.PageToken)
 
 	ctx.Logger().Text("find writing exercises in db")
 	exercises, err := h.writingExerciseRepository.FindWritingExercises(ctx, filter)
