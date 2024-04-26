@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/namhq1989/bapbi-server/pkg/language/infrastructure/mapping"
+
 	"github.com/namhq1989/bapbi-server/internal/database"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
@@ -85,4 +87,86 @@ func (r UserWritingExerciseRepository) IsExerciseCreated(ctx *appcontext.AppCont
 		"exerciseId": eid,
 	})
 	return total > 0, err
+}
+
+func (r UserWritingExerciseRepository) FindUserWritingExercises(ctx *appcontext.AppContext, filter domain.UserWritingExerciseFilter) ([]domain.WritingExerciseDatabaseQuery, error) {
+	result := make([]domain.WritingExerciseDatabaseQuery, 0)
+
+	uid, err := database.ObjectIDFromString(filter.UserID)
+	if err != nil {
+		return result, apperrors.User.InvalidUserID
+	}
+
+	matchCondition := bson.D{{Key: "userId", Value: uid}, {Key: "language", Value: filter.Language.String()}}
+
+	if !filter.Time.IsZero() {
+		matchCondition = append(matchCondition, bson.E{Key: "createdAt", Value: bson.M{"$lt": filter.Time}})
+	}
+	if filter.Status != "" {
+		matchCondition = append(matchCondition, bson.E{Key: "status", Value: filter.Status})
+	}
+
+	lookupStage := bson.D{
+		{Key: "$lookup", Value: bson.M{
+			"from": database.Tables.LanguageWritingExercise,
+			"let":  bson.M{"exerciseId": "$exerciseId"},
+			"pipeline": bson.A{
+				bson.M{
+					"$match": bson.M{
+						"$expr": bson.M{
+							"$eq": bson.A{"$_id", "$$exerciseId"},
+						},
+					},
+				},
+			},
+			"as": "writingExercise",
+		}},
+	}
+
+	projectState := bson.D{{Key: "$project", Value: bson.M{
+		"_id":         "$writingExercise._id",
+		"language":    "$writingExercise.language",
+		"type":        "$writingExercise.type",
+		"level":       "$writingExercise.level",
+		"topic":       "$writingExercise.topic",
+		"question":    "$writingExercise.question",
+		"vocabulary":  "$writingExercise.vocabulary",
+		"data":        "$writingExercise.data",
+		"status":      1,
+		"createdAt":   1,
+		"completedAt": 1,
+	}}}
+
+	pipeline := mongo.Pipeline{
+		bson.D{{Key: "$match", Value: matchCondition}},
+		lookupStage,
+		bson.D{{Key: "$unwind", Value: bson.M{
+			"path":                       "$writingExercise",
+			"includeArrayIndex":          "0",
+			"preserveNullAndEmptyArrays": true,
+		}}},
+		projectState,
+		bson.D{{Key: "$sort", Value: bson.M{"createdAt": -1}}},
+		bson.D{{Key: "$limit", Value: filter.Limit}},
+	}
+
+	// find
+	cursor, err := r.collection().Aggregate(ctx.Context(), pipeline)
+	if err != nil {
+		return result, err
+	}
+	// parse
+	defer func() { _ = cursor.Close(ctx.Context()) }()
+
+	// parse
+	var docs []mapping.WritingExerciseDatabaseQuery
+	if err = cursor.All(ctx.Context(), &docs); err != nil {
+		return result, err
+	}
+
+	// map data
+	for _, doc := range docs {
+		result = append(result, doc.ToDomain())
+	}
+	return result, nil
 }

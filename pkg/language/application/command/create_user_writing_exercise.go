@@ -48,7 +48,7 @@ func (h CreateUserWritingExerciseHandler) CreateUserWritingExercise(ctx *appcont
 	}
 
 	ctx.Logger().Text("create user writing exercise domain model")
-	domainExercise, err := domain.NewUserWritingExercise(performerID, exercise.ID)
+	domainExercise, err := domain.NewUserWritingExercise(performerID, exercise.ID, exercise.Language.String())
 	if err != nil {
 		ctx.Logger().Error("failed to create user writing exercise domain model", err, appcontext.Fields{})
 		return nil, err

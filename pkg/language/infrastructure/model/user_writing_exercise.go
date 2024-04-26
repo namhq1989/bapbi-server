@@ -12,6 +12,7 @@ type UserWritingExercise struct {
 	ID          primitive.ObjectID `bson:"_id"`
 	UserID      primitive.ObjectID `bson:"userId"`
 	ExerciseID  primitive.ObjectID `bson:"exerciseId"`
+	Language    string             `bson:"language"`
 	Status      string             `bson:"status"`
 	CreatedAt   time.Time          `bson:"createdAt"`
 	UpdatedAt   time.Time          `bson:"updatedAt"`
@@ -24,6 +25,7 @@ func (u UserWritingExercise) ToDomain() domain.UserWritingExercise {
 		UserID:      u.UserID.Hex(),
 		ExerciseID:  u.ExerciseID.Hex(),
 		Status:      domain.ToExerciseStatus(u.Status),
+		Language:    domain.ToLanguage(u.Language),
 		CreatedAt:   u.CreatedAt,
 		UpdatedAt:   u.UpdatedAt,
 		CompletedAt: u.CompletedAt,
@@ -51,6 +53,7 @@ func (u UserWritingExercise) FromDomain(exercise domain.UserWritingExercise) (*U
 		UserID:      uid,
 		ExerciseID:  eid,
 		Status:      exercise.Status.String(),
+		Language:    exercise.Language.String(),
 		CreatedAt:   exercise.CreatedAt,
 		UpdatedAt:   exercise.UpdatedAt,
 		CompletedAt: exercise.CompletedAt,

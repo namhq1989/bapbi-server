@@ -21,6 +21,7 @@ type (
 		GetFeaturedTerm(ctx *appcontext.AppContext, req dto.GetFeaturedTermRequest) (*dto.GetFeaturedTermResponse, error)
 
 		GetWritingExercises(ctx *appcontext.AppContext, performerID string, req dto.GetWritingExerciseRequest) (*dto.GetWritingExerciseResponse, error)
+		GetUserWritingExercises(ctx *appcontext.AppContext, performerID string, req dto.GetUserWritingExerciseRequest) (*dto.GetUserWritingExerciseResponse, error)
 	}
 	Hubs interface{}
 	App  interface {
@@ -41,6 +42,7 @@ type (
 		query.GetFeaturedTermHandler
 
 		query.GetWritingExercisesHandler
+		query.GetUserWritingExercisesHandler
 	}
 	appHubHandler struct{}
 	Application   struct {
@@ -75,7 +77,8 @@ func New(
 			GetUserTermsHandler:    query.NewGetUserTermsHandler(termRepository, userTermRepository),
 			GetFeaturedTermHandler: query.NewGetFeaturedTermHandler(termRepository),
 
-			GetWritingExercisesHandler: query.NewGetWritingExercisesHandler(writingExerciseRepository),
+			GetWritingExercisesHandler:     query.NewGetWritingExercisesHandler(writingExerciseRepository),
+			GetUserWritingExercisesHandler: query.NewGetUserWritingExercisesHandler(userWritingExerciseRepository),
 		},
 		appHubHandler: appHubHandler{},
 	}

@@ -139,5 +139,6 @@ func NewWritingExercise(lang, exType, lvl, topic, question, data string, vocabul
 
 type WritingExerciseDatabaseQuery struct {
 	WritingExercise
-	Status ExerciseStatus
+	Status      ExerciseStatus
+	CompletedAt time.Time
 }
