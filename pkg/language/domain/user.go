@@ -60,11 +60,11 @@ func (s SubscriptionPlan) IsExceededAddTermLimitation(todayAdded int64) bool {
 	return true
 }
 
-func (s SubscriptionPlan) IsExceededSearchLimitation(todaySearched int64) bool {
+func (s SubscriptionPlan) IsExceededActionLimitation(todayActions int64) bool {
 	if s.IsFree() {
-		return todaySearched >= 20
+		return todayActions >= 20
 	} else if s.IsSupporter() {
-		return todaySearched >= 50
+		return todayActions >= 50
 	}
 
 	return true

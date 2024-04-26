@@ -21,7 +21,7 @@ func (w Workers) GenerateWritingExercises(bgCtx context.Context, t *asynq.Task) 
 	for _, level := range domain.ListLevels {
 		for _, exType := range domain.ListWritingExerciseTypes {
 			ctx.Logger().Info("call OpenAI to generate writing exercises", appcontext.Fields{"level": level, "exType": exType})
-			result, err := w.openaiRepository.WritingExercise(ctx, language, exType.String(), level.String())
+			result, err := w.openaiRepository.GenerateWritingExercise(ctx, language, exType.String(), level.String())
 			if err != nil {
 				ctx.Logger().Error("failed to call OpenAI to generate writing exercises", err, appcontext.Fields{})
 				continue

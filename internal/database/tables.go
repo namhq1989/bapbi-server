@@ -13,7 +13,7 @@ var Tables = struct {
 	// language
 	LanguageTerm                string
 	LanguageUserTerm            string
-	LanguageUserSearchHistory   string
+	LanguageUserActionHistory   string
 	LanguageWritingExercise     string
 	LanguageUserWritingExercise string
 }{
@@ -27,7 +27,7 @@ var Tables = struct {
 
 	LanguageTerm:                "language.terms",
 	LanguageUserTerm:            "language.userTerms",
-	LanguageUserSearchHistory:   "language.userSearchHistories",
+	LanguageUserActionHistory:   "language.userActionHistories",
 	LanguageWritingExercise:     "language.writingExercises",
 	LanguageUserWritingExercise: "language.userWritingExercises",
 }

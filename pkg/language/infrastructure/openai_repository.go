@@ -70,7 +70,7 @@ func (r OpenAIRepository) SearchSemanticRelations(ctx *appcontext.AppContext, te
 	}, nil
 }
 
-func (r OpenAIRepository) FeaturedWord(ctx *appcontext.AppContext, language string) (*domain.OpenAIFeaturedWordResult, error) {
+func (r OpenAIRepository) GenerateFeaturedWord(ctx *appcontext.AppContext, language string) (*domain.OpenAIFeaturedWordResult, error) {
 	result, err := r.openai.FeaturedWord(ctx, language)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (r OpenAIRepository) FeaturedWord(ctx *appcontext.AppContext, language stri
 	}, nil
 }
 
-func (r OpenAIRepository) WritingExercise(ctx *appcontext.AppContext, language, exType, level string) (*domain.OpenAIWritingExerciseResult, error) {
+func (r OpenAIRepository) GenerateWritingExercise(ctx *appcontext.AppContext, language, exType, level string) (*domain.OpenAIWritingExerciseResult, error) {
 	result, err := r.openai.WritingExercise(ctx, language, exType, level)
 	if err != nil {
 		return nil, err
@@ -104,5 +104,22 @@ func (r OpenAIRepository) WritingExercise(ctx *appcontext.AppContext, language, 
 		Question:   result.Question,
 		Vocabulary: result.Vocabulary,
 		Data:       string(dataByte),
+	}, nil
+}
+
+func (r OpenAIRepository) AssessWritingExercise(ctx *appcontext.AppContext, language, topic, level, content string) (*domain.OpenAIAssessWritingExerciseResult, error) {
+	result, err := r.openai.AssessWritingExercise(ctx, language, topic, level, content)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil {
+		return nil, nil
+	}
+
+	return &domain.OpenAIAssessWritingExerciseResult{
+		IsTopicRelevance: result.IsTopicRelevance,
+		Score:            result.Score,
+		Improvement:      result.Improvement,
+		Comment:          result.Comment,
 	}, nil
 }

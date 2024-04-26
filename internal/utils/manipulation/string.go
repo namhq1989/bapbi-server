@@ -15,3 +15,8 @@ func Slugify(text string) string {
 	safe := reg.ReplaceAllString(hyphens, "")
 	return strings.Trim(safe, "-")
 }
+
+func CountTotalWords(text string) int {
+	words := strings.Fields(text)
+	return len(words)
+}

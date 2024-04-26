@@ -7,22 +7,22 @@ import (
 	"github.com/namhq1989/bapbi-server/pkg/language/dto"
 )
 
-type CreateUserWritingExerciseHandler struct {
+type StartUserWritingExerciseHandler struct {
 	writingExerciseRepository     domain.WritingExerciseRepository
 	userWritingExerciseRepository domain.UserWritingExerciseRepository
 }
 
-func NewCreateUserWritingExerciseHandler(
+func NewStartUserWritingExerciseHandler(
 	writingExerciseRepository domain.WritingExerciseRepository,
 	userWritingExerciseRepository domain.UserWritingExerciseRepository,
-) CreateUserWritingExerciseHandler {
-	return CreateUserWritingExerciseHandler{
+) StartUserWritingExerciseHandler {
+	return StartUserWritingExerciseHandler{
 		writingExerciseRepository:     writingExerciseRepository,
 		userWritingExerciseRepository: userWritingExerciseRepository,
 	}
 }
 
-func (h CreateUserWritingExerciseHandler) CreateUserWritingExercise(ctx *appcontext.AppContext, performerID string, req dto.CreateUserWritingExerciseRequest) (*dto.CreateUserWritingExerciseResponse, error) {
+func (h StartUserWritingExerciseHandler) StartUserWritingExercise(ctx *appcontext.AppContext, performerID string, req dto.StartUserWritingExerciseRequest) (*dto.StartUserWritingExerciseResponse, error) {
 	ctx.Logger().Info("new create user writing exercise request", appcontext.Fields{"performer": performerID, "exerciseId": req.ExerciseID})
 
 	ctx.Logger().Text("check if exercise already created")
@@ -61,7 +61,7 @@ func (h CreateUserWritingExerciseHandler) CreateUserWritingExercise(ctx *appcont
 	}
 
 	ctx.Logger().Text("done create user writing exercise request")
-	return &dto.CreateUserWritingExerciseResponse{
+	return &dto.StartUserWritingExerciseResponse{
 		ID: domainExercise.ID,
 	}, nil
 }

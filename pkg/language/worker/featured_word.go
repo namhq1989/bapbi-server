@@ -23,7 +23,7 @@ func (w Workers) GenerateFeaturedWord(bgCtx context.Context, t *asynq.Task) erro
 
 	// call OpenAI to get featured word
 	ctx.Logger().Text("call OpenAI to get featured word")
-	featureWordData, err := w.openaiRepository.FeaturedWord(ctx, fromLanguage)
+	featureWordData, err := w.openaiRepository.GenerateFeaturedWord(ctx, fromLanguage)
 	if err != nil {
 		ctx.Logger().Error("failed to call OpenAI to get featured word", err, appcontext.Fields{})
 		return err

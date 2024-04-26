@@ -13,7 +13,8 @@ type (
 		AddTerm(ctx *appcontext.AppContext, performerID, termID string, _ dto.AddTermRequest) (*dto.AddTermResponse, error)
 		ChangeTermFavourite(ctx *appcontext.AppContext, performerID, userTermID string, _ dto.ChangeTermFavouriteRequest) (*dto.ChangeTermFavouriteResponse, error)
 
-		CreateUserWritingExercise(ctx *appcontext.AppContext, performerID string, req dto.CreateUserWritingExerciseRequest) (*dto.CreateUserWritingExerciseResponse, error)
+		StartUserWritingExercise(ctx *appcontext.AppContext, performerID string, req dto.StartUserWritingExerciseRequest) (*dto.StartUserWritingExerciseResponse, error)
+		SubmitUserWritingExercise(ctx *appcontext.AppContext, performerID string, req dto.SubmitUserWritingExerciseRequest) (*dto.SubmitUserWritingExerciseResponse, error)
 	}
 	Queries interface {
 		SearchTerm(ctx *appcontext.AppContext, performerID string, req dto.SearchTermRequest) (*dto.SearchTermResponse, error)
@@ -34,7 +35,8 @@ type (
 		command.AddTermHandler
 		command.ChangeTermFavouriteHandler
 
-		command.CreateUserWritingExerciseHandler
+		command.StartUserWritingExerciseHandler
+		command.SubmitUserWritingExerciseHandler
 	}
 	appQueryHandler struct {
 		query.SearchTermHandler
@@ -57,23 +59,23 @@ var _ App = (*Application)(nil)
 func New(
 	termRepository domain.TermRepository,
 	userTermRepository domain.UserTermRepository,
-	userSearchHistoryRepository domain.UserSearchHistoryRepository,
+	userActionHistoryRepository domain.UserActionHistoryRepository,
 	writingExerciseRepository domain.WritingExerciseRepository,
 	userWritingExerciseRepository domain.UserWritingExerciseRepository,
 	openaiRepository domain.OpenAIRepository,
 	scraperRepository domain.ScraperRepository,
 	userHub domain.UserHub,
-	authHub domain.AuthHub,
 ) *Application {
 	return &Application{
 		appCommandHandlers: appCommandHandlers{
 			AddTermHandler:             command.NewAddTermHandler(termRepository, userTermRepository, userHub),
 			ChangeTermFavouriteHandler: command.NewChangeTermFavouriteHandler(userTermRepository),
 
-			CreateUserWritingExerciseHandler: command.NewCreateUserWritingExerciseHandler(writingExerciseRepository, userWritingExerciseRepository),
+			StartUserWritingExerciseHandler:  command.NewStartUserWritingExerciseHandler(writingExerciseRepository, userWritingExerciseRepository),
+			SubmitUserWritingExerciseHandler: command.NewSubmitUserWritingExerciseHandler(writingExerciseRepository, userWritingExerciseRepository, userActionHistoryRepository, openaiRepository, userHub),
 		},
 		appQueryHandler: appQueryHandler{
-			SearchTermHandler:      query.NewSearchTermHandler(termRepository, userSearchHistoryRepository, openaiRepository, scraperRepository, userHub),
+			SearchTermHandler:      query.NewSearchTermHandler(termRepository, userActionHistoryRepository, openaiRepository, scraperRepository, userHub),
 			GetUserTermsHandler:    query.NewGetUserTermsHandler(termRepository, userTermRepository),
 			GetFeaturedTermHandler: query.NewGetFeaturedTermHandler(termRepository),
 

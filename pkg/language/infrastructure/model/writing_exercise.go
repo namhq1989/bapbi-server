@@ -17,6 +17,7 @@ type WritingExercise struct {
 	Topic      string             `bson:"topic"`
 	Question   string             `bson:"question"`
 	Vocabulary []string           `bson:"vocabulary"`
+	MinWords   int                `bson:"minWords"`
 	Data       string             `bson:"data"`
 	CreatedAt  time.Time          `bson:"createdAt"`
 }
@@ -30,6 +31,7 @@ func (m WritingExercise) ToDomain() domain.WritingExercise {
 		Topic:      m.Topic,
 		Question:   m.Question,
 		Vocabulary: m.Vocabulary,
+		MinWords:   m.MinWords,
 		Data:       m.Data,
 		CreatedAt:  m.CreatedAt,
 	}
@@ -49,6 +51,7 @@ func (WritingExercise) FromDomain(exercise domain.WritingExercise) (*WritingExer
 		Topic:      exercise.Topic,
 		Question:   exercise.Question,
 		Vocabulary: exercise.Vocabulary,
+		MinWords:   exercise.MinWords,
 		Data:       exercise.Data,
 		CreatedAt:  exercise.CreatedAt,
 	}, nil
