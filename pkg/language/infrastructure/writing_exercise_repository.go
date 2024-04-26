@@ -2,8 +2,13 @@ package infrastructure
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
+
+	"github.com/namhq1989/bapbi-server/pkg/language/infrastructure/mapping"
+
+	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
 
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	"github.com/namhq1989/bapbi-server/pkg/language/domain"
@@ -49,27 +54,110 @@ func (r WritingExerciseRepository) collection() *mongo.Collection {
 	return r.db.Collection(r.collectionName)
 }
 
-func (r WritingExerciseRepository) FindWritingExercises(ctx *appcontext.AppContext, filter domain.WritingExerciseFilter) ([]domain.WritingExercise, error) {
-	var (
-		condition = bson.M{"language": filter.Language.String()}
-		result    = make([]domain.WritingExercise, 0)
-	)
-
-	if !filter.Time.IsZero() {
-		condition["createdAt"] = bson.M{"$lt": filter.Time}
-	}
-	if filter.Level.IsValid() {
-		condition["level"] = filter.Level.String()
+func (r WritingExerciseRepository) CreateWritingExercise(ctx *appcontext.AppContext, exercise domain.WritingExercise) error {
+	doc, err := model.WritingExercise{}.FromDomain(exercise)
+	if err != nil {
+		return err
 	}
 
-	// TODO: add pipeline to query data
+	_, err = r.collection().InsertOne(ctx.Context(), &doc)
+	return err
+}
+
+func (r WritingExerciseRepository) FindByID(ctx *appcontext.AppContext, exerciseID string) (*domain.WritingExercise, error) {
+	id, err := database.ObjectIDFromString(exerciseID)
+	if err != nil {
+		return nil, apperrors.Common.InvalidID
+	}
 
 	// find
-	cursor, err := r.collection().Find(ctx.Context(), condition, &options.FindOptions{
-		Sort: bson.M{"createdAt": -1},
-	}, &options.FindOptions{
-		Limit: &filter.Limit,
-	})
+	var doc model.WritingExercise
+	if err = r.collection().FindOne(ctx.Context(), bson.M{
+		"_id": id,
+	}).Decode(&doc); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, err
+	} else if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, nil
+	}
+
+	// respond
+	result := doc.ToDomain()
+	return &result, nil
+}
+
+func (r WritingExerciseRepository) FindWritingExercises(ctx *appcontext.AppContext, filter domain.WritingExerciseFilter) ([]domain.WritingExerciseDatabaseQuery, error) {
+	result := make([]domain.WritingExerciseDatabaseQuery, 0)
+
+	uid, err := database.ObjectIDFromString(filter.UserID)
+	if err != nil {
+		return result, apperrors.User.InvalidUserID
+	}
+
+	matchCondition := bson.D{{Key: "language", Value: filter.Language.String()}}
+
+	if !filter.Time.IsZero() {
+		matchCondition = append(matchCondition, bson.E{Key: "createdAt", Value: bson.M{"$lt": filter.Time}})
+	}
+	if filter.Level.IsValid() {
+		matchCondition = append(matchCondition, bson.E{Key: "level", Value: filter.Level.String()})
+	}
+
+	lookupStage := bson.D{
+		{"$lookup", bson.M{
+			"from": database.Tables.LanguageUserWritingExercise,
+			"let":  bson.M{"exerciseId": "$_id"},
+			"pipeline": bson.A{
+				bson.M{
+					"$match": bson.M{
+						"$expr": bson.M{
+							"$and": bson.A{
+								bson.M{"$eq": bson.A{"$userId", uid}},
+								bson.M{"$eq": bson.A{"$exerciseId", "$$exerciseId"}},
+							},
+						},
+					},
+				},
+				bson.M{"$project": bson.M{
+					"_id":    0,
+					"status": 1,
+				}},
+			},
+			"as": "userWritingExercise",
+		}},
+	}
+
+	filterStatusCondition := bson.D{}
+	if filter.Status != "" {
+		filterStatusCondition = append(filterStatusCondition, bson.E{Key: "status", Value: filter.Status.String()})
+	}
+
+	projectState := bson.D{{"$project", bson.M{
+		"_id":        1,
+		"language":   1,
+		"type":       1,
+		"level":      1,
+		"topic":      1,
+		"question":   1,
+		"vocabulary": 1,
+		"data":       1,
+		"createdAt":  1,
+		"status":     1,
+	}}}
+
+	pipeline := mongo.Pipeline{
+		bson.D{{"$match", matchCondition}},
+		lookupStage,
+		bson.D{{"$addFields", bson.M{
+			"status": bson.M{"$ifNull": bson.A{bson.M{"$arrayElemAt": bson.A{"$userWritingExercise.status", 0}}, ""}},
+		}}},
+		projectState,
+		bson.D{{"$match", filterStatusCondition}},
+		bson.D{{"$sort", bson.M{"createdAt": -1}}},
+		bson.D{{"$limit", filter.Limit}},
+	}
+
+	// find
+	cursor, err := r.collection().Aggregate(ctx.Context(), pipeline)
 	if err != nil {
 		return result, err
 	}
@@ -77,7 +165,7 @@ func (r WritingExerciseRepository) FindWritingExercises(ctx *appcontext.AppConte
 	defer func() { _ = cursor.Close(ctx.Context()) }()
 
 	// parse
-	var docs []model.WritingExercise
+	var docs []mapping.WritingExerciseDatabaseQuery
 	if err = cursor.All(ctx.Context(), &docs); err != nil {
 		return result, err
 	}

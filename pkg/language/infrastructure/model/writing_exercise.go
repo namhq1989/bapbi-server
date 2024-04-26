@@ -15,6 +15,7 @@ type WritingExercise struct {
 	Type       string             `bson:"type"`
 	Level      string             `bson:"level"`
 	Topic      string             `bson:"topic"`
+	Question   string             `bson:"question"`
 	Vocabulary []string           `bson:"vocabulary"`
 	Data       string             `bson:"data"`
 	CreatedAt  time.Time          `bson:"createdAt"`
@@ -27,6 +28,7 @@ func (m WritingExercise) ToDomain() domain.WritingExercise {
 		Type:       domain.ToWritingExerciseType(m.Type),
 		Level:      domain.ToLevel(m.Level),
 		Topic:      m.Topic,
+		Question:   m.Question,
 		Vocabulary: m.Vocabulary,
 		Data:       m.Data,
 		CreatedAt:  m.CreatedAt,
@@ -45,6 +47,7 @@ func (WritingExercise) FromDomain(exercise domain.WritingExercise) (*WritingExer
 		Type:       exercise.Type.String(),
 		Level:      exercise.Level.String(),
 		Topic:      exercise.Topic,
+		Question:   exercise.Question,
 		Vocabulary: exercise.Vocabulary,
 		Data:       exercise.Data,
 		CreatedAt:  exercise.CreatedAt,

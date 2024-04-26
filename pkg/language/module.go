@@ -17,6 +17,11 @@ func (Module) Name() string {
 }
 
 func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error {
+	authGRPCClient, err := grpcclient.NewAuthClient(ctx, mono.Config().GRPCPort)
+	if err != nil {
+		return err
+	}
+
 	userGRPCClient, err := grpcclient.NewUserClient(ctx, mono.Config().GRPCPort)
 	if err != nil {
 		return err
@@ -24,17 +29,30 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 
 	var (
 		// infrastructure
-		termRepository              = infrastructure.NewTermRepository(mono.Mongo())
-		userTermRepository          = infrastructure.NewUserTermRepository(mono.Mongo())
-		userSearchHistoryRepository = infrastructure.NewUserSearchHistoryRepository(mono.Mongo())
-		openaiRepository            = infrastructure.NewOpenAIRepository(mono.OpenAI())
-		scraperRepository           = infrastructure.NewScraperRepository(mono.Scraper())
+		termRepository                = infrastructure.NewTermRepository(mono.Mongo())
+		userTermRepository            = infrastructure.NewUserTermRepository(mono.Mongo())
+		userSearchHistoryRepository   = infrastructure.NewUserSearchHistoryRepository(mono.Mongo())
+		writingExerciseRepository     = infrastructure.NewWritingExerciseRepository(mono.Mongo())
+		userWritingExerciseRepository = infrastructure.NewUserWritingExerciseRepository(mono.Mongo())
+		openaiRepository              = infrastructure.NewOpenAIRepository(mono.OpenAI())
+		scraperRepository             = infrastructure.NewScraperRepository(mono.Scraper())
 
 		// hub
 		userHub = infrastructure.NewUserHub(userGRPCClient)
+		authHub = infrastructure.NewAuthHub(authGRPCClient)
 
 		// application
-		app = application.New(termRepository, userTermRepository, userSearchHistoryRepository, openaiRepository, scraperRepository, userHub)
+		app = application.New(
+			termRepository,
+			userTermRepository,
+			userSearchHistoryRepository,
+			writingExerciseRepository,
+			userWritingExerciseRepository,
+			openaiRepository,
+			scraperRepository,
+			userHub,
+			authHub,
+		)
 	)
 
 	// rest server
@@ -43,7 +61,7 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 	}
 
 	// worker
-	w := worker.New(mono.Queue(), termRepository, openaiRepository, scraperRepository)
+	w := worker.New(mono.Queue(), termRepository, writingExerciseRepository, openaiRepository, scraperRepository)
 	w.Start()
 
 	return nil

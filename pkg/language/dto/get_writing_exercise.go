@@ -1,5 +1,7 @@
 package dto
 
+import "github.com/namhq1989/bapbi-server/pkg/language/domain"
+
 type GetWritingExerciseRequest struct {
 	PageToken string `query:"pageToken"`
 	Language  string `query:"language" validate:"required" message:"language_invalid_language"`
@@ -8,7 +10,8 @@ type GetWritingExerciseRequest struct {
 }
 
 type GetWritingExerciseResponse struct {
-	Exercise WritingExercise `json:"exercise"`
+	Exercises     []WritingExercise `json:"exercises"`
+	NextPageToken string            `json:"nextPageToken"`
 }
 
 type WritingExercise struct {
@@ -16,6 +19,21 @@ type WritingExercise struct {
 	Type       string   `json:"type"`
 	Level      string   `json:"level"`
 	Topic      string   `json:"topic"`
+	Question   string   `json:"question"`
 	Vocabulary []string `json:"vocabulary"`
 	Data       string   `json:"data"`
+	Status     string   `json:"status"`
+}
+
+func (d WritingExercise) FromDomain(exercise domain.WritingExerciseDatabaseQuery) WritingExercise {
+	return WritingExercise{
+		ID:         exercise.ID,
+		Type:       exercise.Type.String(),
+		Level:      exercise.Level.String(),
+		Topic:      exercise.Topic,
+		Question:   exercise.Question,
+		Vocabulary: exercise.Vocabulary,
+		Data:       exercise.Data,
+		Status:     exercise.Status.String(),
+	}
 }

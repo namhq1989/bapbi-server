@@ -10,23 +10,26 @@ import (
 )
 
 type Workers struct {
-	queue             *queue.Queue
-	termRepository    domain.TermRepository
-	openaiRepository  domain.OpenAIRepository
-	scraperRepository domain.ScraperRepository
+	queue                     *queue.Queue
+	termRepository            domain.TermRepository
+	writingExerciseRepository domain.WritingExerciseRepository
+	openaiRepository          domain.OpenAIRepository
+	scraperRepository         domain.ScraperRepository
 }
 
 func New(
 	queue *queue.Queue,
 	termRepository domain.TermRepository,
+	writingExerciseRepository domain.WritingExerciseRepository,
 	openaiRepository domain.OpenAIRepository,
 	scraperRepository domain.ScraperRepository,
 ) Workers {
 	return Workers{
-		queue:             queue,
-		termRepository:    termRepository,
-		openaiRepository:  openaiRepository,
-		scraperRepository: scraperRepository,
+		queue:                     queue,
+		termRepository:            termRepository,
+		writingExerciseRepository: writingExerciseRepository,
+		openaiRepository:          openaiRepository,
+		scraperRepository:         scraperRepository,
 	}
 }
 
@@ -41,7 +44,8 @@ func (w Workers) Start() {
 	// cron jobs
 	w.addCronjob()
 
-	w.queue.Server.HandleFunc(w.queue.GenerateTypename(queue.TypeNames.Language.FeaturedWord), w.FeaturedWord)
+	w.queue.Server.HandleFunc(w.queue.GenerateTypename(queue.TypeNames.Language.GenerateFeaturedWord), w.GenerateFeaturedWord)
+	w.queue.Server.HandleFunc(w.queue.GenerateTypename(queue.TypeNames.Language.GenerateWritingExercises), w.GenerateWritingExercises)
 }
 
 func (w Workers) addCronjob() {
@@ -49,8 +53,14 @@ func (w Workers) addCronjob() {
 		ctx  = appcontext.New(context.Background())
 		jobs = []cronjobData{
 			{
-				Task:       w.queue.GenerateTypename(queue.TypeNames.Language.FeaturedWord),
+				Task:       w.queue.GenerateTypename(queue.TypeNames.Language.GenerateFeaturedWord),
 				CronSpec:   "@every 8h",
+				Payload:    nil,
+				RetryTimes: 3,
+			},
+			{
+				Task:       w.queue.GenerateTypename(queue.TypeNames.Language.GenerateWritingExercises),
+				CronSpec:   "@every 24h",
 				Payload:    nil,
 				RetryTimes: 3,
 			},

@@ -4,6 +4,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
+
 	"github.com/namhq1989/bapbi-server/internal/database"
 	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
 
@@ -11,6 +13,9 @@ import (
 )
 
 type WritingExerciseRepository interface {
+	CreateWritingExercise(ctx *appcontext.AppContext, exercise WritingExercise) error
+	FindByID(ctx *appcontext.AppContext, exerciseID string) (*WritingExercise, error)
+	FindWritingExercises(ctx *appcontext.AppContext, filter WritingExerciseFilter) ([]WritingExerciseDatabaseQuery, error)
 }
 
 //
@@ -18,6 +23,7 @@ type WritingExerciseRepository interface {
 //
 
 type WritingExerciseFilter struct {
+	UserID   string
 	Language Language
 	Status   ExerciseStatus
 	Level    Level
@@ -25,7 +31,7 @@ type WritingExerciseFilter struct {
 	Limit    int64
 }
 
-func NewWritingExerciseFilter(lang, lvl, stt, pageToken string) WritingExerciseFilter {
+func NewWritingExerciseFilter(uId, lang, lvl, stt, pageToken string) WritingExerciseFilter {
 	language := ToLanguage(lang)
 	if !language.IsValid() {
 		language = LanguageEnglish
@@ -33,6 +39,7 @@ func NewWritingExerciseFilter(lang, lvl, stt, pageToken string) WritingExerciseF
 
 	pt := pagetoken.Decode(pageToken)
 	return WritingExerciseFilter{
+		UserID:   uId,
 		Language: language,
 		Level:    ToLevel(lvl),
 		Status:   ToExerciseStatus(stt),
@@ -52,6 +59,8 @@ const (
 	WritingExerciseTypeBasic   WritingExerciseType = "basic"
 	WritingExerciseTypeAnalyze WritingExerciseType = "analyze"
 )
+
+var ListWritingExerciseTypes = []WritingExerciseType{WritingExerciseTypeBasic, WritingExerciseTypeAnalyze}
 
 func (s WritingExerciseType) String() string {
 	switch s {
@@ -87,12 +96,13 @@ type WritingExercise struct {
 	Type       WritingExerciseType
 	Level      Level
 	Topic      string
+	Question   string
 	Vocabulary []string
 	Data       string // JSON string
 	CreatedAt  time.Time
 }
 
-func NewWritingExercise(lang, exType, lvl, topic, data string) (*WritingExercise, error) {
+func NewWritingExercise(lang, exType, lvl, topic, question, data string, vocabulary []string) (*WritingExercise, error) {
 	language := ToLanguage(lang)
 	if !language.IsValid() {
 		return nil, apperrors.Language.InvalidLanguage
@@ -108,7 +118,7 @@ func NewWritingExercise(lang, exType, lvl, topic, data string) (*WritingExercise
 		return nil, apperrors.Language.InvalidWritingExerciseData
 	}
 
-	if topic == "" {
+	if topic == "" || question == "" {
 		return nil, apperrors.Language.InvalidWritingExerciseData
 	}
 
@@ -118,8 +128,18 @@ func NewWritingExercise(lang, exType, lvl, topic, data string) (*WritingExercise
 		Type:       exerciseType,
 		Level:      level,
 		Topic:      topic,
-		Vocabulary: []string{},
+		Question:   question,
+		Vocabulary: vocabulary,
 		Data:       data,
 		CreatedAt:  time.Now(),
 	}, nil
+}
+
+//
+// QUERY
+//
+
+type WritingExerciseDatabaseQuery struct {
+	WritingExercise
+	Status ExerciseStatus
 }

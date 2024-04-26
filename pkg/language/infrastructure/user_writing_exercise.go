@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
+
+	"github.com/namhq1989/bapbi-server/pkg/language/infrastructure/model"
+
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	"github.com/namhq1989/bapbi-server/pkg/language/domain"
 
@@ -49,5 +53,39 @@ func (r UserWritingExerciseRepository) collection() *mongo.Collection {
 }
 
 func (r UserWritingExerciseRepository) CreateUserWritingExercise(ctx *appcontext.AppContext, exercise domain.UserWritingExercise) error {
-	return nil
+	doc, err := model.UserWritingExercise{}.FromDomain(exercise)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.collection().InsertOne(ctx.Context(), &doc)
+	return err
+}
+
+func (r UserWritingExerciseRepository) UpdateUserWritingExercise(ctx *appcontext.AppContext, exercise domain.UserWritingExercise) error {
+	doc, err := model.UserWritingExercise{}.FromDomain(exercise)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.collection().UpdateByID(ctx.Context(), doc.ID, bson.M{"$set": doc})
+	return err
+}
+
+func (r UserWritingExerciseRepository) IsExerciseCreated(ctx *appcontext.AppContext, userID, exerciseID string) (bool, error) {
+	uid, err := database.ObjectIDFromString(userID)
+	if err != nil {
+		return false, apperrors.Common.InvalidID
+	}
+
+	eid, err := database.ObjectIDFromString(exerciseID)
+	if err != nil {
+		return false, apperrors.Common.InvalidID
+	}
+
+	total, err := r.collection().CountDocuments(ctx.Context(), bson.M{
+		"userId":     uid,
+		"exerciseId": eid,
+	})
+	return total > 0, err
 }

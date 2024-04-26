@@ -3,10 +3,15 @@ package domain
 import (
 	"time"
 
+	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
+
 	"github.com/namhq1989/bapbi-server/internal/database"
 )
 
 type UserWritingExerciseRepository interface {
+	CreateUserWritingExercise(ctx *appcontext.AppContext, exercise UserWritingExercise) error
+	UpdateUserWritingExercise(ctx *appcontext.AppContext, exercise UserWritingExercise) error
+	IsExerciseCreated(ctx *appcontext.AppContext, userID, exerciseID string) (bool, error)
 }
 
 type UserWritingExercise struct {

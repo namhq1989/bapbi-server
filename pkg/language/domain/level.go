@@ -5,15 +5,21 @@ import "strings"
 type Level string
 
 const (
-	LevelUnknown Level = ""
-	LevelA       Level = "A"
-	LevelB       Level = "B"
-	LevelC       Level = "C"
+	LevelUnknown      Level = ""
+	LevelBeginner     Level = "beginner"
+	LevelIntermediate Level = "intermediate"
+	LevelAdvanced     Level = "advanced"
 )
+
+var ListLevels = []Level{
+	LevelBeginner,
+	LevelIntermediate,
+	LevelAdvanced,
+}
 
 func (s Level) String() string {
 	switch s {
-	case LevelA, LevelB, LevelC:
+	case LevelBeginner, LevelIntermediate, LevelAdvanced:
 		return string(s)
 	default:
 		return ""
@@ -26,12 +32,12 @@ func (s Level) IsValid() bool {
 
 func ToLevel(value string) Level {
 	switch strings.ToLower(value) {
-	case LevelA.String():
-		return LevelA
-	case LevelC.String():
-		return LevelB
-	case LevelC.String():
-		return LevelC
+	case LevelBeginner.String():
+		return LevelBeginner
+	case LevelIntermediate.String():
+		return LevelIntermediate
+	case LevelAdvanced.String():
+		return LevelAdvanced
 	default:
 		return LevelUnknown
 	}

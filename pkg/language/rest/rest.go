@@ -21,6 +21,7 @@ func RegisterServer(_ *appcontext.AppContext, app application.App, e *echo.Echo,
 	}
 
 	s.registerTermRoutes()
+	s.registerExerciseRoutes()
 
 	return nil
 }

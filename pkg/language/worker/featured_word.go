@@ -11,7 +11,7 @@ import (
 	"github.com/namhq1989/bapbi-server/pkg/language/domain"
 )
 
-func (w Workers) FeaturedWord(bgCtx context.Context, t *asynq.Task) error {
+func (w Workers) GenerateFeaturedWord(bgCtx context.Context, t *asynq.Task) error {
 	var (
 		ctx = appcontext.New(bgCtx)
 
