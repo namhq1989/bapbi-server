@@ -16,6 +16,7 @@ type User struct {
 	Status               string             `bson:"status" json:"status"`
 	SubscriptionPlan     string             `bson:"subscriptionPlan" json:"subscriptionPlan"`
 	SubscriptionExpireAt time.Time          `bson:"subscriptionExpireAt" json:"subscriptionExpireAt"`
+	IsAdmin              bool               `bson:"isAdmin" json:"isAdmin"`
 	CreatedAt            time.Time          `bson:"createdAt" json:"createdAt"`
 	UpdatedAt            time.Time          `bson:"updatedAt" json:"updatedAt"`
 }
@@ -28,6 +29,7 @@ func (m User) ToDomain() domain.User {
 		Status:               domain.ToUserStatus(m.Status),
 		SubscriptionPlan:     domain.ToSubscriptionPlan(m.SubscriptionPlan),
 		SubscriptionExpireAt: m.SubscriptionExpireAt,
+		IsAdmin:              m.IsAdmin,
 		CreatedAt:            m.CreatedAt,
 		UpdatedAt:            m.UpdatedAt,
 	}
@@ -46,6 +48,7 @@ func (m User) FromDomain(user domain.User) (*User, error) {
 		Status:               user.Status.String(),
 		SubscriptionPlan:     user.SubscriptionPlan.String(),
 		SubscriptionExpireAt: user.SubscriptionExpireAt,
+		IsAdmin:              user.IsAdmin,
 		CreatedAt:            user.CreatedAt,
 		UpdatedAt:            user.UpdatedAt,
 	}, nil

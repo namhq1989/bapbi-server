@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/namhq1989/bapbi-server/internal/database"
-
 	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
 	"github.com/namhq1989/bapbi-server/internal/utils/validation"
 )
@@ -18,6 +17,7 @@ type User struct {
 	Status               UserStatus
 	SubscriptionPlan     SubscriptionPlan
 	SubscriptionExpireAt time.Time
+	IsAdmin              bool
 	CreatedAt            time.Time
 	UpdatedAt            time.Time
 }
@@ -38,6 +38,7 @@ func CreateUser(name, email string) (*User, error) {
 		Status:               UserStatusActive,
 		SubscriptionPlan:     SubscriptionPlanFree,
 		SubscriptionExpireAt: time.Time{},
+		IsAdmin:              false,
 		CreatedAt:            time.Now(),
 		UpdatedAt:            time.Now(),
 	}, nil

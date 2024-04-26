@@ -1,8 +1,10 @@
 package application
 
 import (
+	"github.com/namhq1989/bapbi-server/internal/genproto/authpb"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	"github.com/namhq1989/bapbi-server/pkg/auth/application/command"
+	"github.com/namhq1989/bapbi-server/pkg/auth/application/hub"
 	"github.com/namhq1989/bapbi-server/pkg/auth/application/query"
 	"github.com/namhq1989/bapbi-server/pkg/auth/domain"
 	"github.com/namhq1989/bapbi-server/pkg/auth/dto"
@@ -19,6 +21,7 @@ type (
 		Me(ctx *appcontext.AppContext, req dto.MeRequest) (*dto.MeResponse, error)
 	}
 	Hubs interface {
+		IsAdmin(ctx *appcontext.AppContext, req *authpb.IsAdminRequest) (*authpb.IsAdminResponse, error)
 	}
 	App interface {
 		Commands
@@ -36,6 +39,7 @@ type (
 		query.MeHandler
 	}
 	appHubHandler struct {
+		hub.IsAdminHandler
 	}
 	Application struct {
 		appCommandHandlers
@@ -62,6 +66,8 @@ func New(
 			GetAccessTokenByUserIdHandler: query.NewGetAccessTokenByUserIdHandler(jwtRepository),
 			MeHandler:                     query.NewMeHandler(userHub),
 		},
-		appHubHandler: appHubHandler{},
+		appHubHandler: appHubHandler{
+			IsAdminHandler: hub.NewIsAdminHandler(userHub),
+		},
 	}
 }

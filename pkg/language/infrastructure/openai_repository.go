@@ -3,6 +3,8 @@ package infrastructure
 import (
 	"strings"
 
+	"github.com/goccy/go-json"
+
 	"github.com/namhq1989/bapbi-server/internal/openai"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	"github.com/namhq1989/bapbi-server/pkg/language/domain"
@@ -79,5 +81,28 @@ func (r OpenAIRepository) FeaturedWord(ctx *appcontext.AppContext, language stri
 
 	return &domain.OpenAIFeaturedWordResult{
 		Word: result.Word,
+	}, nil
+}
+
+func (r OpenAIRepository) WritingExercise(ctx *appcontext.AppContext, language, exType, level string) (*domain.OpenAIWritingExerciseResult, error) {
+	result, err := r.openai.WritingExercise(ctx, language, exType, level)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil {
+		return nil, nil
+	}
+
+	// convert data into string
+	dataByte, err := json.Marshal(result.Data)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.OpenAIWritingExerciseResult{
+		Topic:      result.Topic,
+		Question:   result.Question,
+		Vocabulary: result.Vocabulary,
+		Data:       string(dataByte),
 	}, nil
 }

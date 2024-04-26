@@ -6,4 +6,5 @@ message User {
   string id = 1;
   string name = 2;
   string email = 3;
+  bool isAdmin = 4;
 }
