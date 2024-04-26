@@ -3,6 +3,8 @@ package command
 import (
 	"time"
 
+	"github.com/namhq1989/bapbi-server/internal/utils/httprespond"
+
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
 	"github.com/namhq1989/bapbi-server/internal/utils/manipulation"
@@ -118,7 +120,12 @@ func (h SubmitUserWritingExerciseHandler) SubmitUserWritingExercise(ctx *appcont
 
 	ctx.Logger().Text("done submit user writing exercise request")
 	return &dto.SubmitUserWritingExerciseResponse{
-		ID: exercise.ID,
+		Status:           userWritingExercise.Status.String(),
+		CompletedAt:      httprespond.NewTimeResponse(userWritingExercise.CompletedAt),
+		IsTopicRelevance: assessment.IsTopicRelevance,
+		Score:            assessment.Score,
+		Improvement:      assessment.Improvement,
+		Comment:          assessment.Comment,
 	}, nil
 }
 
