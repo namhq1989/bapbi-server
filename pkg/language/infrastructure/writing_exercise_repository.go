@@ -131,6 +131,7 @@ func (r WritingExerciseRepository) FindWritingExercises(ctx *appcontext.AppConte
 		"topic":      1,
 		"question":   1,
 		"vocabulary": 1,
+		"minWords":   1,
 		"data":       1,
 		"createdAt":  1,
 		"status":     1,

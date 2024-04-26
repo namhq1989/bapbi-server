@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -71,6 +72,33 @@ func (r UserWritingExerciseRepository) UpdateUserWritingExercise(ctx *appcontext
 	return err
 }
 
+func (r UserWritingExerciseRepository) FindByUserIDAndExerciseID(ctx *appcontext.AppContext, userID, exerciseID string) (*domain.UserWritingExercise, error) {
+	uid, err := database.ObjectIDFromString(userID)
+	if err != nil {
+		return nil, apperrors.User.InvalidUserID
+	}
+
+	eid, err := database.ObjectIDFromString(exerciseID)
+	if err != nil {
+		return nil, apperrors.Common.InvalidID
+	}
+
+	// find
+	var doc model.UserWritingExercise
+	if err = r.collection().FindOne(ctx.Context(), bson.M{
+		"userId":     uid,
+		"exerciseId": eid,
+	}).Decode(&doc); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, err
+	} else if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, nil
+	}
+
+	// respond
+	result := doc.ToDomain()
+	return &result, nil
+}
+
 func (r UserWritingExerciseRepository) IsExerciseCreated(ctx *appcontext.AppContext, userID, exerciseID string) (bool, error) {
 	uid, err := database.ObjectIDFromString(userID)
 	if err != nil {
@@ -131,6 +159,7 @@ func (r UserWritingExerciseRepository) FindUserWritingExercises(ctx *appcontext.
 		"topic":       "$writingExercise.topic",
 		"question":    "$writingExercise.question",
 		"vocabulary":  "$writingExercise.vocabulary",
+		"minWords":    "$writingExercise.minWords",
 		"data":        "$writingExercise.data",
 		"status":      1,
 		"createdAt":   1,

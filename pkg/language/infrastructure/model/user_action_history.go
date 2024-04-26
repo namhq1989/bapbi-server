@@ -9,25 +9,25 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type UserSearchHistory struct {
+type UserActionHistory struct {
 	ID        primitive.ObjectID `bson:"_id"`
 	UserID    primitive.ObjectID `bson:"userId"`
-	Term      string             `bson:"term"`
-	IsValid   bool               `bson:"isValid"`
+	Action    string             `bson:"action"`
+	Data      string             `bson:"data"`
 	CreatedAt time.Time          `bson:"createdAt"`
 }
 
-func (m UserSearchHistory) ToDomain() domain.UserSearchHistory {
-	return domain.UserSearchHistory{
+func (m UserActionHistory) ToDomain() domain.UserActionHistory {
+	return domain.UserActionHistory{
 		ID:        m.ID.Hex(),
 		UserID:    m.UserID.Hex(),
-		Term:      m.Term,
-		IsValid:   m.IsValid,
+		Action:    domain.ToUserActionType(m.Action),
+		Data:      m.Data,
 		CreatedAt: m.CreatedAt,
 	}
 }
 
-func (m UserSearchHistory) FromDomain(history domain.UserSearchHistory) (*UserSearchHistory, error) {
+func (m UserActionHistory) FromDomain(history domain.UserActionHistory) (*UserActionHistory, error) {
 	id, err := database.ObjectIDFromString(history.ID)
 	if err != nil {
 		return nil, apperrors.Common.InvalidID
@@ -38,11 +38,11 @@ func (m UserSearchHistory) FromDomain(history domain.UserSearchHistory) (*UserSe
 		return nil, apperrors.User.InvalidUserID
 	}
 
-	return &UserSearchHistory{
+	return &UserActionHistory{
 		ID:        id,
 		UserID:    uid,
-		Term:      history.Term,
-		IsValid:   history.IsValid,
+		Action:    history.Action.String(),
+		Data:      history.Data,
 		CreatedAt: history.CreatedAt,
 	}, nil
 }

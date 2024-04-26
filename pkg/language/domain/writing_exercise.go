@@ -96,6 +96,7 @@ type WritingExercise struct {
 	Topic      string
 	Question   string
 	Vocabulary []string
+	MinWords   int
 	Data       string // JSON string
 	CreatedAt  time.Time
 }
@@ -128,6 +129,7 @@ func NewWritingExercise(lang, exType, lvl, topic, question, data string, vocabul
 		Topic:      topic,
 		Question:   question,
 		Vocabulary: vocabulary,
+		MinWords:   GetMinWordsBasedOnLevel(level),
 		Data:       data,
 		CreatedAt:  time.Now(),
 	}, nil

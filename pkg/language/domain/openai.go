@@ -5,8 +5,9 @@ import "github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 type OpenAIRepository interface {
 	SearchTerm(ctx *appcontext.AppContext, term, fromLanguage, toLanguage string) (*OpenAISearchTermResult, error)
 	SearchSemanticRelations(ctx *appcontext.AppContext, term, language string) (*OpenAISearchSemanticRelationsResult, error)
-	FeaturedWord(ctx *appcontext.AppContext, language string) (*OpenAIFeaturedWordResult, error)
-	WritingExercise(ctx *appcontext.AppContext, language, exType, level string) (*OpenAIWritingExerciseResult, error)
+	GenerateFeaturedWord(ctx *appcontext.AppContext, language string) (*OpenAIFeaturedWordResult, error)
+	GenerateWritingExercise(ctx *appcontext.AppContext, language, exType, level string) (*OpenAIWritingExerciseResult, error)
+	AssessWritingExercise(ctx *appcontext.AppContext, language, topic, level, content string) (*OpenAIAssessWritingExerciseResult, error)
 }
 
 type OpenAISearchTermResult struct {
@@ -29,4 +30,11 @@ type OpenAIWritingExerciseResult struct {
 	Question   string
 	Vocabulary []string
 	Data       string
+}
+
+type OpenAIAssessWritingExerciseResult struct {
+	IsTopicRelevance bool
+	Score            int
+	Improvement      []string
+	Comment          string
 }

@@ -31,18 +31,35 @@ func (s server) registerExerciseRoutes() {
 	g.POST("/writing", func(c echo.Context) error {
 		var (
 			ctx         = c.Get("ctx").(*appcontext.AppContext)
-			req         = c.Get("req").(dto.CreateUserWritingExerciseRequest)
+			req         = c.Get("req").(dto.StartUserWritingExerciseRequest)
 			performerID = ctx.GetUserID()
 		)
 
-		resp, err := s.app.CreateUserWritingExercise(ctx, performerID, req)
+		resp, err := s.app.StartUserWritingExercise(ctx, performerID, req)
 		if err != nil {
 			return httprespond.R400(c, err, nil)
 		}
 
 		return httprespond.R200(c, resp)
 	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return validation.ValidateHTTPPayload[dto.CreateUserWritingExerciseRequest](next)
+		return validation.ValidateHTTPPayload[dto.StartUserWritingExerciseRequest](next)
+	})
+
+	g.PUT("/submit-writing", func(c echo.Context) error {
+		var (
+			ctx         = c.Get("ctx").(*appcontext.AppContext)
+			req         = c.Get("req").(dto.SubmitUserWritingExerciseRequest)
+			performerID = ctx.GetUserID()
+		)
+
+		resp, err := s.app.SubmitUserWritingExercise(ctx, performerID, req)
+		if err != nil {
+			return httprespond.R400(c, err, nil)
+		}
+
+		return httprespond.R200(c, resp)
+	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return validation.ValidateHTTPPayload[dto.SubmitUserWritingExerciseRequest](next)
 	})
 
 	g.GET("/user-writing", func(c echo.Context) error {

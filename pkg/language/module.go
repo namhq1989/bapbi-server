@@ -17,11 +17,6 @@ func (Module) Name() string {
 }
 
 func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error {
-	authGRPCClient, err := grpcclient.NewAuthClient(ctx, mono.Config().GRPCPort)
-	if err != nil {
-		return err
-	}
-
 	userGRPCClient, err := grpcclient.NewUserClient(ctx, mono.Config().GRPCPort)
 	if err != nil {
 		return err
@@ -31,7 +26,7 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 		// infrastructure
 		termRepository                = infrastructure.NewTermRepository(mono.Mongo())
 		userTermRepository            = infrastructure.NewUserTermRepository(mono.Mongo())
-		userSearchHistoryRepository   = infrastructure.NewUserSearchHistoryRepository(mono.Mongo())
+		userActionHistoryRepository   = infrastructure.NewUserActionHistoryRepository(mono.Mongo())
 		writingExerciseRepository     = infrastructure.NewWritingExerciseRepository(mono.Mongo())
 		userWritingExerciseRepository = infrastructure.NewUserWritingExerciseRepository(mono.Mongo())
 		openaiRepository              = infrastructure.NewOpenAIRepository(mono.OpenAI())
@@ -39,19 +34,17 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 
 		// hub
 		userHub = infrastructure.NewUserHub(userGRPCClient)
-		authHub = infrastructure.NewAuthHub(authGRPCClient)
 
 		// application
 		app = application.New(
 			termRepository,
 			userTermRepository,
-			userSearchHistoryRepository,
+			userActionHistoryRepository,
 			writingExerciseRepository,
 			userWritingExerciseRepository,
 			openaiRepository,
 			scraperRepository,
 			userHub,
-			authHub,
 		)
 	)
 

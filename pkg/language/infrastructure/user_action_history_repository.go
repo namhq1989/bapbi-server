@@ -16,27 +16,27 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type UserSearchHistoryRepository struct {
+type UserActionHistoryRepository struct {
 	db             *mongo.Database
 	collectionName string
 }
 
-func NewUserSearchHistoryRepository(db *mongo.Database) UserSearchHistoryRepository {
-	r := UserSearchHistoryRepository{
+func NewUserActionHistoryRepository(db *mongo.Database) UserActionHistoryRepository {
+	r := UserActionHistoryRepository{
 		db:             db,
-		collectionName: database.Tables.LanguageUserSearchHistory,
+		collectionName: database.Tables.LanguageUserActionHistory,
 	}
 	r.ensureIndexes()
 	return r
 }
 
-func (r UserSearchHistoryRepository) ensureIndexes() {
+func (r UserActionHistoryRepository) ensureIndexes() {
 	var (
 		ctx     = context.Background()
 		opts    = options.CreateIndexes().SetMaxTime(time.Minute * 30)
 		indexes = []mongo.IndexModel{
 			{
-				Keys: bson.D{{Key: "userId", Value: 1}, {Key: "term", Value: 1}, {Key: "createdAt", Value: -1}},
+				Keys: bson.D{{Key: "userId", Value: 1}, {Key: "action", Value: 1}, {Key: "createdAt", Value: -1}},
 			},
 		}
 	)
@@ -46,12 +46,12 @@ func (r UserSearchHistoryRepository) ensureIndexes() {
 	}
 }
 
-func (r UserSearchHistoryRepository) collection() *mongo.Collection {
+func (r UserActionHistoryRepository) collection() *mongo.Collection {
 	return r.db.Collection(r.collectionName)
 }
 
-func (r UserSearchHistoryRepository) CreateUserSearchHistory(ctx *appcontext.AppContext, history domain.UserSearchHistory) error {
-	doc, err := model.UserSearchHistory{}.FromDomain(history)
+func (r UserActionHistoryRepository) CreateUserActionHistory(ctx *appcontext.AppContext, history domain.UserActionHistory) error {
+	doc, err := model.UserActionHistory{}.FromDomain(history)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (r UserSearchHistoryRepository) CreateUserSearchHistory(ctx *appcontext.App
 	return err
 }
 
-func (r UserSearchHistoryRepository) CountTotalSearchedByTimeRange(ctx *appcontext.AppContext, userID string, start, end time.Time) (int64, error) {
+func (r UserActionHistoryRepository) CountTotalActionsByTimeRange(ctx *appcontext.AppContext, userID string, start, end time.Time) (int64, error) {
 	uid, err := database.ObjectIDFromString(userID)
 	if err != nil {
 		return 0, apperrors.Common.InvalidID

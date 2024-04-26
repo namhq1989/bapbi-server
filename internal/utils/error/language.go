@@ -13,6 +13,8 @@ var Language = struct {
 	InvalidExerciseID          error
 	InvalidExerciseStatus      error
 	UserExerciseExisted        error
+	InvalidUserAction          error
+	ExerciseAlreadyCompleted   error
 }{
 	TermNotFound:               errors.New("language_term_not_found"),
 	ExerciseNotFound:           errors.New("language_exercise_not_found"),
@@ -24,4 +26,6 @@ var Language = struct {
 	InvalidExerciseID:          errors.New("language_invalid_exercise_id"),
 	InvalidExerciseStatus:      errors.New("language_invalid_exercise_status"),
 	UserExerciseExisted:        errors.New("language_user_exercise_existed"),
+	InvalidUserAction:          errors.New("language_invalid_user_action"),
+	ExerciseAlreadyCompleted:   errors.New("language_exercise_already_completed"),
 }
