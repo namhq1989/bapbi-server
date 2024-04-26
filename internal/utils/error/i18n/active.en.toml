@@ -47,4 +47,4 @@ language_invalid_level = "Invalid level"
 language_invalid_language = "Invalid language"
 language_invalid_language_data = "Invalid language data"
 language_invalid_writing_exercise_data = "Invalid writing exercise data"
-
+language_invalid_exercise_status = "Invalid exercise status"

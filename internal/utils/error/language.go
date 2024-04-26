@@ -9,6 +9,7 @@ var Language = struct {
 	InvalidLanguage            error
 	InvalidLanguageData        error
 	InvalidWritingExerciseData error
+	InvalidExerciseStatus      error
 }{
 	TermNotFound:               errors.New("language_term_not_found"),
 	InvalidTerm:                errors.New("language_invalid_term"),
@@ -16,4 +17,5 @@ var Language = struct {
 	InvalidLanguage:            errors.New("language_invalid_language"),
 	InvalidLanguageData:        errors.New("language_invalid_language_data"),
 	InvalidWritingExerciseData: errors.New("language_invalid_writing_exercise_data"),
+	InvalidExerciseStatus:      errors.New("language_invalid_exercise_status"),
 }
