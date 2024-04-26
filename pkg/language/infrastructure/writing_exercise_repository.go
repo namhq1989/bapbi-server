@@ -100,7 +100,7 @@ func (r WritingExerciseRepository) FindWritingExercises(ctx *appcontext.AppConte
 	}
 
 	lookupStage := bson.D{
-		{"$lookup", bson.M{
+		{Key: "$lookup", Value: bson.M{
 			"from": database.Tables.LanguageUserWritingExercise,
 			"let":  bson.M{"exerciseId": "$_id"},
 			"pipeline": bson.A{
@@ -123,7 +123,7 @@ func (r WritingExerciseRepository) FindWritingExercises(ctx *appcontext.AppConte
 		}},
 	}
 
-	projectState := bson.D{{"$project", bson.M{
+	projectState := bson.D{{Key: "$project", Value: bson.M{
 		"_id":        1,
 		"language":   1,
 		"type":       1,
@@ -137,14 +137,14 @@ func (r WritingExerciseRepository) FindWritingExercises(ctx *appcontext.AppConte
 	}}}
 
 	pipeline := mongo.Pipeline{
-		bson.D{{"$match", matchCondition}},
+		bson.D{{Key: "$match", Value: matchCondition}},
 		lookupStage,
-		bson.D{{"$addFields", bson.M{
+		bson.D{{Key: "$addFields", Value: bson.M{
 			"status": bson.M{"$ifNull": bson.A{bson.M{"$arrayElemAt": bson.A{"$userWritingExercise.status", 0}}, ""}},
 		}}},
 		projectState,
-		bson.D{{"$sort", bson.M{"createdAt": -1}}},
-		bson.D{{"$limit", filter.Limit}},
+		bson.D{{Key: "$sort", Value: bson.M{"createdAt": -1}}},
+		bson.D{{Key: "$limit", Value: filter.Limit}},
 	}
 
 	// find
