@@ -15,6 +15,7 @@ type (
 
 		StartUserWritingExercise(ctx *appcontext.AppContext, performerID string, req dto.StartUserWritingExerciseRequest) (*dto.StartUserWritingExerciseResponse, error)
 		SubmitUserWritingExercise(ctx *appcontext.AppContext, performerID string, req dto.SubmitUserWritingExerciseRequest) (*dto.SubmitUserWritingExerciseResponse, error)
+		ModifyUserWritingExercise(ctx *appcontext.AppContext, performerID string, req dto.ModifyUserWritingExerciseRequest) (*dto.ModifyUserWritingExerciseResponse, error)
 	}
 	Queries interface {
 		SearchTerm(ctx *appcontext.AppContext, performerID string, req dto.SearchTermRequest) (*dto.SearchTermResponse, error)
@@ -37,6 +38,7 @@ type (
 
 		command.StartUserWritingExerciseHandler
 		command.SubmitUserWritingExerciseHandler
+		command.ModifyUserWritingExerciseHandler
 	}
 	appQueryHandler struct {
 		query.SearchTermHandler
@@ -73,6 +75,7 @@ func New(
 
 			StartUserWritingExerciseHandler:  command.NewStartUserWritingExerciseHandler(writingExerciseRepository, userWritingExerciseRepository),
 			SubmitUserWritingExerciseHandler: command.NewSubmitUserWritingExerciseHandler(writingExerciseRepository, userWritingExerciseRepository, userActionHistoryRepository, openaiRepository, userHub),
+			ModifyUserWritingExerciseHandler: command.NewModifyUserWritingExerciseHandler(writingExerciseRepository, userWritingExerciseRepository),
 		},
 		appQueryHandler: appQueryHandler{
 			SearchTermHandler:      query.NewSearchTermHandler(termRepository, userActionHistoryRepository, openaiRepository, scraperRepository, userHub),
