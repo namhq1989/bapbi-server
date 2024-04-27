@@ -62,6 +62,23 @@ func (s server) registerExerciseRoutes() {
 		return validation.ValidateHTTPPayload[dto.SubmitUserWritingExerciseRequest](next)
 	})
 
+	g.PUT("/modify-writing", func(c echo.Context) error {
+		var (
+			ctx         = c.Get("ctx").(*appcontext.AppContext)
+			req         = c.Get("req").(dto.ModifyUserWritingExerciseRequest)
+			performerID = ctx.GetUserID()
+		)
+
+		resp, err := s.app.ModifyUserWritingExercise(ctx, performerID, req)
+		if err != nil {
+			return httprespond.R400(c, err, nil)
+		}
+
+		return httprespond.R200(c, resp)
+	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return validation.ValidateHTTPPayload[dto.ModifyUserWritingExerciseRequest](next)
+	})
+
 	g.GET("/user-writing", func(c echo.Context) error {
 		var (
 			ctx         = c.Get("ctx").(*appcontext.AppContext)

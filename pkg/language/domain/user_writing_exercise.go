@@ -106,6 +106,10 @@ func (d *UserWritingExercise) SetContent(content string, minWords int) error {
 	return nil
 }
 
+func (d *UserWritingExercise) IsProgressing() bool {
+	return d.Status == ExerciseStatusProgressing
+}
+
 func (d *UserWritingExercise) IsCompleted() bool {
 	return d.Status == ExerciseStatusCompleted
 }
@@ -117,6 +121,11 @@ func (d *UserWritingExercise) SetAssessment(isTopicRelevance bool, score int, im
 		Improvement:      improvement,
 		Comment:          comment,
 	}
+}
+
+func (d *UserWritingExercise) SetProgressing() {
+	d.Status = ExerciseStatusProgressing
+	d.UpdatedAt = time.Now()
 }
 
 func (d *UserWritingExercise) SetCompleted() {
