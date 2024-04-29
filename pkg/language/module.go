@@ -30,8 +30,11 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 		writingExerciseRepository        = infrastructure.NewWritingExerciseRepository(mono.Mongo())
 		userWritingExerciseRepository    = infrastructure.NewUserWritingExerciseRepository(mono.Mongo())
 		userVocabularyExerciseRepository = infrastructure.NewUserVocabularyExerciseRepository(mono.Mongo())
-		openaiRepository                 = infrastructure.NewOpenAIRepository(mono.OpenAI())
-		scraperRepository                = infrastructure.NewScraperRepository(mono.Scraper())
+
+		// 3rd
+		queueRepository   = infrastructure.NewQueueRepository(mono.Queue())
+		openaiRepository  = infrastructure.NewOpenAIRepository(mono.OpenAI())
+		scraperRepository = infrastructure.NewScraperRepository(mono.Scraper())
 
 		// hub
 		userHub = infrastructure.NewUserHub(userGRPCClient)
@@ -46,6 +49,7 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 			userVocabularyExerciseRepository,
 			openaiRepository,
 			scraperRepository,
+			queueRepository,
 			userHub,
 		)
 	)
@@ -56,7 +60,14 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 	}
 
 	// worker
-	w := worker.New(mono.Queue(), termRepository, writingExerciseRepository, openaiRepository, scraperRepository)
+	w := worker.New(
+		mono.Queue(),
+		termRepository,
+		writingExerciseRepository,
+		userVocabularyExerciseRepository,
+		openaiRepository,
+		scraperRepository,
+	)
 	w.Start()
 
 	return nil

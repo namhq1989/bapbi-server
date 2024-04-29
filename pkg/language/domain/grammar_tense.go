@@ -1,5 +1,7 @@
 package domain
 
+import "github.com/namhq1989/bapbi-server/internal/utils/manipulation"
+
 type GrammarTenseCode string
 
 const (
@@ -23,6 +25,11 @@ func (c GrammarTenseCode) String() string {
 
 func (c GrammarTenseCode) IsValid() bool {
 	return c != GrammarTenseCodeUnknown
+}
+
+func RandomGrammarTenseCode() GrammarTenseCode {
+	randIndex := manipulation.RandomIntInRange(0, len(EnglishGrammarTenses))
+	return EnglishGrammarTenses[randIndex].Code
 }
 
 func ToGrammarTenseCode(value string) GrammarTenseCode {
