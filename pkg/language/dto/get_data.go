@@ -25,7 +25,7 @@ func (d GetDataResponse) FromDomain(tenses []domain.GrammarTense) []GrammarTense
 	result := make([]GrammarTense, len(tenses))
 	for i, t := range tenses {
 		result[i] = GrammarTense{
-			Code: t.Code,
+			Code: t.Code.String(),
 			Name: LanguageTranslation{
 				English:    t.Name.English,
 				Vietnamese: t.Name.Vietnamese,
