@@ -10,26 +10,29 @@ import (
 )
 
 type Workers struct {
-	queue                     *queue.Queue
-	termRepository            domain.TermRepository
-	writingExerciseRepository domain.WritingExerciseRepository
-	openaiRepository          domain.OpenAIRepository
-	scraperRepository         domain.ScraperRepository
+	queue                            *queue.Queue
+	termRepository                   domain.TermRepository
+	writingExerciseRepository        domain.WritingExerciseRepository
+	userVocabularyExerciseRepository domain.UserVocabularyExerciseRepository
+	openaiRepository                 domain.OpenAIRepository
+	scraperRepository                domain.ScraperRepository
 }
 
 func New(
 	queue *queue.Queue,
 	termRepository domain.TermRepository,
 	writingExerciseRepository domain.WritingExerciseRepository,
+	userVocabularyExerciseRepository domain.UserVocabularyExerciseRepository,
 	openaiRepository domain.OpenAIRepository,
 	scraperRepository domain.ScraperRepository,
 ) Workers {
 	return Workers{
-		queue:                     queue,
-		termRepository:            termRepository,
-		writingExerciseRepository: writingExerciseRepository,
-		openaiRepository:          openaiRepository,
-		scraperRepository:         scraperRepository,
+		queue:                            queue,
+		termRepository:                   termRepository,
+		writingExerciseRepository:        writingExerciseRepository,
+		userVocabularyExerciseRepository: userVocabularyExerciseRepository,
+		openaiRepository:                 openaiRepository,
+		scraperRepository:                scraperRepository,
 	}
 }
 
@@ -46,6 +49,8 @@ func (w Workers) Start() {
 
 	w.queue.Server.HandleFunc(w.queue.GenerateTypename(queue.TypeNames.Language.GenerateFeaturedWord), w.GenerateFeaturedWord)
 	w.queue.Server.HandleFunc(w.queue.GenerateTypename(queue.TypeNames.Language.GenerateWritingExercises), w.GenerateWritingExercises)
+
+	w.queue.Server.HandleFunc(w.queue.GenerateTypename(queue.TypeNames.Language.NewUserTerm), w.NewUserTerm)
 }
 
 func (w Workers) addCronjob() {

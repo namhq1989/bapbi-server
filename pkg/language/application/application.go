@@ -10,7 +10,7 @@ import (
 
 type (
 	Commands interface {
-		AddTerm(ctx *appcontext.AppContext, performerID, termID string, _ dto.AddTermRequest) (*dto.AddTermResponse, error)
+		AddUserTerm(ctx *appcontext.AppContext, performerID, termID string, _ dto.AddUserTermRequest) (*dto.AddUserTermResponse, error)
 		ChangeTermFavourite(ctx *appcontext.AppContext, performerID, userTermID string, _ dto.ChangeTermFavouriteRequest) (*dto.ChangeTermFavouriteResponse, error)
 
 		StartUserWritingExercise(ctx *appcontext.AppContext, performerID string, req dto.StartUserWritingExerciseRequest) (*dto.StartUserWritingExerciseResponse, error)
@@ -35,7 +35,7 @@ type (
 	}
 
 	appCommandHandlers struct {
-		command.AddTermHandler
+		command.AddUserTermHandler
 		command.ChangeTermFavouriteHandler
 
 		command.StartUserWritingExerciseHandler
@@ -71,11 +71,12 @@ func New(
 	userVocabularyExerciseRepository domain.UserVocabularyExerciseRepository,
 	openaiRepository domain.OpenAIRepository,
 	scraperRepository domain.ScraperRepository,
+	queueRepository domain.QueueRepository,
 	userHub domain.UserHub,
 ) *Application {
 	return &Application{
 		appCommandHandlers: appCommandHandlers{
-			AddTermHandler:             command.NewAddTermHandler(termRepository, userTermRepository, userHub),
+			AddUserTermHandler:         command.NewAddUserTermHandler(termRepository, userTermRepository, queueRepository, userHub),
 			ChangeTermFavouriteHandler: command.NewChangeTermFavouriteHandler(userTermRepository),
 
 			StartUserWritingExerciseHandler:  command.NewStartUserWritingExerciseHandler(writingExerciseRepository, userWritingExerciseRepository),

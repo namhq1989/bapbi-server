@@ -11,6 +11,7 @@ type TypeUserNames struct {
 }
 
 type LanguageNames struct {
+	NewUserTerm              string
 	GenerateFeaturedWord     string
 	GenerateWritingExercises string
 }
@@ -29,6 +30,7 @@ var TypeNames = struct {
 		UserUpdated: "user:user.updated",
 	},
 	Language: LanguageNames{
+		NewUserTerm:              "language:userTerm.newUserTerm",
 		GenerateFeaturedWord:     "language:term.generateFeaturedWord",
 		GenerateWritingExercises: "language:exercise.generateWritingExercises",
 	},

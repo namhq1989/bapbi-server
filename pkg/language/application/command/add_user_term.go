@@ -10,22 +10,24 @@ import (
 	"github.com/namhq1989/bapbi-server/pkg/language/dto"
 )
 
-type AddTermHandler struct {
+type AddUserTermHandler struct {
 	termRepository     domain.TermRepository
 	userTermRepository domain.UserTermRepository
+	queueRepository    domain.QueueRepository
 	userHub            domain.UserHub
 }
 
-func NewAddTermHandler(termRepository domain.TermRepository, userTermRepository domain.UserTermRepository, userHub domain.UserHub) AddTermHandler {
-	return AddTermHandler{
+func NewAddUserTermHandler(termRepository domain.TermRepository, userTermRepository domain.UserTermRepository, queueRepository domain.QueueRepository, userHub domain.UserHub) AddUserTermHandler {
+	return AddUserTermHandler{
 		termRepository:     termRepository,
 		userTermRepository: userTermRepository,
+		queueRepository:    queueRepository,
 		userHub:            userHub,
 	}
 }
 
-func (h AddTermHandler) AddTerm(ctx *appcontext.AppContext, performerID, termID string, _ dto.AddTermRequest) (*dto.AddTermResponse, error) {
-	ctx.Logger().Info("new add term request", appcontext.Fields{"performer": performerID, "term": termID})
+func (h AddUserTermHandler) AddUserTerm(ctx *appcontext.AppContext, performerID, termID string, _ dto.AddUserTermRequest) (*dto.AddUserTermResponse, error) {
+	ctx.Logger().Info("new add user term request", appcontext.Fields{"performer": performerID, "term": termID})
 
 	ctx.Logger().Text("find term in db")
 	term, err := h.termRepository.FindByID(ctx, termID)
@@ -46,7 +48,7 @@ func (h AddTermHandler) AddTerm(ctx *appcontext.AppContext, performerID, termID 
 	}
 	if isAdded {
 		ctx.Logger().Text("user already added this term, respond")
-		return &dto.AddTermResponse{}, nil
+		return &dto.AddUserTermResponse{}, nil
 	}
 
 	ctx.Logger().Text("get user's subscription plan")
@@ -84,6 +86,12 @@ func (h AddTermHandler) AddTerm(ctx *appcontext.AppContext, performerID, termID 
 		return nil, err
 	}
 
-	ctx.Logger().Text("add user's term successfully")
-	return &dto.AddTermResponse{}, nil
+	ctx.Logger().Text("add queue job")
+	if err = h.queueRepository.EnqueueNewUserTerm(ctx, *userTerm); err != nil {
+		ctx.Logger().Error("failed to add queue job", err, appcontext.Fields{})
+		return nil, err
+	}
+
+	ctx.Logger().Text("done add user term request")
+	return &dto.AddUserTermResponse{}, nil
 }
