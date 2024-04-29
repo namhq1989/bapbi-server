@@ -33,3 +33,12 @@ func ToLanguage(value string) Language {
 		return LanguageUnknown
 	}
 }
+
+//
+// LANGUAGE TRANSLATION
+//
+
+type LanguageTranslation struct {
+	English    string
+	Vietnamese string
+}

@@ -95,10 +95,10 @@ func NewUserWritingExercise(userID, exerciseID, lang string) (*UserWritingExerci
 
 func (d *UserWritingExercise) SetContent(content string, minWords int) error {
 	var (
-		l             = manipulation.CountTotalWords(content)
-		maxCharacters = math.Round(float64(minWords * 2))
+		l        = manipulation.CountTotalWords(content)
+		maxWords = math.Round(float64(minWords * 2))
 	)
-	if l < minWords || l > int(maxCharacters) {
+	if l < minWords || l > int(maxWords) {
 		return apperrors.Language.InvalidWritingExerciseData
 	}
 

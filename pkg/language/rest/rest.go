@@ -20,6 +20,7 @@ func RegisterServer(_ *appcontext.AppContext, app application.App, e *echo.Echo,
 		jwt:  jwt,
 	}
 
+	s.registerBaseRoutes()
 	s.registerTermRoutes()
 	s.registerExerciseRoutes()
 
