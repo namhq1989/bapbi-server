@@ -24,13 +24,14 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 
 	var (
 		// infrastructure
-		termRepository                = infrastructure.NewTermRepository(mono.Mongo())
-		userTermRepository            = infrastructure.NewUserTermRepository(mono.Mongo())
-		userActionHistoryRepository   = infrastructure.NewUserActionHistoryRepository(mono.Mongo())
-		writingExerciseRepository     = infrastructure.NewWritingExerciseRepository(mono.Mongo())
-		userWritingExerciseRepository = infrastructure.NewUserWritingExerciseRepository(mono.Mongo())
-		openaiRepository              = infrastructure.NewOpenAIRepository(mono.OpenAI())
-		scraperRepository             = infrastructure.NewScraperRepository(mono.Scraper())
+		termRepository                   = infrastructure.NewTermRepository(mono.Mongo())
+		userTermRepository               = infrastructure.NewUserTermRepository(mono.Mongo())
+		userActionHistoryRepository      = infrastructure.NewUserActionHistoryRepository(mono.Mongo())
+		writingExerciseRepository        = infrastructure.NewWritingExerciseRepository(mono.Mongo())
+		userWritingExerciseRepository    = infrastructure.NewUserWritingExerciseRepository(mono.Mongo())
+		userVocabularyExerciseRepository = infrastructure.NewUserVocabularyExerciseRepository(mono.Mongo())
+		openaiRepository                 = infrastructure.NewOpenAIRepository(mono.OpenAI())
+		scraperRepository                = infrastructure.NewScraperRepository(mono.Scraper())
 
 		// hub
 		userHub = infrastructure.NewUserHub(userGRPCClient)
@@ -42,6 +43,7 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 			userActionHistoryRepository,
 			writingExerciseRepository,
 			userWritingExerciseRepository,
+			userVocabularyExerciseRepository,
 			openaiRepository,
 			scraperRepository,
 			userHub,

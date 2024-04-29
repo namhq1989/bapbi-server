@@ -18,6 +18,8 @@ type (
 		ModifyUserWritingExercise(ctx *appcontext.AppContext, performerID string, req dto.ModifyUserWritingExerciseRequest) (*dto.ModifyUserWritingExerciseResponse, error)
 	}
 	Queries interface {
+		GetData(_ *appcontext.AppContext, _ dto.GetDataRequest) (*dto.GetDataResponse, error)
+
 		SearchTerm(ctx *appcontext.AppContext, performerID string, req dto.SearchTermRequest) (*dto.SearchTermResponse, error)
 		GetUserTerms(ctx *appcontext.AppContext, performerID string, req dto.GetUserTermsRequest) (*dto.GetUserTermsResponse, error)
 		GetFeaturedTerm(ctx *appcontext.AppContext, req dto.GetFeaturedTermRequest) (*dto.GetFeaturedTermResponse, error)
@@ -41,6 +43,8 @@ type (
 		command.ModifyUserWritingExerciseHandler
 	}
 	appQueryHandler struct {
+		query.GetDataHandler
+
 		query.SearchTermHandler
 		query.GetUserTermsHandler
 		query.GetFeaturedTermHandler
@@ -64,6 +68,7 @@ func New(
 	userActionHistoryRepository domain.UserActionHistoryRepository,
 	writingExerciseRepository domain.WritingExerciseRepository,
 	userWritingExerciseRepository domain.UserWritingExerciseRepository,
+	userVocabularyExerciseRepository domain.UserVocabularyExerciseRepository,
 	openaiRepository domain.OpenAIRepository,
 	scraperRepository domain.ScraperRepository,
 	userHub domain.UserHub,
@@ -78,6 +83,8 @@ func New(
 			ModifyUserWritingExerciseHandler: command.NewModifyUserWritingExerciseHandler(writingExerciseRepository, userWritingExerciseRepository),
 		},
 		appQueryHandler: appQueryHandler{
+			GetDataHandler: query.NewGetDataHandler(),
+
 			SearchTermHandler:      query.NewSearchTermHandler(termRepository, userActionHistoryRepository, openaiRepository, scraperRepository, userHub),
 			GetUserTermsHandler:    query.NewGetUserTermsHandler(termRepository, userTermRepository),
 			GetFeaturedTermHandler: query.NewGetFeaturedTermHandler(termRepository),
