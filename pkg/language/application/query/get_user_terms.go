@@ -49,9 +49,10 @@ func (h GetUserTermsHandler) GetUserTerms(ctx *appcontext.AppContext, performerI
 		term, _ := h.termRepository.FindByID(ctx, userTerm.TermID)
 		if term == nil {
 			result.Terms[i] = dto.Term{}
-		} else {
-			result.Terms[i] = dto.Term{}.FromDomain(*term, userTerm.IsFavourite)
+			continue
 		}
+
+		result.Terms[i] = dto.Term{}.FromDomain(*term, userTerm.IsFavourite)
 	}
 
 	ctx.Logger().Text("generate page token")

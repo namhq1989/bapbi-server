@@ -16,21 +16,21 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type UserVocabularyExerciseRepository struct {
+type UserTermExerciseRepository struct {
 	db             *mongo.Database
 	collectionName string
 }
 
-func NewUserVocabularyExerciseRepository(db *mongo.Database) UserVocabularyExerciseRepository {
-	r := UserVocabularyExerciseRepository{
+func NewUserTermExerciseRepository(db *mongo.Database) UserTermExerciseRepository {
+	r := UserTermExerciseRepository{
 		db:             db,
-		collectionName: database.Tables.LanguageUserVocabularyExercise,
+		collectionName: database.Tables.LanguageUserTermExercise,
 	}
 	r.ensureIndexes()
 	return r
 }
 
-func (r UserVocabularyExerciseRepository) ensureIndexes() {
+func (r UserTermExerciseRepository) ensureIndexes() {
 	var (
 		ctx     = context.Background()
 		opts    = options.CreateIndexes().SetMaxTime(time.Minute * 30)
@@ -46,12 +46,12 @@ func (r UserVocabularyExerciseRepository) ensureIndexes() {
 	}
 }
 
-func (r UserVocabularyExerciseRepository) collection() *mongo.Collection {
+func (r UserTermExerciseRepository) collection() *mongo.Collection {
 	return r.db.Collection(r.collectionName)
 }
 
-func (r UserVocabularyExerciseRepository) CreateUserVocabularyExercise(ctx *appcontext.AppContext, exercise domain.UserVocabularyExercise) error {
-	doc, err := model.UserVocabularyExercise{}.FromDomain(exercise)
+func (r UserTermExerciseRepository) CreateUserTermExercise(ctx *appcontext.AppContext, exercise domain.UserTermExercise) error {
+	doc, err := model.UserTermExercise{}.FromDomain(exercise)
 	if err != nil {
 		return err
 	}
@@ -60,8 +60,8 @@ func (r UserVocabularyExerciseRepository) CreateUserVocabularyExercise(ctx *appc
 	return err
 }
 
-func (r UserVocabularyExerciseRepository) UpdateUserVocabularyExercise(ctx *appcontext.AppContext, exercise domain.UserVocabularyExercise) error {
-	doc, err := model.UserVocabularyExercise{}.FromDomain(exercise)
+func (r UserTermExerciseRepository) UpdateUserTermExercise(ctx *appcontext.AppContext, exercise domain.UserTermExercise) error {
+	doc, err := model.UserTermExercise{}.FromDomain(exercise)
 	if err != nil {
 		return err
 	}
@@ -70,14 +70,14 @@ func (r UserVocabularyExerciseRepository) UpdateUserVocabularyExercise(ctx *appc
 	return err
 }
 
-func (r UserVocabularyExerciseRepository) FindByExerciseID(ctx *appcontext.AppContext, exerciseID string) (*domain.UserVocabularyExercise, error) {
+func (r UserTermExerciseRepository) FindByExerciseID(ctx *appcontext.AppContext, exerciseID string) (*domain.UserTermExercise, error) {
 	id, err := database.ObjectIDFromString(exerciseID)
 	if err != nil {
 		return nil, apperrors.Common.InvalidID
 	}
 
 	// find
-	var doc model.UserVocabularyExercise
+	var doc model.UserTermExercise
 	if err = r.collection().FindOne(ctx.Context(), bson.M{
 		"_id": id,
 	}).Decode(&doc); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
@@ -91,7 +91,7 @@ func (r UserVocabularyExerciseRepository) FindByExerciseID(ctx *appcontext.AppCo
 	return &result, nil
 }
 
-func (r UserVocabularyExerciseRepository) FindByUserIDAndTermID(ctx *appcontext.AppContext, userID, termID string) (*domain.UserVocabularyExercise, error) {
+func (r UserTermExerciseRepository) FindByUserIDAndTermID(ctx *appcontext.AppContext, userID, termID string) (*domain.UserTermExercise, error) {
 	uid, err := database.ObjectIDFromString(userID)
 	if err != nil {
 		return nil, apperrors.User.InvalidUserID
@@ -103,7 +103,7 @@ func (r UserVocabularyExerciseRepository) FindByUserIDAndTermID(ctx *appcontext.
 	}
 
 	// find
-	var doc model.UserVocabularyExercise
+	var doc model.UserTermExercise
 	if err = r.collection().FindOne(ctx.Context(), bson.M{
 		"userId": uid,
 		"termId": tid,
@@ -118,7 +118,7 @@ func (r UserVocabularyExerciseRepository) FindByUserIDAndTermID(ctx *appcontext.
 	return &result, nil
 }
 
-func (r UserVocabularyExerciseRepository) IsExerciseCreated(ctx *appcontext.AppContext, userID, termID string) (bool, error) {
+func (r UserTermExerciseRepository) IsExerciseCreated(ctx *appcontext.AppContext, userID, termID string) (bool, error) {
 	uid, err := database.ObjectIDFromString(userID)
 	if err != nil {
 		return false, apperrors.Common.InvalidID

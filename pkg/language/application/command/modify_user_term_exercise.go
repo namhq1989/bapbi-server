@@ -7,23 +7,23 @@ import (
 	"github.com/namhq1989/bapbi-server/pkg/language/dto"
 )
 
-type ModifyUserVocabularyExerciseHandler struct {
-	userVocabularyExerciseRepository domain.UserVocabularyExerciseRepository
+type ModifyUserTermExerciseHandler struct {
+	UserTermExerciseRepository domain.UserTermExerciseRepository
 }
 
-func NewModifyUserVocabularyExerciseHandler(
-	userVocabularyExerciseRepository domain.UserVocabularyExerciseRepository,
-) ModifyUserVocabularyExerciseHandler {
-	return ModifyUserVocabularyExerciseHandler{
-		userVocabularyExerciseRepository: userVocabularyExerciseRepository,
+func NewModifyUserTermExerciseHandler(
+	UserTermExerciseRepository domain.UserTermExerciseRepository,
+) ModifyUserTermExerciseHandler {
+	return ModifyUserTermExerciseHandler{
+		UserTermExerciseRepository: UserTermExerciseRepository,
 	}
 }
 
-func (h ModifyUserVocabularyExerciseHandler) ModifyUserVocabularyExercise(ctx *appcontext.AppContext, performerID string, req dto.ModifyUserVocabularyExerciseRequest) (*dto.ModifyUserVocabularyExerciseResponse, error) {
+func (h ModifyUserTermExerciseHandler) ModifyUserTermExercise(ctx *appcontext.AppContext, performerID string, req dto.ModifyUserTermExerciseRequest) (*dto.ModifyUserTermExerciseResponse, error) {
 	ctx.Logger().Info("new modify user vocabulary exercise request", appcontext.Fields{"performer": performerID, "exerciseId": req.ExerciseId})
 
 	ctx.Logger().Text("find exercise in db")
-	exercise, err := h.userVocabularyExerciseRepository.FindByExerciseID(ctx, req.ExerciseId)
+	exercise, err := h.UserTermExerciseRepository.FindByExerciseID(ctx, req.ExerciseId)
 	if err != nil {
 		ctx.Logger().Error("failed to find exercise in db", err, appcontext.Fields{})
 		return nil, err
@@ -35,18 +35,18 @@ func (h ModifyUserVocabularyExerciseHandler) ModifyUserVocabularyExercise(ctx *a
 
 	if exercise.IsProgressing() {
 		ctx.Logger().Text("user exercise is already progressing, respond")
-		return &dto.ModifyUserVocabularyExerciseResponse{}, nil
+		return &dto.ModifyUserTermExerciseResponse{}, nil
 	}
 
 	ctx.Logger().Text("set user exercise status to progressing")
 	exercise.SetProgressing()
 
 	ctx.Logger().Text("update user exercise in db")
-	if err = h.userVocabularyExerciseRepository.UpdateUserVocabularyExercise(ctx, *exercise); err != nil {
+	if err = h.UserTermExerciseRepository.UpdateUserTermExercise(ctx, *exercise); err != nil {
 		ctx.Logger().Error("failed to update user exercise in db", err, appcontext.Fields{})
 		return nil, err
 	}
 
 	ctx.Logger().Text("done modify user vocabulary exercise request")
-	return &dto.ModifyUserVocabularyExerciseResponse{}, nil
+	return &dto.ModifyUserTermExerciseResponse{}, nil
 }

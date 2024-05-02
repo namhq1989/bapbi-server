@@ -9,11 +9,11 @@ import (
 	"github.com/namhq1989/bapbi-server/internal/utils/manipulation"
 )
 
-type UserVocabularyExerciseRepository interface {
-	CreateUserVocabularyExercise(ctx *appcontext.AppContext, exercise UserVocabularyExercise) error
-	UpdateUserVocabularyExercise(ctx *appcontext.AppContext, exercise UserVocabularyExercise) error
-	FindByExerciseID(ctx *appcontext.AppContext, exerciseID string) (*UserVocabularyExercise, error)
-	FindByUserIDAndTermID(ctx *appcontext.AppContext, userID, termID string) (*UserVocabularyExercise, error)
+type UserTermExerciseRepository interface {
+	CreateUserTermExercise(ctx *appcontext.AppContext, exercise UserTermExercise) error
+	UpdateUserTermExercise(ctx *appcontext.AppContext, exercise UserTermExercise) error
+	FindByExerciseID(ctx *appcontext.AppContext, exerciseID string) (*UserTermExercise, error)
+	FindByUserIDAndTermID(ctx *appcontext.AppContext, userID, termID string) (*UserTermExercise, error)
 	IsExerciseCreated(ctx *appcontext.AppContext, userID, termID string) (bool, error)
 }
 
@@ -21,26 +21,26 @@ type UserVocabularyExerciseRepository interface {
 // USER VOCABULARY EXERCISE
 //
 
-type UserVocabularyExerciseAssessmentGrammarIssue struct {
+type UserTermExerciseAssessmentGrammarIssue struct {
 	Issue      string
 	Correction string
 }
 
-type UserVocabularyExerciseAssessmentImprovementSuggestion struct {
+type UserTermExerciseAssessmentImprovementSuggestion struct {
 	Instruction string
 	Example     string
 }
 
-type UserVocabularyExerciseAssessment struct {
+type UserTermExerciseAssessment struct {
 	IsVocabularyCorrect    bool
 	VocabularyIssue        string
 	IsTenseCorrect         bool
 	TenseIssue             string
-	GrammarIssues          []UserVocabularyExerciseAssessmentGrammarIssue
-	ImprovementSuggestions []UserVocabularyExerciseAssessmentImprovementSuggestion
+	GrammarIssues          []UserTermExerciseAssessmentGrammarIssue
+	ImprovementSuggestions []UserTermExerciseAssessmentImprovementSuggestion
 }
 
-type UserVocabularyExercise struct {
+type UserTermExercise struct {
 	ID          string
 	UserID      string
 	TermID      string
@@ -49,13 +49,13 @@ type UserVocabularyExercise struct {
 	Tense       GrammarTenseCode
 	Content     string
 	Status      ExerciseStatus
-	Assessment  *UserVocabularyExerciseAssessment
+	Assessment  *UserTermExerciseAssessment
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	CompletedAt time.Time
 }
 
-func NewUserVocabularyExercise(userID, termID, term, lang, tense string) (*UserVocabularyExercise, error) {
+func NewUserTermExercise(userID, termID, term, lang, tense string) (*UserTermExercise, error) {
 	if term == "" {
 		return nil, apperrors.Language.InvalidTerm
 	}
@@ -70,7 +70,7 @@ func NewUserVocabularyExercise(userID, termID, term, lang, tense string) (*UserV
 		return nil, apperrors.Language.InvalidVocabularyExerciseData
 	}
 
-	return &UserVocabularyExercise{
+	return &UserTermExercise{
 		ID:         database.NewStringID(),
 		UserID:     userID,
 		TermID:     termID,
@@ -85,11 +85,11 @@ func NewUserVocabularyExercise(userID, termID, term, lang, tense string) (*UserV
 	}, nil
 }
 
-func (d *UserVocabularyExercise) GetExerciseWordsRange() (int, int) {
+func (d *UserTermExercise) GetExerciseWordsRange() (int, int) {
 	return 5, 30
 }
 
-func (d *UserVocabularyExercise) SetContent(content string) error {
+func (d *UserTermExercise) SetContent(content string) error {
 	var (
 		l                  = manipulation.CountTotalWords(content)
 		minWords, maxWords = d.GetExerciseWordsRange()
@@ -103,27 +103,27 @@ func (d *UserVocabularyExercise) SetContent(content string) error {
 	return nil
 }
 
-func (d *UserVocabularyExercise) IsProgressing() bool {
+func (d *UserTermExercise) IsProgressing() bool {
 	return d.Status == ExerciseStatusProgressing
 }
 
-func (d *UserVocabularyExercise) IsCompleted() bool {
+func (d *UserTermExercise) IsCompleted() bool {
 	return d.Status == ExerciseStatusCompleted
 }
 
-func (d *UserVocabularyExercise) IsOwner(userID string) bool {
+func (d *UserTermExercise) IsOwner(userID string) bool {
 	return d.UserID == userID
 }
 
-func (d *UserVocabularyExercise) SetAssessment(
+func (d *UserTermExercise) SetAssessment(
 	isVocabularyCorrect bool,
 	vocabularyIssue string,
 	isTenseCorrect bool,
 	tenseIssue string,
-	grammarIssues []UserVocabularyExerciseAssessmentGrammarIssue,
-	improvementSuggestions []UserVocabularyExerciseAssessmentImprovementSuggestion,
+	grammarIssues []UserTermExerciseAssessmentGrammarIssue,
+	improvementSuggestions []UserTermExerciseAssessmentImprovementSuggestion,
 ) {
-	d.Assessment = &UserVocabularyExerciseAssessment{
+	d.Assessment = &UserTermExerciseAssessment{
 		IsVocabularyCorrect:    isVocabularyCorrect,
 		VocabularyIssue:        vocabularyIssue,
 		IsTenseCorrect:         isTenseCorrect,
@@ -133,12 +133,12 @@ func (d *UserVocabularyExercise) SetAssessment(
 	}
 }
 
-func (d *UserVocabularyExercise) SetProgressing() {
+func (d *UserTermExercise) SetProgressing() {
 	d.Status = ExerciseStatusProgressing
 	d.UpdatedAt = time.Now()
 }
 
-func (d *UserVocabularyExercise) SetCompleted() {
+func (d *UserTermExercise) SetCompleted() {
 	d.Status = ExerciseStatusCompleted
 	d.CompletedAt = time.Now()
 	d.UpdatedAt = time.Now()

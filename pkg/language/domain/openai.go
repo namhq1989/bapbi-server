@@ -8,7 +8,7 @@ type OpenAIRepository interface {
 	GenerateFeaturedWord(ctx *appcontext.AppContext, language string) (*OpenAIFeaturedWordResult, error)
 	GenerateWritingExercise(ctx *appcontext.AppContext, language, exType, level string) (*OpenAIWritingExerciseResult, error)
 	AssessWritingExercise(ctx *appcontext.AppContext, language, topic, level, content string) (*OpenAIAssessWritingExerciseResult, error)
-	AssessVocabularyExercise(ctx *appcontext.AppContext, language, term, tense, content string) (*OpenAIAssessVocabularyExerciseResult, error)
+	AssessTermExercise(ctx *appcontext.AppContext, language, term, tense, content string) (*OpenAIAssessTermExerciseResult, error)
 }
 
 type OpenAISearchTermResult struct {
@@ -40,11 +40,11 @@ type OpenAIAssessWritingExerciseResult struct {
 	Comment          string
 }
 
-type OpenAIAssessVocabularyExerciseResult struct {
+type OpenAIAssessTermExerciseResult struct {
 	IsVocabularyCorrect    bool
 	VocabularyIssue        string
 	IsTenseCorrect         bool
 	TenseIssue             string
-	GrammarIssues          []UserVocabularyExerciseAssessmentGrammarIssue
-	ImprovementSuggestions []UserVocabularyExerciseAssessmentImprovementSuggestion
+	GrammarIssues          []UserTermExerciseAssessmentGrammarIssue
+	ImprovementSuggestions []UserTermExerciseAssessmentImprovementSuggestion
 }

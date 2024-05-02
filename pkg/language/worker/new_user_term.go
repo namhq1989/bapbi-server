@@ -4,10 +4,9 @@ import (
 	"context"
 
 	"github.com/goccy/go-json"
-	"github.com/namhq1989/bapbi-server/pkg/language/domain"
-
 	"github.com/hibiken/asynq"
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
+	"github.com/namhq1989/bapbi-server/pkg/language/domain"
 )
 
 func (w Workers) NewUserTerm(bgCtx context.Context, t *asynq.Task) error {
@@ -28,7 +27,7 @@ func (w Workers) NewUserTerm(bgCtx context.Context, t *asynq.Task) error {
 	// TASK
 	//
 
-	if err := w.addUserVocabularyExercise(ctx, userTerm); err != nil {
+	if err := w.addUserTermExercise(ctx, userTerm); err != nil {
 		return err
 	}
 
@@ -36,36 +35,36 @@ func (w Workers) NewUserTerm(bgCtx context.Context, t *asynq.Task) error {
 	return nil
 }
 
-func (w Workers) addUserVocabularyExercise(ctx *appcontext.AppContext, userTerm domain.UserTerm) error {
-	ctx.Logger().Text("add user vocabulary exercise")
+func (w Workers) addUserTermExercise(ctx *appcontext.AppContext, userTerm domain.UserTerm) error {
+	ctx.Logger().Text("add user term exercise")
 
-	ctx.Logger().Text("check user vocabulary exercise existence")
-	isExisted, err := w.userVocabularyExerciseRepository.IsExerciseCreated(ctx, userTerm.UserID, userTerm.TermID)
+	ctx.Logger().Text("check user term exercise existence")
+	isExisted, err := w.userTermExerciseRepository.IsExerciseCreated(ctx, userTerm.UserID, userTerm.TermID)
 	if err != nil {
-		ctx.Logger().Error("failed to check user vocabulary exercise", err, appcontext.Fields{})
+		ctx.Logger().Error("failed to check user term exercise", err, appcontext.Fields{})
 		return err
 	}
 	if isExisted {
-		ctx.Logger().Text("user vocabulary exercise already created, stop the flow")
+		ctx.Logger().Text("user term exercise already created, stop the flow")
 		return nil
 	}
 
 	ctx.Logger().Text("random English grammar tense")
 	tenseCode := domain.RandomGrammarTenseCode()
 
-	ctx.Logger().Text("create user vocabulary exercise")
-	exercise, err := domain.NewUserVocabularyExercise(userTerm.UserID, userTerm.TermID, userTerm.Term, domain.LanguageEnglish.String(), tenseCode.String())
+	ctx.Logger().Text("create user term exercise")
+	exercise, err := domain.NewUserTermExercise(userTerm.UserID, userTerm.TermID, userTerm.Term, domain.LanguageEnglish.String(), tenseCode.String())
 	if err != nil {
-		ctx.Logger().Error("failed to create user vocabulary exercise", err, appcontext.Fields{})
+		ctx.Logger().Error("failed to create user term exercise", err, appcontext.Fields{})
 		return err
 	}
 
-	ctx.Logger().Text("persist user vocabulary exercise to database")
-	if err = w.userVocabularyExerciseRepository.CreateUserVocabularyExercise(ctx, *exercise); err != nil {
-		ctx.Logger().Error("failed to persist user vocabulary exercise", err, appcontext.Fields{})
+	ctx.Logger().Text("persist user term exercise to database")
+	if err = w.userTermExerciseRepository.CreateUserTermExercise(ctx, *exercise); err != nil {
+		ctx.Logger().Error("failed to persist user term exercise", err, appcontext.Fields{})
 		return err
 	}
 
-	ctx.Logger().Text("done add user vocabulary exercise")
+	ctx.Logger().Text("done add user term exercise")
 	return nil
 }
