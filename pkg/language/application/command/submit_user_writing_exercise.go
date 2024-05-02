@@ -105,10 +105,10 @@ func (h SubmitUserWritingExerciseHandler) SubmitUserWritingExercise(ctx *appcont
 	}
 
 	ctx.Logger().Text("done submit user writing exercise request")
-	dtoAssessment := dto.UserWritingExerciseAssessment{}.FromDomain(*userWritingExercise.Assessment)
+	dtoAssessment := dto.UserWritingExerciseAssessment{}.FromDomain(userWritingExercise.Assessment)
 	return &dto.SubmitUserWritingExerciseResponse{
 		Status:      userWritingExercise.Status.String(),
 		CompletedAt: httprespond.NewTimeResponse(userWritingExercise.CompletedAt),
-		Assessment:  dtoAssessment,
+		Assessment:  *dtoAssessment,
 	}, nil
 }

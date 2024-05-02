@@ -23,8 +23,12 @@ type UserWritingExerciseAssessment struct {
 	Comment          string   `json:"comment"`
 }
 
-func (u UserWritingExerciseAssessment) FromDomain(assessment domain.UserWritingExerciseAssessment) UserWritingExerciseAssessment {
-	return UserWritingExerciseAssessment{
+func (u UserWritingExerciseAssessment) FromDomain(assessment *domain.UserWritingExerciseAssessment) *UserWritingExerciseAssessment {
+	if assessment == nil {
+		return nil
+	}
+
+	return &UserWritingExerciseAssessment{
 		IsTopicRelevance: assessment.IsTopicRelevance,
 		Score:            assessment.Score,
 		Improvement:      assessment.Improvement,

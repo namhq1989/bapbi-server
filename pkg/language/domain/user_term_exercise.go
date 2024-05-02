@@ -7,6 +7,7 @@ import (
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
 	"github.com/namhq1989/bapbi-server/internal/utils/manipulation"
+	"github.com/namhq1989/bapbi-server/internal/utils/pagetoken"
 )
 
 type UserTermExerciseRepository interface {
@@ -15,10 +16,39 @@ type UserTermExerciseRepository interface {
 	FindByExerciseID(ctx *appcontext.AppContext, exerciseID string) (*UserTermExercise, error)
 	FindByUserIDAndTermID(ctx *appcontext.AppContext, userID, termID string) (*UserTermExercise, error)
 	IsExerciseCreated(ctx *appcontext.AppContext, userID, termID string) (bool, error)
+	FindUserTermExercises(ctx *appcontext.AppContext, filter UserTermExerciseFilter) ([]UserTermExercise, error)
 }
 
 //
-// USER VOCABULARY EXERCISE
+// FILTER
+//
+
+type UserTermExerciseFilter struct {
+	UserID   string
+	Language Language
+	Status   string
+	Time     time.Time
+	Limit    int64
+}
+
+func NewUserTermExerciseFilter(uId, lang, stt, pageToken string) UserTermExerciseFilter {
+	language := ToLanguage(lang)
+	if !language.IsValid() {
+		language = LanguageEnglish
+	}
+
+	pt := pagetoken.Decode(pageToken)
+	return UserTermExerciseFilter{
+		UserID:   uId,
+		Language: language,
+		Status:   stt,
+		Time:     pt.Timestamp,
+		Limit:    10,
+	}
+}
+
+//
+// USER TERM EXERCISE
 //
 
 type UserTermExerciseAssessmentGrammarIssue struct {

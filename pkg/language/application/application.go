@@ -29,6 +29,7 @@ type (
 
 		GetWritingExercises(ctx *appcontext.AppContext, performerID string, req dto.GetWritingExerciseRequest) (*dto.GetWritingExerciseResponse, error)
 		GetUserWritingExercises(ctx *appcontext.AppContext, performerID string, req dto.GetUserWritingExerciseRequest) (*dto.GetUserWritingExerciseResponse, error)
+		GetUserTermExercises(ctx *appcontext.AppContext, performerID string, req dto.GetUserTermExerciseRequest) (*dto.GetUserTermExerciseResponse, error)
 	}
 	Hubs interface{}
 	App  interface {
@@ -57,6 +58,7 @@ type (
 
 		query.GetWritingExercisesHandler
 		query.GetUserWritingExercisesHandler
+		query.GetUserTermExercisesHandler
 	}
 	appHubHandler struct{}
 	Application   struct {
@@ -101,6 +103,7 @@ func New(
 
 			GetWritingExercisesHandler:     query.NewGetWritingExercisesHandler(writingExerciseRepository),
 			GetUserWritingExercisesHandler: query.NewGetUserWritingExercisesHandler(userWritingExerciseRepository),
+			GetUserTermExercisesHandler:    query.NewGetUserTermExercisesHandler(UserTermExerciseRepository),
 		},
 		appHubHandler: appHubHandler{},
 	}

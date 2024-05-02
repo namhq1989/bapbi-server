@@ -129,4 +129,21 @@ func (s server) registerExerciseRoutes() {
 	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
 		return validation.ValidateHTTPPayload[dto.ModifyUserTermExerciseRequest](next)
 	})
+
+	g.GET("/user-term", func(c echo.Context) error {
+		var (
+			ctx         = c.Get("ctx").(*appcontext.AppContext)
+			req         = c.Get("req").(dto.GetUserTermExerciseRequest)
+			performerID = ctx.GetUserID()
+		)
+
+		resp, err := s.app.GetUserTermExercises(ctx, performerID, req)
+		if err != nil {
+			return httprespond.R400(c, err, nil)
+		}
+
+		return httprespond.R200(c, resp)
+	}, s.jwt.RequireLoggedIn, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return validation.ValidateHTTPPayload[dto.GetUserTermExerciseRequest](next)
+	})
 }
