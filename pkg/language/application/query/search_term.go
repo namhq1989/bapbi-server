@@ -2,9 +2,6 @@ package query
 
 import (
 	"sync"
-	"time"
-
-	"github.com/namhq1989/bapbi-server/internal/utils/manipulation"
 
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
@@ -13,55 +10,44 @@ import (
 )
 
 type SearchTermHandler struct {
-	termRepository              domain.TermRepository
-	userActionHistoryRepository domain.UserActionHistoryRepository
-	openaiRepository            domain.OpenAIRepository
-	scraperRepository           domain.ScraperRepository
-	userHub                     domain.UserHub
+	termRepository    domain.TermRepository
+	openaiRepository  domain.OpenAIRepository
+	scraperRepository domain.ScraperRepository
+	userHub           domain.UserHub
+	languageService   domain.LanguageService
 }
 
 func NewSearchTermHandler(
 	termRepository domain.TermRepository,
-	userActionHistoryRepository domain.UserActionHistoryRepository,
 	openaiRepository domain.OpenAIRepository,
 	scraperRepository domain.ScraperRepository,
 	userHub domain.UserHub,
+	languageService domain.LanguageService,
 ) SearchTermHandler {
 	return SearchTermHandler{
-		termRepository:              termRepository,
-		userActionHistoryRepository: userActionHistoryRepository,
-		openaiRepository:            openaiRepository,
-		scraperRepository:           scraperRepository,
-		userHub:                     userHub,
+		termRepository:    termRepository,
+		openaiRepository:  openaiRepository,
+		scraperRepository: scraperRepository,
+		userHub:           userHub,
+		languageService:   languageService,
 	}
 }
 
 func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID string, req dto.SearchTermRequest) (*dto.SearchTermResponse, error) {
 	ctx.Logger().Info("new search term request", appcontext.Fields{"term": req.Term, "from": req.From, "to": req.To})
 
-	ctx.Logger().Text("get user's subscription plan")
-	plan, err := h.userHub.GetUserPlan(ctx, performerID)
+	ctx.Logger().Text("check today actions limitation")
+	isExceeded, err := h.languageService.IsExceededActionLimitation(ctx, performerID)
 	if err != nil {
-		ctx.Logger().Error("failed to get user's subscription plan", err, appcontext.Fields{})
+		ctx.Logger().Error("failed to check today actions limitation", err, appcontext.Fields{})
 		return nil, err
 	}
-
-	ctx.Logger().Text("count total actions today")
-	var (
-		start = manipulation.StartOfToday()
-		end   = time.Now()
-	)
-	totalActions, err := h.userActionHistoryRepository.CountTotalActionsByTimeRange(ctx, performerID, start, end)
-	if err != nil {
-		ctx.Logger().Error("failed to count total actions today", err, appcontext.Fields{})
-		return nil, err
-	}
-	if isExceeded := plan.IsExceededActionLimitation(totalActions); isExceeded {
-		ctx.Logger().Error("exceeded search term limitation", nil, appcontext.Fields{"plan": plan.String(), "actions": totalActions})
+	if isExceeded {
+		ctx.Logger().Error("exceeded action limitation", nil, appcontext.Fields{})
 		return nil, apperrors.User.ExceededPlanLimitation
 	}
 
-	ctx.Logger().Info("still available to search term, create new domain model", appcontext.Fields{"actions": totalActions})
+	ctx.Logger().Text("create new domain model")
 	domainTerm, err := domain.NewTerm(req.Term, req.From, req.To)
 	if err != nil {
 		ctx.Logger().Error("failed to create new domain term", err, appcontext.Fields{})
@@ -77,7 +63,10 @@ func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID st
 	if term != nil {
 		ctx.Logger().Text("found in db")
 
-		if err = h.insertUserActionHistory(ctx, performerID, req.Term, true); err != nil {
+		if err = h.languageService.PersistUserActionHistory(ctx, performerID, domain.UserActionTypeSearchTerm.String(), domain.UserActionHistoryData{
+			Term:    req.Term,
+			IsValid: true,
+		}); err != nil {
 			return nil, err
 		}
 
@@ -94,7 +83,10 @@ func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID st
 	}
 	if scrapeData == nil {
 		ctx.Logger().Error("this term is an invalid vocabulary", nil, appcontext.Fields{})
-		if err = h.insertUserActionHistory(ctx, performerID, req.Term, false); err != nil {
+		if err = h.languageService.PersistUserActionHistory(ctx, performerID, domain.UserActionTypeSearchTerm.String(), domain.UserActionHistoryData{
+			Term:    req.Term,
+			IsValid: false,
+		}); err != nil {
 			return nil, err
 		}
 		return nil, apperrors.Language.InvalidTerm
@@ -154,7 +146,10 @@ func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID st
 		return nil, err
 	}
 
-	if err = h.insertUserActionHistory(ctx, performerID, req.Term, true); err != nil {
+	if err = h.languageService.PersistUserActionHistory(ctx, performerID, domain.UserActionTypeSearchTerm.String(), domain.UserActionHistoryData{
+		Term:    req.Term,
+		IsValid: true,
+	}); err != nil {
 		return nil, err
 	}
 
@@ -162,28 +157,4 @@ func (h SearchTermHandler) SearchTerm(ctx *appcontext.AppContext, performerID st
 	return &dto.SearchTermResponse{
 		Term: dto.Term{}.FromDomain(*domainTerm, false),
 	}, nil
-}
-
-func (h SearchTermHandler) insertUserActionHistory(ctx *appcontext.AppContext, performerID, term string, isValid bool) error {
-	ctx.Logger().Text("new user action history")
-
-	action, err := domain.NewUserActionHistory(performerID, domain.UserActionTypeSearch.String())
-	if err != nil {
-		ctx.Logger().Error("failed to create new user action history", err, appcontext.Fields{})
-		return err
-	}
-
-	// set data
-	action.SetData(domain.UserActionHistoryData{
-		Term:    term,
-		IsValid: isValid,
-	})
-
-	ctx.Logger().Text("insert user action history to database")
-	if err = h.userActionHistoryRepository.CreateUserActionHistory(ctx, *action); err != nil {
-		ctx.Logger().Error("failed to insert user action history to database", err, appcontext.Fields{})
-		return err
-	}
-
-	return nil
 }

@@ -12,6 +12,7 @@ import (
 type UserVocabularyExerciseRepository interface {
 	CreateUserVocabularyExercise(ctx *appcontext.AppContext, exercise UserVocabularyExercise) error
 	UpdateUserVocabularyExercise(ctx *appcontext.AppContext, exercise UserVocabularyExercise) error
+	FindByExerciseID(ctx *appcontext.AppContext, exerciseID string) (*UserVocabularyExercise, error)
 	FindByUserIDAndTermID(ctx *appcontext.AppContext, userID, termID string) (*UserVocabularyExercise, error)
 	IsExerciseCreated(ctx *appcontext.AppContext, userID, termID string) (bool, error)
 }
@@ -20,11 +21,23 @@ type UserVocabularyExerciseRepository interface {
 // USER VOCABULARY EXERCISE
 //
 
+type UserVocabularyExerciseAssessmentGrammarIssue struct {
+	Issue      string
+	Correction string
+}
+
+type UserVocabularyExerciseAssessmentImprovementSuggestion struct {
+	Instruction string
+	Example     string
+}
+
 type UserVocabularyExerciseAssessment struct {
-	IsRelevance bool
-	Score       int
-	Improvement []string
-	Comment     string
+	IsVocabularyCorrect    bool
+	VocabularyIssue        string
+	IsTenseCorrect         bool
+	TenseIssue             string
+	GrammarIssues          []UserVocabularyExerciseAssessmentGrammarIssue
+	ImprovementSuggestions []UserVocabularyExerciseAssessmentImprovementSuggestion
 }
 
 type UserVocabularyExercise struct {
@@ -98,12 +111,25 @@ func (d *UserVocabularyExercise) IsCompleted() bool {
 	return d.Status == ExerciseStatusCompleted
 }
 
-func (d *UserVocabularyExercise) SetAssessment(isRelevance bool, score int, improvement []string, comment string) {
+func (d *UserVocabularyExercise) IsOwner(userID string) bool {
+	return d.UserID == userID
+}
+
+func (d *UserVocabularyExercise) SetAssessment(
+	isVocabularyCorrect bool,
+	vocabularyIssue string,
+	isTenseCorrect bool,
+	tenseIssue string,
+	grammarIssues []UserVocabularyExerciseAssessmentGrammarIssue,
+	improvementSuggestions []UserVocabularyExerciseAssessmentImprovementSuggestion,
+) {
 	d.Assessment = &UserVocabularyExerciseAssessment{
-		IsRelevance: isRelevance,
-		Score:       score,
-		Improvement: improvement,
-		Comment:     comment,
+		IsVocabularyCorrect:    isVocabularyCorrect,
+		VocabularyIssue:        vocabularyIssue,
+		IsTenseCorrect:         isTenseCorrect,
+		TenseIssue:             tenseIssue,
+		GrammarIssues:          grammarIssues,
+		ImprovementSuggestions: improvementSuggestions,
 	}
 }
 

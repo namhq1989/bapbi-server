@@ -70,6 +70,27 @@ func (r UserVocabularyExerciseRepository) UpdateUserVocabularyExercise(ctx *appc
 	return err
 }
 
+func (r UserVocabularyExerciseRepository) FindByExerciseID(ctx *appcontext.AppContext, exerciseID string) (*domain.UserVocabularyExercise, error) {
+	id, err := database.ObjectIDFromString(exerciseID)
+	if err != nil {
+		return nil, apperrors.Common.InvalidID
+	}
+
+	// find
+	var doc model.UserVocabularyExercise
+	if err = r.collection().FindOne(ctx.Context(), bson.M{
+		"_id": id,
+	}).Decode(&doc); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, err
+	} else if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, nil
+	}
+
+	// respond
+	result := doc.ToDomain()
+	return &result, nil
+}
+
 func (r UserVocabularyExerciseRepository) FindByUserIDAndTermID(ctx *appcontext.AppContext, userID, termID string) (*domain.UserVocabularyExercise, error) {
 	uid, err := database.ObjectIDFromString(userID)
 	if err != nil {

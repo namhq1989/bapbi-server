@@ -7,6 +7,7 @@ import (
 	"github.com/namhq1989/bapbi-server/pkg/language/application"
 	"github.com/namhq1989/bapbi-server/pkg/language/infrastructure"
 	"github.com/namhq1989/bapbi-server/pkg/language/rest"
+	"github.com/namhq1989/bapbi-server/pkg/language/service"
 	"github.com/namhq1989/bapbi-server/pkg/language/worker"
 )
 
@@ -39,11 +40,13 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 		// hub
 		userHub = infrastructure.NewUserHub(userGRPCClient)
 
+		// service
+		languageService = service.NewLanguageService(userTermRepository, userActionHistoryRepository, userHub)
+
 		// application
 		app = application.New(
 			termRepository,
 			userTermRepository,
-			userActionHistoryRepository,
 			writingExerciseRepository,
 			userWritingExerciseRepository,
 			userVocabularyExerciseRepository,
@@ -51,6 +54,7 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 			scraperRepository,
 			queueRepository,
 			userHub,
+			languageService,
 		)
 	)
 

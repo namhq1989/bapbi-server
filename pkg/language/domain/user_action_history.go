@@ -24,14 +24,15 @@ type UserActionHistoryRepository interface {
 type UserActionType string
 
 const (
-	UserActionTypeUnknown               UserActionType = ""
-	UserActionTypeSearch                UserActionType = "search"
-	UserActionTypeSubmitWritingExercise UserActionType = "submit_writing_exercise"
+	UserActionTypeUnknown                  UserActionType = ""
+	UserActionTypeSearchTerm               UserActionType = "search_term"
+	UserActionTypeSubmitWritingExercise    UserActionType = "submit_writing_exercise"
+	UserActionTypeSubmitVocabularyExercise UserActionType = "submit_vocabulary_exercise"
 )
 
 func (s UserActionType) String() string {
 	switch s {
-	case UserActionTypeSearch, UserActionTypeSubmitWritingExercise:
+	case UserActionTypeSearchTerm, UserActionTypeSubmitWritingExercise, UserActionTypeSubmitVocabularyExercise:
 		return string(s)
 	default:
 		return ""
@@ -44,10 +45,12 @@ func (s UserActionType) IsValid() bool {
 
 func ToUserActionType(value string) UserActionType {
 	switch strings.ToLower(value) {
-	case UserActionTypeSearch.String():
-		return UserActionTypeSearch
+	case UserActionTypeSearchTerm.String():
+		return UserActionTypeSearchTerm
 	case UserActionTypeSubmitWritingExercise.String():
 		return UserActionTypeSubmitWritingExercise
+	case UserActionTypeSubmitVocabularyExercise.String():
+		return UserActionTypeSubmitVocabularyExercise
 	default:
 		return UserActionTypeUnknown
 	}
