@@ -18,6 +18,7 @@ type (
 		ModifyUserWritingExercise(ctx *appcontext.AppContext, performerID string, req dto.ModifyUserWritingExerciseRequest) (*dto.ModifyUserWritingExerciseResponse, error)
 
 		SubmitUserVocabularyExercise(ctx *appcontext.AppContext, performerID string, req dto.SubmitUserVocabularyExerciseRequest) (*dto.SubmitUserVocabularyExerciseResponse, error)
+		ModifyUserVocabularyExercise(ctx *appcontext.AppContext, performerID string, req dto.ModifyUserVocabularyExerciseRequest) (*dto.ModifyUserVocabularyExerciseResponse, error)
 	}
 	Queries interface {
 		GetData(_ *appcontext.AppContext, _ dto.GetDataRequest) (*dto.GetDataResponse, error)
@@ -45,6 +46,7 @@ type (
 		command.ModifyUserWritingExerciseHandler
 
 		command.SubmitUserVocabularyExerciseHandler
+		command.ModifyUserVocabularyExerciseHandler
 	}
 	appQueryHandler struct {
 		query.GetDataHandler
@@ -88,6 +90,7 @@ func New(
 			ModifyUserWritingExerciseHandler: command.NewModifyUserWritingExerciseHandler(writingExerciseRepository, userWritingExerciseRepository),
 
 			SubmitUserVocabularyExerciseHandler: command.NewSubmitUserVocabularyExerciseHandler(userTermRepository, userVocabularyExerciseRepository, openaiRepository, languageService),
+			ModifyUserVocabularyExerciseHandler: command.NewModifyUserVocabularyExerciseHandler(userVocabularyExerciseRepository),
 		},
 		appQueryHandler: appQueryHandler{
 			GetDataHandler: query.NewGetDataHandler(),
