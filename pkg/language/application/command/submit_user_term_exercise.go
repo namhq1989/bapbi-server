@@ -8,29 +8,29 @@ import (
 	"github.com/namhq1989/bapbi-server/pkg/language/dto"
 )
 
-type SubmitUserVocabularyExerciseHandler struct {
-	userTermRepository               domain.UserTermRepository
-	userVocabularyExerciseRepository domain.UserVocabularyExerciseRepository
-	openaiRepository                 domain.OpenAIRepository
-	languageService                  domain.LanguageService
+type SubmitUserTermExerciseHandler struct {
+	userTermRepository         domain.UserTermRepository
+	UserTermExerciseRepository domain.UserTermExerciseRepository
+	openaiRepository           domain.OpenAIRepository
+	languageService            domain.LanguageService
 }
 
-func NewSubmitUserVocabularyExerciseHandler(
+func NewSubmitUserTermExerciseHandler(
 	userTermRepository domain.UserTermRepository,
-	userVocabularyExerciseRepository domain.UserVocabularyExerciseRepository,
+	UserTermExerciseRepository domain.UserTermExerciseRepository,
 	openaiRepository domain.OpenAIRepository,
 	languageService domain.LanguageService,
-) SubmitUserVocabularyExerciseHandler {
-	return SubmitUserVocabularyExerciseHandler{
-		userTermRepository:               userTermRepository,
-		userVocabularyExerciseRepository: userVocabularyExerciseRepository,
-		openaiRepository:                 openaiRepository,
-		languageService:                  languageService,
+) SubmitUserTermExerciseHandler {
+	return SubmitUserTermExerciseHandler{
+		userTermRepository:         userTermRepository,
+		UserTermExerciseRepository: UserTermExerciseRepository,
+		openaiRepository:           openaiRepository,
+		languageService:            languageService,
 	}
 }
 
-func (h SubmitUserVocabularyExerciseHandler) SubmitUserVocabularyExercise(ctx *appcontext.AppContext, performerID string, req dto.SubmitUserVocabularyExerciseRequest) (*dto.SubmitUserVocabularyExerciseResponse, error) {
-	ctx.Logger().Info("new submit user vocabulary exercise request", appcontext.Fields{"performer": performerID, "exerciseId": req.ExerciseID, "content": req.Content})
+func (h SubmitUserTermExerciseHandler) SubmitUserTermExercise(ctx *appcontext.AppContext, performerID string, req dto.SubmitUserTermExerciseRequest) (*dto.SubmitUserTermExerciseResponse, error) {
+	ctx.Logger().Info("new submit user term exercise request", appcontext.Fields{"performer": performerID, "exerciseId": req.ExerciseID, "content": req.Content})
 
 	ctx.Logger().Text("check today actions limitation")
 	isExceeded, err := h.languageService.IsExceededActionLimitation(ctx, performerID)
@@ -44,7 +44,7 @@ func (h SubmitUserVocabularyExerciseHandler) SubmitUserVocabularyExercise(ctx *a
 	}
 
 	ctx.Logger().Text("find exercise in db")
-	exercise, err := h.userVocabularyExerciseRepository.FindByExerciseID(ctx, req.ExerciseID)
+	exercise, err := h.UserTermExerciseRepository.FindByExerciseID(ctx, req.ExerciseID)
 	if err != nil {
 		ctx.Logger().Error("failed to find exercise in db", err, appcontext.Fields{})
 		return nil, err
@@ -59,7 +59,7 @@ func (h SubmitUserVocabularyExerciseHandler) SubmitUserVocabularyExercise(ctx *a
 	}
 
 	ctx.Logger().Text("call OpenAI's api to assess the exercise's content")
-	assessment, err := h.openaiRepository.AssessVocabularyExercise(ctx, exercise.Language.String(), exercise.Term, exercise.Tense.String(), req.Content)
+	assessment, err := h.openaiRepository.AssessTermExercise(ctx, exercise.Language.String(), exercise.Term, exercise.Tense.String(), req.Content)
 	if err != nil {
 		ctx.Logger().Error("failed to call OpenAI's api to assess the exercise's content", err, appcontext.Fields{})
 		return nil, err
@@ -79,18 +79,18 @@ func (h SubmitUserVocabularyExerciseHandler) SubmitUserVocabularyExercise(ctx *a
 	ctx.Logger().Text("set assessment")
 	exercise.SetAssessment(assessment.IsVocabularyCorrect, assessment.VocabularyIssue, assessment.IsTenseCorrect, assessment.TenseIssue, assessment.GrammarIssues, assessment.ImprovementSuggestions)
 
-	ctx.Logger().Text("set user vocabulary exercise status to completed")
+	ctx.Logger().Text("set user term exercise status to completed")
 	exercise.SetCompleted()
 
-	ctx.Logger().Text("update user vocabulary exercise in db")
-	err = h.userVocabularyExerciseRepository.UpdateUserVocabularyExercise(ctx, *exercise)
+	ctx.Logger().Text("update user term exercise in db")
+	err = h.UserTermExerciseRepository.UpdateUserTermExercise(ctx, *exercise)
 	if err != nil {
-		ctx.Logger().Error("failed to update user vocabulary exercise in db", err, appcontext.Fields{})
+		ctx.Logger().Error("failed to update user term exercise in db", err, appcontext.Fields{})
 		return nil, err
 	}
 
-	dtoAssessment := dto.UserVocabularyExerciseAssessment{}.FromDomain(*exercise.Assessment)
-	return &dto.SubmitUserVocabularyExerciseResponse{
+	dtoAssessment := dto.UserTermExerciseAssessment{}.FromDomain(*exercise.Assessment)
+	return &dto.SubmitUserTermExerciseResponse{
 		Status:      exercise.Status.String(),
 		CompletedAt: httprespond.NewTimeResponse(exercise.CompletedAt),
 		Assessment:  dtoAssessment,

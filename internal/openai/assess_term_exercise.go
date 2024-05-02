@@ -10,26 +10,26 @@ import (
 	oai "github.com/sashabaranov/go-openai"
 )
 
-type AssessVocabularyExerciseResult struct {
-	IsVocabularyCorrect    bool                                            `json:"isVocabularyCorrect"`
-	VocabularyIssue        string                                          `json:"vocabularyIssue"`
-	IsTenseCorrect         bool                                            `json:"isTenseCorrect"`
-	TenseIssue             string                                          `json:"tenseIssue"`
-	GrammarIssues          []AssessVocabularyExerciseGrammarIssue          `json:"grammarIssues"`
-	ImprovementSuggestions []AssessVocabularyExerciseImprovementSuggestion `json:"improvementSuggestions"`
+type AssessTermExerciseResult struct {
+	IsVocabularyCorrect    bool                                      `json:"isVocabularyCorrect"`
+	VocabularyIssue        string                                    `json:"vocabularyIssue"`
+	IsTenseCorrect         bool                                      `json:"isTenseCorrect"`
+	TenseIssue             string                                    `json:"tenseIssue"`
+	GrammarIssues          []AssessTermExerciseGrammarIssue          `json:"grammarIssues"`
+	ImprovementSuggestions []AssessTermExerciseImprovementSuggestion `json:"improvementSuggestions"`
 }
 
-type AssessVocabularyExerciseGrammarIssue struct {
+type AssessTermExerciseGrammarIssue struct {
 	Issue      string `json:"issue"`
 	Correction string `json:"correction"`
 }
 
-type AssessVocabularyExerciseImprovementSuggestion struct {
+type AssessTermExerciseImprovementSuggestion struct {
 	Instruction string `json:"instruction"`
 	Example     string `json:"example"`
 }
 
-const assessVocabularyExercisePrompt = `
+const assessTermExercisePrompt = `
 	{{timestamp}}
 	Evaluate the following sentence for {{language}} proficiency and provide responses in a structured JSON-friendly (JSON only, don't be verbose) format:
 
@@ -63,8 +63,8 @@ const assessVocabularyExercisePrompt = `
 	}
 `
 
-func (o *OpenAI) AssessVocabularyExercise(ctx *appcontext.AppContext, language, term, tense, content string) (*AssessVocabularyExerciseResult, error) {
-	prompt := strings.ReplaceAll(assessVocabularyExercisePrompt, "{{language}}", language)
+func (o *OpenAI) AssessTermExercise(ctx *appcontext.AppContext, language, term, tense, content string) (*AssessTermExerciseResult, error) {
+	prompt := strings.ReplaceAll(assessTermExercisePrompt, "{{language}}", language)
 	prompt = strings.ReplaceAll(prompt, "{{vocabulary}}", term)
 	prompt = strings.ReplaceAll(prompt, "{{tense}}", tense)
 	prompt = strings.ReplaceAll(prompt, "{{content}}", content)
@@ -73,7 +73,7 @@ func (o *OpenAI) AssessVocabularyExercise(ctx *appcontext.AppContext, language, 
 	resp, err := o.client.CreateChatCompletion(ctx.Context(), oai.ChatCompletionRequest{
 		Model:       oai.GPT4,
 		Messages:    []oai.ChatCompletionMessage{{Role: oai.ChatMessageRoleUser, Content: prompt}},
-		MaxTokens:   200,
+		MaxTokens:   400,
 		Temperature: 0.2,
 	})
 
@@ -81,9 +81,9 @@ func (o *OpenAI) AssessVocabularyExercise(ctx *appcontext.AppContext, language, 
 		return nil, err
 	}
 
-	var result AssessVocabularyExerciseResult
+	var result AssessTermExerciseResult
 	if err = json.Unmarshal([]byte(resp.Choices[0].Message.Content), &result); err != nil {
-		ctx.Logger().Print("data", resp.Choices[0].Message.Content)
+		ctx.Logger().Print("cannot unmarshal", resp.Choices[0].Message.Content)
 		return nil, err
 	}
 

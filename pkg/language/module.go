@@ -25,12 +25,12 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 
 	var (
 		// infrastructure
-		termRepository                   = infrastructure.NewTermRepository(mono.Mongo())
-		userTermRepository               = infrastructure.NewUserTermRepository(mono.Mongo())
-		userActionHistoryRepository      = infrastructure.NewUserActionHistoryRepository(mono.Mongo())
-		writingExerciseRepository        = infrastructure.NewWritingExerciseRepository(mono.Mongo())
-		userWritingExerciseRepository    = infrastructure.NewUserWritingExerciseRepository(mono.Mongo())
-		userVocabularyExerciseRepository = infrastructure.NewUserVocabularyExerciseRepository(mono.Mongo())
+		termRepository                = infrastructure.NewTermRepository(mono.Mongo())
+		userTermRepository            = infrastructure.NewUserTermRepository(mono.Mongo())
+		userActionHistoryRepository   = infrastructure.NewUserActionHistoryRepository(mono.Mongo())
+		writingExerciseRepository     = infrastructure.NewWritingExerciseRepository(mono.Mongo())
+		userWritingExerciseRepository = infrastructure.NewUserWritingExerciseRepository(mono.Mongo())
+		userTermExerciseRepository    = infrastructure.NewUserTermExerciseRepository(mono.Mongo())
 
 		// 3rd
 		queueRepository   = infrastructure.NewQueueRepository(mono.Queue())
@@ -49,7 +49,7 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 			userTermRepository,
 			writingExerciseRepository,
 			userWritingExerciseRepository,
-			userVocabularyExerciseRepository,
+			userTermExerciseRepository,
 			openaiRepository,
 			scraperRepository,
 			queueRepository,
@@ -68,7 +68,7 @@ func (Module) Startup(ctx *appcontext.AppContext, mono monolith.Monolith) error 
 		mono.Queue(),
 		termRepository,
 		writingExerciseRepository,
-		userVocabularyExerciseRepository,
+		userTermExerciseRepository,
 		openaiRepository,
 		scraperRepository,
 	)

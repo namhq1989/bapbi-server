@@ -10,29 +10,29 @@ import (
 )
 
 type Workers struct {
-	queue                            *queue.Queue
-	termRepository                   domain.TermRepository
-	writingExerciseRepository        domain.WritingExerciseRepository
-	userVocabularyExerciseRepository domain.UserVocabularyExerciseRepository
-	openaiRepository                 domain.OpenAIRepository
-	scraperRepository                domain.ScraperRepository
+	queue                      *queue.Queue
+	termRepository             domain.TermRepository
+	writingExerciseRepository  domain.WritingExerciseRepository
+	userTermExerciseRepository domain.UserTermExerciseRepository
+	openaiRepository           domain.OpenAIRepository
+	scraperRepository          domain.ScraperRepository
 }
 
 func New(
 	queue *queue.Queue,
 	termRepository domain.TermRepository,
 	writingExerciseRepository domain.WritingExerciseRepository,
-	userVocabularyExerciseRepository domain.UserVocabularyExerciseRepository,
+	userTermExerciseRepository domain.UserTermExerciseRepository,
 	openaiRepository domain.OpenAIRepository,
 	scraperRepository domain.ScraperRepository,
 ) Workers {
 	return Workers{
-		queue:                            queue,
-		termRepository:                   termRepository,
-		writingExerciseRepository:        writingExerciseRepository,
-		userVocabularyExerciseRepository: userVocabularyExerciseRepository,
-		openaiRepository:                 openaiRepository,
-		scraperRepository:                scraperRepository,
+		queue:                      queue,
+		termRepository:             termRepository,
+		writingExerciseRepository:  writingExerciseRepository,
+		userTermExerciseRepository: userTermExerciseRepository,
+		openaiRepository:           openaiRepository,
+		scraperRepository:          scraperRepository,
 	}
 }
 

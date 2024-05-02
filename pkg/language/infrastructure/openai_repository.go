@@ -124,8 +124,8 @@ func (r OpenAIRepository) AssessWritingExercise(ctx *appcontext.AppContext, lang
 	}, nil
 }
 
-func (r OpenAIRepository) AssessVocabularyExercise(ctx *appcontext.AppContext, language, term, tense, content string) (*domain.OpenAIAssessVocabularyExerciseResult, error) {
-	result, err := r.openai.AssessVocabularyExercise(ctx, language, term, tense, content)
+func (r OpenAIRepository) AssessTermExercise(ctx *appcontext.AppContext, language, term, tense, content string) (*domain.OpenAIAssessTermExerciseResult, error) {
+	result, err := r.openai.AssessTermExercise(ctx, language, term, tense, content)
 	if err != nil {
 		return nil, err
 	}
@@ -135,23 +135,23 @@ func (r OpenAIRepository) AssessVocabularyExercise(ctx *appcontext.AppContext, l
 
 	ctx.Logger().Print("assess vocabulary exercise result", result)
 
-	grammarIssues := make([]domain.UserVocabularyExerciseAssessmentGrammarIssue, len(result.GrammarIssues))
+	grammarIssues := make([]domain.UserTermExerciseAssessmentGrammarIssue, len(result.GrammarIssues))
 	for i, issue := range result.GrammarIssues {
-		grammarIssues[i] = domain.UserVocabularyExerciseAssessmentGrammarIssue{
+		grammarIssues[i] = domain.UserTermExerciseAssessmentGrammarIssue{
 			Issue:      issue.Issue,
 			Correction: issue.Correction,
 		}
 	}
 
-	improvementSuggestions := make([]domain.UserVocabularyExerciseAssessmentImprovementSuggestion, len(result.ImprovementSuggestions))
+	improvementSuggestions := make([]domain.UserTermExerciseAssessmentImprovementSuggestion, len(result.ImprovementSuggestions))
 	for i, suggestion := range result.ImprovementSuggestions {
-		improvementSuggestions[i] = domain.UserVocabularyExerciseAssessmentImprovementSuggestion{
+		improvementSuggestions[i] = domain.UserTermExerciseAssessmentImprovementSuggestion{
 			Instruction: suggestion.Instruction,
 			Example:     suggestion.Example,
 		}
 	}
 
-	return &domain.OpenAIAssessVocabularyExerciseResult{
+	return &domain.OpenAIAssessTermExerciseResult{
 		IsVocabularyCorrect:    result.IsVocabularyCorrect,
 		VocabularyIssue:        result.VocabularyIssue,
 		IsTenseCorrect:         result.IsTenseCorrect,

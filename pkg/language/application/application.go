@@ -17,8 +17,8 @@ type (
 		SubmitUserWritingExercise(ctx *appcontext.AppContext, performerID string, req dto.SubmitUserWritingExerciseRequest) (*dto.SubmitUserWritingExerciseResponse, error)
 		ModifyUserWritingExercise(ctx *appcontext.AppContext, performerID string, req dto.ModifyUserWritingExerciseRequest) (*dto.ModifyUserWritingExerciseResponse, error)
 
-		SubmitUserVocabularyExercise(ctx *appcontext.AppContext, performerID string, req dto.SubmitUserVocabularyExerciseRequest) (*dto.SubmitUserVocabularyExerciseResponse, error)
-		ModifyUserVocabularyExercise(ctx *appcontext.AppContext, performerID string, req dto.ModifyUserVocabularyExerciseRequest) (*dto.ModifyUserVocabularyExerciseResponse, error)
+		SubmitUserTermExercise(ctx *appcontext.AppContext, performerID string, req dto.SubmitUserTermExerciseRequest) (*dto.SubmitUserTermExerciseResponse, error)
+		ModifyUserTermExercise(ctx *appcontext.AppContext, performerID string, req dto.ModifyUserTermExerciseRequest) (*dto.ModifyUserTermExerciseResponse, error)
 	}
 	Queries interface {
 		GetData(_ *appcontext.AppContext, _ dto.GetDataRequest) (*dto.GetDataResponse, error)
@@ -45,8 +45,8 @@ type (
 		command.SubmitUserWritingExerciseHandler
 		command.ModifyUserWritingExerciseHandler
 
-		command.SubmitUserVocabularyExerciseHandler
-		command.ModifyUserVocabularyExerciseHandler
+		command.SubmitUserTermExerciseHandler
+		command.ModifyUserTermExerciseHandler
 	}
 	appQueryHandler struct {
 		query.GetDataHandler
@@ -73,7 +73,7 @@ func New(
 	userTermRepository domain.UserTermRepository,
 	writingExerciseRepository domain.WritingExerciseRepository,
 	userWritingExerciseRepository domain.UserWritingExerciseRepository,
-	userVocabularyExerciseRepository domain.UserVocabularyExerciseRepository,
+	UserTermExerciseRepository domain.UserTermExerciseRepository,
 	openaiRepository domain.OpenAIRepository,
 	scraperRepository domain.ScraperRepository,
 	queueRepository domain.QueueRepository,
@@ -89,8 +89,8 @@ func New(
 			SubmitUserWritingExerciseHandler: command.NewSubmitUserWritingExerciseHandler(writingExerciseRepository, userWritingExerciseRepository, openaiRepository, userHub, languageService),
 			ModifyUserWritingExerciseHandler: command.NewModifyUserWritingExerciseHandler(writingExerciseRepository, userWritingExerciseRepository),
 
-			SubmitUserVocabularyExerciseHandler: command.NewSubmitUserVocabularyExerciseHandler(userTermRepository, userVocabularyExerciseRepository, openaiRepository, languageService),
-			ModifyUserVocabularyExerciseHandler: command.NewModifyUserVocabularyExerciseHandler(userVocabularyExerciseRepository),
+			SubmitUserTermExerciseHandler: command.NewSubmitUserTermExerciseHandler(userTermRepository, UserTermExerciseRepository, openaiRepository, languageService),
+			ModifyUserTermExerciseHandler: command.NewModifyUserTermExerciseHandler(UserTermExerciseRepository),
 		},
 		appQueryHandler: appQueryHandler{
 			GetDataHandler: query.NewGetDataHandler(),
