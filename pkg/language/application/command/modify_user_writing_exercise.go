@@ -52,7 +52,7 @@ func (h ModifyUserWritingExerciseHandler) ModifyUserWritingExercise(ctx *appcont
 	}
 
 	ctx.Logger().Text("set user exercise status to progressing")
-	userExercise.SetProgressing()
+	userExercise.SetStatus(domain.ExerciseStatusProgressing)
 
 	ctx.Logger().Text("update user exercise in db")
 	if err = h.userWritingExerciseRepository.UpdateUserWritingExercise(ctx, *userExercise); err != nil {

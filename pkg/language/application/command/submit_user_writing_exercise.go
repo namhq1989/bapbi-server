@@ -93,8 +93,9 @@ func (h SubmitUserWritingExerciseHandler) SubmitUserWritingExercise(ctx *appcont
 	ctx.Logger().Text("set assessment")
 	userWritingExercise.SetAssessment(assessment.IsTopicRelevance, assessment.Score, assessment.Improvement, assessment.Comment)
 
-	ctx.Logger().Text("set user writing exercise status to completed")
-	userWritingExercise.SetCompleted()
+	ctx.Logger().Text("get and set status based on assessment")
+	status := userWritingExercise.GetStatusBasedOnAssessment()
+	userWritingExercise.SetStatus(status)
 
 	ctx.Logger().Text("update user writing exercise in db")
 	err = h.userWritingExerciseRepository.UpdateUserWritingExercise(ctx, *userWritingExercise)
