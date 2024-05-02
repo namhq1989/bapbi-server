@@ -70,6 +70,12 @@ func (h SubmitUserVocabularyExerciseHandler) SubmitUserVocabularyExercise(ctx *a
 		return nil, apperrors.Common.BadRequest
 	}
 
+	ctx.Logger().Text("set content")
+	if err = exercise.SetContent(req.Content); err != nil {
+		ctx.Logger().Error("failed to set content", err, appcontext.Fields{})
+		return nil, err
+	}
+
 	ctx.Logger().Text("set assessment")
 	exercise.SetAssessment(assessment.IsVocabularyCorrect, assessment.VocabularyIssue, assessment.IsTenseCorrect, assessment.TenseIssue, assessment.GrammarIssues, assessment.ImprovementSuggestions)
 
