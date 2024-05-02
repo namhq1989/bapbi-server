@@ -20,7 +20,7 @@ func NewModifyUserTermExerciseHandler(
 }
 
 func (h ModifyUserTermExerciseHandler) ModifyUserTermExercise(ctx *appcontext.AppContext, performerID string, req dto.ModifyUserTermExerciseRequest) (*dto.ModifyUserTermExerciseResponse, error) {
-	ctx.Logger().Info("new modify user vocabulary exercise request", appcontext.Fields{"performer": performerID, "exerciseId": req.ExerciseId})
+	ctx.Logger().Info("new modify user term exercise request", appcontext.Fields{"performer": performerID, "exerciseId": req.ExerciseId})
 
 	ctx.Logger().Text("find exercise in db")
 	exercise, err := h.UserTermExerciseRepository.FindByExerciseID(ctx, req.ExerciseId)
@@ -39,7 +39,7 @@ func (h ModifyUserTermExerciseHandler) ModifyUserTermExercise(ctx *appcontext.Ap
 	}
 
 	ctx.Logger().Text("set user exercise status to progressing")
-	exercise.SetProgressing()
+	exercise.SetStatus(domain.ExerciseStatusProgressing)
 
 	ctx.Logger().Text("update user exercise in db")
 	if err = h.UserTermExerciseRepository.UpdateUserTermExercise(ctx, *exercise); err != nil {
@@ -47,6 +47,6 @@ func (h ModifyUserTermExerciseHandler) ModifyUserTermExercise(ctx *appcontext.Ap
 		return nil, err
 	}
 
-	ctx.Logger().Text("done modify user vocabulary exercise request")
+	ctx.Logger().Text("done modify user term exercise request")
 	return &dto.ModifyUserTermExerciseResponse{}, nil
 }

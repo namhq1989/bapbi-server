@@ -133,13 +133,19 @@ func (d *UserTermExercise) SetAssessment(
 	}
 }
 
-func (d *UserTermExercise) SetProgressing() {
-	d.Status = ExerciseStatusProgressing
-	d.UpdatedAt = time.Now()
+func (d *UserTermExercise) GetStatusBasedOnAssessment() ExerciseStatus {
+	if d.Assessment.IsVocabularyCorrect && d.Assessment.IsTenseCorrect {
+		return ExerciseStatusCompleted
+	}
+
+	return ExerciseStatusCorrectionRequired
 }
 
-func (d *UserTermExercise) SetCompleted() {
-	d.Status = ExerciseStatusCompleted
-	d.CompletedAt = time.Now()
+func (d *UserTermExercise) SetStatus(status ExerciseStatus) {
+	d.Status = status
 	d.UpdatedAt = time.Now()
+
+	if status == ExerciseStatusCompleted {
+		d.CompletedAt = time.Now()
+	}
 }

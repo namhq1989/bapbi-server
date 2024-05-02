@@ -5,14 +5,15 @@ import "strings"
 type ExerciseStatus string
 
 const (
-	ExerciseStatusUnknown     ExerciseStatus = ""
-	ExerciseStatusCompleted   ExerciseStatus = "completed"
-	ExerciseStatusProgressing ExerciseStatus = "progressing"
+	ExerciseStatusUnknown            ExerciseStatus = ""
+	ExerciseStatusCompleted          ExerciseStatus = "completed"
+	ExerciseStatusProgressing        ExerciseStatus = "progressing"
+	ExerciseStatusCorrectionRequired ExerciseStatus = "correction_required"
 )
 
 func (s ExerciseStatus) String() string {
 	switch s {
-	case ExerciseStatusCompleted, ExerciseStatusProgressing:
+	case ExerciseStatusCompleted, ExerciseStatusProgressing, ExerciseStatusCorrectionRequired:
 		return string(s)
 	default:
 		return ""
@@ -29,6 +30,8 @@ func ToExerciseStatus(value string) ExerciseStatus {
 		return ExerciseStatusCompleted
 	case ExerciseStatusProgressing.String():
 		return ExerciseStatusProgressing
+	case ExerciseStatusCorrectionRequired.String():
+		return ExerciseStatusCorrectionRequired
 	default:
 		return ExerciseStatusUnknown
 	}

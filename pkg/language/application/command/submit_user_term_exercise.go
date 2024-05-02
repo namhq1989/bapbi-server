@@ -79,8 +79,9 @@ func (h SubmitUserTermExerciseHandler) SubmitUserTermExercise(ctx *appcontext.Ap
 	ctx.Logger().Text("set assessment")
 	exercise.SetAssessment(assessment.IsVocabularyCorrect, assessment.VocabularyIssue, assessment.IsTenseCorrect, assessment.TenseIssue, assessment.GrammarIssues, assessment.ImprovementSuggestions)
 
-	ctx.Logger().Text("set user term exercise status to completed")
-	exercise.SetCompleted()
+	ctx.Logger().Text("get and set status based on assessment")
+	status := exercise.GetStatusBasedOnAssessment()
+	exercise.SetStatus(status)
 
 	ctx.Logger().Text("update user term exercise in db")
 	err = h.UserTermExerciseRepository.UpdateUserTermExercise(ctx, *exercise)

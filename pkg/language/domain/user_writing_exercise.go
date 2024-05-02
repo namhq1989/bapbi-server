@@ -123,13 +123,19 @@ func (d *UserWritingExercise) SetAssessment(isTopicRelevance bool, score int, im
 	}
 }
 
-func (d *UserWritingExercise) SetProgressing() {
-	d.Status = ExerciseStatusProgressing
-	d.UpdatedAt = time.Now()
+func (d *UserWritingExercise) GetStatusBasedOnAssessment() ExerciseStatus {
+	if d.Assessment.IsTopicRelevance {
+		return ExerciseStatusCompleted
+	}
+
+	return ExerciseStatusCorrectionRequired
 }
 
-func (d *UserWritingExercise) SetCompleted() {
-	d.Status = ExerciseStatusCompleted
-	d.CompletedAt = time.Now()
+func (d *UserWritingExercise) SetStatus(status ExerciseStatus) {
+	d.Status = status
 	d.UpdatedAt = time.Now()
+
+	if status == ExerciseStatusCompleted {
+		d.CompletedAt = time.Now()
+	}
 }
