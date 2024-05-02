@@ -8,11 +8,23 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type UserVocabularyExerciseAssessmentGrammarIssue struct {
+	Issue      string `bson:"issue"`
+	Correction string `bson:"correction"`
+}
+
+type UserVocabularyExerciseAssessmentImprovementSuggestion struct {
+	Instruction string `bson:"instruction"`
+	Example     string `bson:"example"`
+}
+
 type UserVocabularyExerciseAssessment struct {
-	IsRelevance bool     `bson:"isRelevance"`
-	Score       int      `bson:"score"`
-	Improvement []string `bson:"improvement"`
-	Comment     string   `bson:"comment"`
+	IsVocabularyCorrect    bool                                                    `bson:"isVocabularyCorrect"`
+	VocabularyIssue        string                                                  `bson:"vocabularyIssue"`
+	IsTenseCorrect         bool                                                    `bson:"isTenseCorrect"`
+	TenseIssue             string                                                  `bson:"tenseIssue"`
+	GrammarIssues          []UserVocabularyExerciseAssessmentGrammarIssue          `bson:"grammarIssues"`
+	ImprovementSuggestions []UserVocabularyExerciseAssessmentImprovementSuggestion `bson:"improvementSuggestions"`
 }
 
 type UserVocabularyExercise struct {
@@ -47,11 +59,29 @@ func (u UserVocabularyExercise) ToDomain() domain.UserVocabularyExercise {
 	}
 
 	if u.Assessment != nil {
+		grammarIssues := make([]domain.UserVocabularyExerciseAssessmentGrammarIssue, len(u.Assessment.GrammarIssues))
+		for i, issue := range u.Assessment.GrammarIssues {
+			grammarIssues[i] = domain.UserVocabularyExerciseAssessmentGrammarIssue{
+				Issue:      issue.Issue,
+				Correction: issue.Correction,
+			}
+		}
+
+		improvementSuggestions := make([]domain.UserVocabularyExerciseAssessmentImprovementSuggestion, len(u.Assessment.ImprovementSuggestions))
+		for i, suggestion := range u.Assessment.ImprovementSuggestions {
+			improvementSuggestions[i] = domain.UserVocabularyExerciseAssessmentImprovementSuggestion{
+				Instruction: suggestion.Instruction,
+				Example:     suggestion.Example,
+			}
+		}
+
 		exercise.Assessment = &domain.UserVocabularyExerciseAssessment{
-			IsRelevance: u.Assessment.IsRelevance,
-			Score:       u.Assessment.Score,
-			Improvement: u.Assessment.Improvement,
-			Comment:     u.Assessment.Comment,
+			IsVocabularyCorrect:    u.Assessment.IsVocabularyCorrect,
+			VocabularyIssue:        u.Assessment.VocabularyIssue,
+			IsTenseCorrect:         u.Assessment.IsTenseCorrect,
+			TenseIssue:             u.Assessment.TenseIssue,
+			GrammarIssues:          grammarIssues,
+			ImprovementSuggestions: improvementSuggestions,
 		}
 	}
 	return exercise
@@ -75,11 +105,29 @@ func (u UserVocabularyExercise) FromDomain(exercise domain.UserVocabularyExercis
 
 	var assessment *UserVocabularyExerciseAssessment
 	if exercise.Assessment != nil {
+		grammarIssues := make([]UserVocabularyExerciseAssessmentGrammarIssue, len(exercise.Assessment.GrammarIssues))
+		for i, issue := range exercise.Assessment.GrammarIssues {
+			grammarIssues[i] = UserVocabularyExerciseAssessmentGrammarIssue{
+				Issue:      issue.Issue,
+				Correction: issue.Correction,
+			}
+		}
+
+		improvementSuggestions := make([]UserVocabularyExerciseAssessmentImprovementSuggestion, len(exercise.Assessment.ImprovementSuggestions))
+		for i, suggestion := range exercise.Assessment.ImprovementSuggestions {
+			improvementSuggestions[i] = UserVocabularyExerciseAssessmentImprovementSuggestion{
+				Instruction: suggestion.Instruction,
+				Example:     suggestion.Example,
+			}
+		}
+
 		assessment = &UserVocabularyExerciseAssessment{
-			IsRelevance: exercise.Assessment.IsRelevance,
-			Score:       exercise.Assessment.Score,
-			Improvement: exercise.Assessment.Improvement,
-			Comment:     exercise.Assessment.Comment,
+			IsVocabularyCorrect:    exercise.Assessment.IsVocabularyCorrect,
+			VocabularyIssue:        exercise.Assessment.VocabularyIssue,
+			IsTenseCorrect:         exercise.Assessment.IsTenseCorrect,
+			TenseIssue:             exercise.Assessment.TenseIssue,
+			GrammarIssues:          grammarIssues,
+			ImprovementSuggestions: improvementSuggestions,
 		}
 	}
 

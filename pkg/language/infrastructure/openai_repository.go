@@ -123,3 +123,40 @@ func (r OpenAIRepository) AssessWritingExercise(ctx *appcontext.AppContext, lang
 		Comment:          result.Comment,
 	}, nil
 }
+
+func (r OpenAIRepository) AssessVocabularyExercise(ctx *appcontext.AppContext, language, term, tense, content string) (*domain.OpenAIAssessVocabularyExerciseResult, error) {
+	result, err := r.openai.AssessVocabularyExercise(ctx, language, term, tense, content)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil {
+		return nil, nil
+	}
+
+	ctx.Logger().Print("assess vocabulary exercise result", result)
+
+	grammarIssues := make([]domain.UserVocabularyExerciseAssessmentGrammarIssue, len(result.GrammarIssues))
+	for i, issue := range result.GrammarIssues {
+		grammarIssues[i] = domain.UserVocabularyExerciseAssessmentGrammarIssue{
+			Issue:      issue.Issue,
+			Correction: issue.Correction,
+		}
+	}
+
+	improvementSuggestions := make([]domain.UserVocabularyExerciseAssessmentImprovementSuggestion, len(result.ImprovementSuggestions))
+	for i, suggestion := range result.ImprovementSuggestions {
+		improvementSuggestions[i] = domain.UserVocabularyExerciseAssessmentImprovementSuggestion{
+			Instruction: suggestion.Instruction,
+			Example:     suggestion.Example,
+		}
+	}
+
+	return &domain.OpenAIAssessVocabularyExerciseResult{
+		IsVocabularyCorrect:    result.IsVocabularyCorrect,
+		VocabularyIssue:        result.VocabularyIssue,
+		IsTenseCorrect:         result.IsTenseCorrect,
+		TenseIssue:             result.TenseIssue,
+		GrammarIssues:          grammarIssues,
+		ImprovementSuggestions: improvementSuggestions,
+	}, nil
+}

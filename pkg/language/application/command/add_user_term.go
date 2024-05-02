@@ -1,11 +1,8 @@
 package command
 
 import (
-	"time"
-
 	"github.com/namhq1989/bapbi-server/internal/utils/appcontext"
 	apperrors "github.com/namhq1989/bapbi-server/internal/utils/error"
-	"github.com/namhq1989/bapbi-server/internal/utils/manipulation"
 	"github.com/namhq1989/bapbi-server/pkg/language/domain"
 	"github.com/namhq1989/bapbi-server/pkg/language/dto"
 )
@@ -15,19 +12,38 @@ type AddUserTermHandler struct {
 	userTermRepository domain.UserTermRepository
 	queueRepository    domain.QueueRepository
 	userHub            domain.UserHub
+	languageService    domain.LanguageService
 }
 
-func NewAddUserTermHandler(termRepository domain.TermRepository, userTermRepository domain.UserTermRepository, queueRepository domain.QueueRepository, userHub domain.UserHub) AddUserTermHandler {
+func NewAddUserTermHandler(
+	termRepository domain.TermRepository,
+	userTermRepository domain.UserTermRepository,
+	queueRepository domain.QueueRepository,
+	userHub domain.UserHub,
+	languageService domain.LanguageService,
+) AddUserTermHandler {
 	return AddUserTermHandler{
 		termRepository:     termRepository,
 		userTermRepository: userTermRepository,
 		queueRepository:    queueRepository,
 		userHub:            userHub,
+		languageService:    languageService,
 	}
 }
 
 func (h AddUserTermHandler) AddUserTerm(ctx *appcontext.AppContext, performerID, termID string, _ dto.AddUserTermRequest) (*dto.AddUserTermResponse, error) {
 	ctx.Logger().Info("new add user term request", appcontext.Fields{"performer": performerID, "term": termID})
+
+	ctx.Logger().Text("check today actions limitation")
+	isExceeded, err := h.languageService.IsExceededAddTermLimitation(ctx, performerID)
+	if err != nil {
+		ctx.Logger().Error("failed to check today actions limitation", err, appcontext.Fields{})
+		return nil, err
+	}
+	if isExceeded {
+		ctx.Logger().Error("exceeded action limitation", nil, appcontext.Fields{})
+		return nil, apperrors.User.ExceededPlanLimitation
+	}
 
 	ctx.Logger().Text("find term in db")
 	term, err := h.termRepository.FindByID(ctx, termID)
@@ -51,29 +67,7 @@ func (h AddUserTermHandler) AddUserTerm(ctx *appcontext.AppContext, performerID,
 		return &dto.AddUserTermResponse{}, nil
 	}
 
-	ctx.Logger().Text("get user's subscription plan")
-	plan, err := h.userHub.GetUserPlan(ctx, performerID)
-	if err != nil {
-		ctx.Logger().Error("failed to get user's subscription plan", err, appcontext.Fields{})
-		return nil, err
-	}
-
-	ctx.Logger().Text("count total terms added today")
-	var (
-		start = manipulation.StartOfToday()
-		end   = time.Now()
-	)
-	totalAdded, err := h.userTermRepository.CountTotalTermAddedByTimeRange(ctx, performerID, start, end)
-	if err != nil {
-		ctx.Logger().Error("failed to count total terms added today", err, appcontext.Fields{})
-		return nil, err
-	}
-	if isExceeded := plan.IsExceededAddTermLimitation(totalAdded); isExceeded {
-		ctx.Logger().Error("exceeded add term limitation", nil, appcontext.Fields{"plan": plan.String(), "added": totalAdded})
-		return nil, apperrors.User.ExceededPlanLimitation
-	}
-
-	ctx.Logger().Info("still available to add term, create new user term", appcontext.Fields{"added": totalAdded})
+	ctx.Logger().Text("create new user term")
 	userTerm, err := domain.NewUserTerm(performerID, term.ID, term.Term)
 	if err != nil {
 		ctx.Logger().Error("failed to create new user term", err, appcontext.Fields{})
