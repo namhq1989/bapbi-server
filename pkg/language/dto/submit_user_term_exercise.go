@@ -35,7 +35,11 @@ type UserTermExerciseAssessment struct {
 	ImprovementSuggestions []UserTermExerciseAssessmentImprovementSuggestion `json:"improvementSuggestions"`
 }
 
-func (u UserTermExerciseAssessment) FromDomain(assessment domain.UserTermExerciseAssessment) UserTermExerciseAssessment {
+func (u UserTermExerciseAssessment) FromDomain(assessment *domain.UserTermExerciseAssessment) *UserTermExerciseAssessment {
+	if assessment == nil {
+		return nil
+	}
+
 	grammarIssues := make([]UserTermExerciseAssessmentGrammarIssue, len(assessment.GrammarIssues))
 	for i, issue := range assessment.GrammarIssues {
 		grammarIssues[i] = UserTermExerciseAssessmentGrammarIssue{
@@ -52,7 +56,7 @@ func (u UserTermExerciseAssessment) FromDomain(assessment domain.UserTermExercis
 		}
 	}
 
-	return UserTermExerciseAssessment{
+	return &UserTermExerciseAssessment{
 		IsVocabularyCorrect:    assessment.IsVocabularyCorrect,
 		VocabularyIssue:        assessment.VocabularyIssue,
 		IsTenseCorrect:         assessment.IsTenseCorrect,

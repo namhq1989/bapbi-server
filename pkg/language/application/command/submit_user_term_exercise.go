@@ -90,10 +90,10 @@ func (h SubmitUserTermExerciseHandler) SubmitUserTermExercise(ctx *appcontext.Ap
 		return nil, err
 	}
 
-	dtoAssessment := dto.UserTermExerciseAssessment{}.FromDomain(*exercise.Assessment)
+	dtoAssessment := dto.UserTermExerciseAssessment{}.FromDomain(exercise.Assessment)
 	return &dto.SubmitUserTermExerciseResponse{
 		Status:      exercise.Status.String(),
 		CompletedAt: httprespond.NewTimeResponse(exercise.CompletedAt),
-		Assessment:  dtoAssessment,
+		Assessment:  *dtoAssessment,
 	}, nil
 }

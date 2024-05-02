@@ -135,3 +135,46 @@ func (r UserTermExerciseRepository) IsExerciseCreated(ctx *appcontext.AppContext
 	})
 	return total > 0, err
 }
+
+func (r UserTermExerciseRepository) FindUserTermExercises(ctx *appcontext.AppContext, filter domain.UserTermExerciseFilter) ([]domain.UserTermExercise, error) {
+	uid, err := database.ObjectIDFromString(filter.UserID)
+	if err != nil {
+		return nil, apperrors.User.InvalidUserID
+	}
+
+	var (
+		condition = bson.M{"userId": uid, "language": filter.Language.String()}
+		result    = make([]domain.UserTermExercise, 0)
+	)
+
+	if !filter.Time.IsZero() {
+		condition["createdAt"] = bson.M{"$lt": filter.Time}
+	}
+	if filter.Status != "" {
+		condition["status"] = filter.Status
+	}
+
+	// find
+	cursor, err := r.collection().Find(ctx.Context(), condition, &options.FindOptions{
+		Sort: bson.M{"createdAt": -1},
+	}, &options.FindOptions{
+		Limit: &filter.Limit,
+	})
+	if err != nil {
+		return result, err
+	}
+	// parse
+	defer func() { _ = cursor.Close(ctx.Context()) }()
+
+	// parse
+	var docs []model.UserTermExercise
+	if err = cursor.All(ctx.Context(), &docs); err != nil {
+		return result, err
+	}
+
+	// map data
+	for _, doc := range docs {
+		result = append(result, doc.ToDomain())
+	}
+	return result, nil
+}
